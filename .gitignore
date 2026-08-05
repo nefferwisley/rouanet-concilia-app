@@ -1,0 +1,17 @@
+# Credenciais - NUNCA subir pro Git
+creds.json
+*.json.key
+.env
+.streamlit/secrets.toml
+
+# Ambiente virtual Python
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Sistema
+.DS_Store
