@@ -4916,17 +4916,21 @@ ${itemsXml}
           ? 'c5370549d8612ca909ea8e4fe9ede65029e4f7bef530272c9b375cc5aa41a9da' 
           : (matchedItem.fullHash || 'c5370549d8612ca909ea8e4fe9ede65029e4f7bef530272c9b375cc5aa41a9da');
 
-        const driveFolderUrl = 'https://drive.google.com/drive/folders/1ydDeUQQzcTRk6QhJY_QIow1SfaJyL0Mj';
+        const driveFolderUrl = (proj && proj.driveFolderUrl) ? proj.driveFolderUrl : 'https://drive.google.com/drive/folders/1ydDeUQQzcTRk6QhJY_QIow1SfaJyL0Mj';
         const targetPdfLink = (resolvedDocUrl && (resolvedDocUrl.startsWith('http://') || resolvedDocUrl.startsWith('https://'))) 
           ? resolvedDocUrl 
           : driveFolderUrl;
 
         // Extrai o ID do Drive para focar somente no recibo e remover barras laterais/pastas
-        let iframeSrc = "https://drive.google.com/embeddedfolderview?id=1ydDeUQQzcTRk6QhJY_QIow1SfaJyL0Mj#list";
-        const driveMatch = targetPdfLink.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-        if (driveMatch && driveMatch[1]) {
-          iframeSrc = `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
-        } else if (targetPdfLink && targetPdfLink !== driveFolderUrl) {
+        let iframeSrc = "https://drive.google.com/embeddedfolderview?id=1ydDeUQQzcTRk6QhJY_QIow1SfaJyL0Mj#list"; // fallback padrão
+        const fileMatch = targetPdfLink.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+        const folderMatch = targetPdfLink.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+        
+        if (fileMatch && fileMatch[1]) {
+          iframeSrc = `https://drive.google.com/file/d/${fileMatch[1]}/preview`;
+        } else if (folderMatch && folderMatch[1]) {
+          iframeSrc = `https://drive.google.com/embeddedfolderview?id=${folderMatch[1]}#list`;
+        } else if (targetPdfLink) {
           iframeSrc = targetPdfLink; // fallback para links normais não-drive
         }
 
