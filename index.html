@@ -1302,6 +1302,10 @@
             <svg class="svg-icon" style="width:16px; height:16px;" viewBox="0 0 24 24"><path d="M4 14.89 12 3l8 11.89M12 3v13M4 21h16"/></svg>
             Exportar Prestação SALIC (MinC)
           </button>
+          <button class="btn-export-salic" style="background:#dc2626;" onclick="apagarProjetoAtual()" title="Apagar o projeto atual e voltar para a tela inicial">
+            <svg class="svg-icon" style="width:16px; height:16px;" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Apagar Projeto
+          </button>
         </div>
       </div>
 
@@ -3316,6 +3320,37 @@
     };
 
     // 1 & 3. ISOLAMENTO ESTRITO DE PROJETOS POR ABAS NO TOPO
+    function apagarProjetoAtual() {
+      if (!currentProjectKey) return;
+      if (currentProjectKey === '1961') {
+        showToast('⚠️ O projeto de demonstração não pode ser apagado permanentemente. Apenas resets são permitidos.', 'warning');
+        return;
+      }
+      
+      const conf = confirm('⚠️ ATENÇÃO: Tem certeza que deseja apagar este projeto? Esta ação não pode ser desfeita e todos os lançamentos extraídos serão perdidos.');
+      if (conf) {
+        delete projectsData[currentProjectKey];
+        saveProjectsToLocalStorage();
+        
+        // Remove a aba do DOM
+        const tabEl = document.getElementById(`tab_${currentProjectKey}`);
+        if (tabEl) tabEl.remove();
+        
+        showToast('🗑️ Projeto apagado com sucesso.', 'success');
+        
+        // Volta para o primeiro projeto existente, ou 1961
+        const remainingKeys = Object.keys(projectsData);
+        if (remainingKeys.length > 0) {
+          switchProject(remainingKeys[0]);
+        } else {
+          initItems1961(true);
+          switchProject('1961');
+        }
+        
+        saveDatabaseToDrive(true);
+      }
+    }
+
     function switchProject(projectKey) {
       currentProjectKey = projectKey || '1961';
       currentPage = 1;
