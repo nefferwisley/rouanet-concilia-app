@@ -4006,80 +4006,120 @@ ${itemsXml}
         body: JSON.stringify({ folder_id: folderId, access_token: "mock_token" })
       })
       .then(res => {
-        if (!res.ok) throw new Error('Erro ao processar pasta no servidor OCR');
-        if (progressBar) progressBar.style.width = '70%';
-        if (progressPercent) progressPercent.innerText = '70%';
-        if (progressStatus) progressStatus.innerText = '📄 OCR concluído! Montando matriz de conciliação...';
+        if (!res.ok) throw new Error('Erro ao solicitar processamento na API OCR');
         return res.json();
       })
-      .then(responseJson => {
-        const payload = responseJson.data;
-        if (!payload) throw new Error('Payload vazio retornado pela API.');
-
-        // Etapa 3: 100%
-        if (progressBar) progressBar.style.width = '100%';
-        if (progressPercent) progressPercent.innerText = '100%';
-        if (progressStatus) progressStatus.innerText = '✨ Metadados extraídos! Instanciando espaço de trabalho...';
-
-        const shortId = folderId.substring(0, 8);
-        const timestampId = Date.now().toString().slice(-4);
-        const newKey = `drive_${shortId}_${timestampId}`;
-
-        const pronacEl = document.getElementById('newPronacNum');
-        const titleEl = document.getElementById('newProjectTitle');
-        const propEl = document.getElementById('newProponente');
-        const bancoEl = document.getElementById('newBanco');
-
-        if (pronacEl) pronacEl.value = payload.pronac || `PRONAC 20.7457 (${shortId})`;
-        if (titleEl) titleEl.value = payload.title || "Projeto Processado via OCR";
-        // Proponente/Banco mocks para simplificar caso a API não mande
-        if (propEl) propEl.value = "Circunstância Cinematográfica Ltda";
-        if (bancoEl) bancoEl.value = "Banco do Brasil Ag: 3210-9 C/C: 14.209-1";
-
-        // Instancia novo objeto de projeto no banco
-        projectsData[newKey] = {
-          key: newKey,
-          pronac: pronacEl.value,
-          title: titleEl.value,
-          proponente: propEl.value,
-          cnpj: "12.345.678/0001-90",
-          banco: bancoEl.value,
-          controllerName: "Controller: IA OCR",
-          driveFolderUrl: url,
-          folderPath: url.endsWith('/') ? url : (url + '/'),
-          currentFilter: 'ALL',
-          metrics: payload.metrics || {
-            total: "R$ 0,00", conciliados: "R$ 0,00", pendentes: "R$ 0,00", 
-            rawTotalCentavos: 0, rawConciliadosCentavos: 0, rawPendentesCentavos: 0, 
-            totalCount: 0, percent: "0%"
-          },
-          salicAlerts: payload.salicAlerts || [],
-          items: payload.items || []
-        };
-
-        // Injeta a nova aba no DOM e salva a persistencia no LocalStorage
-        injectProjectTabElementIntoDOM(newKey, projectsData[newKey]);
-        saveProjectsToLocalStorage();
-
-        // Carrega o projeto
-        currentProjectKey = newKey;
+      .then(initialResponse => {
+        if (initialResponse.data) {
+          // Retrocompatibilidade se a API responder síncrono
+          return handleFinalPayload(initialResponse.data);
+        }
         
-        setTimeout(() => {
-          if (progressBox) progressBox.style.display = 'none';
-          if (btn) btn.disabled = false;
+        if (!initialResponse.ticket_id) {
+          throw new Error('Payload inválido retornado pela API (sem ticket_id).');
+        }
+        
+        const ticketId = initialResponse.ticket_id;
+        if (progressStatus) progressStatus.innerText = '⏳ Fila: Aguardando servidor iniciar...';
+        
+        const pollInterval = setInterval(() => {
+          fetch(`${activeApiUrl}/api/v1/ticket-status/${ticketId}`)
+            .then(res => res.json())
+            .then(statusData => {
+               if (statusData.status === 'processing' || statusData.status === 'queued') {
+                 if (progressPercent) progressPercent.innerText = statusData.progress || '10%';
+                 if (progressBar) progressBar.style.width = statusData.progress || '10%';
+                 if (progressStatus) progressStatus.innerText = statusData.message || 'Processando lote OCR...';
+               } else if (statusData.status === 'completed') {
+                 clearInterval(pollInterval);
+                 handleFinalPayload(statusData.data);
+               } else if (statusData.status === 'failed') {
+                 clearInterval(pollInterval);
+                 throw new Error(statusData.message || 'Falha no processamento no servidor');
+               }
+            })
+            .catch(err => {
+               clearInterval(pollInterval);
+               console.error('Polling error:', err);
+               showToast('❌ Falha ao verificar status na API.', 'error');
+               if (progressBox) progressBox.style.display = 'none';
+               if (btn) btn.disabled = false;
+            });
+        }, 2500); // Polling a cada 2.5s
+        
+        function handleFinalPayload(payload) {
+          if (!payload) {
+            showToast('❌ Payload vazio retornado pela API.', 'error');
+            if (progressBox) progressBox.style.display = 'none';
+            if (btn) btn.disabled = false;
+            return;
+          }
+
+          // Etapa 3: 100%
+          if (progressBar) progressBar.style.width = '100%';
+          if (progressPercent) progressPercent.innerText = '100%';
+          if (progressStatus) progressStatus.innerText = '✨ Metadados extraídos! Instanciando espaço de trabalho...';
+
+          const shortId = folderId.substring(0, 8);
+          const timestampId = Date.now().toString().slice(-4);
+          const newKey = `drive_${shortId}_${timestampId}`;
+
+          const pronacEl = document.getElementById('newPronacNum');
+          const titleEl = document.getElementById('newProjectTitle');
+          const propEl = document.getElementById('newProponente');
+          const bancoEl = document.getElementById('newBanco');
+
+          if (pronacEl) pronacEl.value = payload.pronac || `PRONAC 20.7457 (${shortId})`;
+          if (titleEl) titleEl.value = payload.title || "Projeto Processado via OCR Assíncrono";
+          // Proponente/Banco mocks para simplificar caso a API não mande
+          if (propEl) propEl.value = "Circunstância Cinematográfica Ltda";
+          if (bancoEl) bancoEl.value = "Banco do Brasil Ag: 3210-9 C/C: 14.209-1";
+
+          // Instancia novo objeto de projeto no banco
+          projectsData[newKey] = {
+            key: newKey,
+            pronac: pronacEl.value,
+            title: titleEl.value,
+            proponente: propEl.value,
+            cnpj: "12.345.678/0001-90",
+            banco: bancoEl.value,
+            controllerName: "Controller: IA OCR RAG",
+            driveFolderUrl: url,
+            folderPath: url.endsWith('/') ? url : (url + '/'),
+            currentFilter: 'ALL',
+            metrics: payload.metrics || {
+              total: "R$ 0,00", conciliados: "R$ 0,00", pendentes: "R$ 0,00", 
+              rawTotalCentavos: 0, rawConciliadosCentavos: 0, rawPendentesCentavos: 0, 
+              totalCount: 0, percent: "0%"
+            },
+            salicAlerts: payload.salicAlerts || [],
+            items: payload.items || []
+          };
+
+          // Injeta a nova aba no DOM e salva a persistencia no LocalStorage
+          injectProjectTabElementIntoDOM(newKey, projectsData[newKey]);
+          saveProjectsToLocalStorage();
+
+          // Carrega o projeto
+          currentProjectKey = newKey;
           
-          closeNewProjectModal();
-          switchProject(newKey);
-          saveDatabaseToDrive(true);
+          setTimeout(() => {
+            if (progressBox) progressBox.style.display = 'none';
+            if (btn) btn.disabled = false;
+            
+            closeNewProjectModal();
+            switchProject(newKey);
+            saveDatabaseToDrive(true);
 
-          addAuditLogEntry('criacao_projeto_ocr', newKey, `Novo projeto processado por OCR a partir do Drive: ${url}`);
+            addAuditLogEntry('criacao_projeto_ocr', newKey, `Novo projeto processado por OCR Assíncrono a partir do Drive: ${url}`);
 
-          showToast(`🎉 SUCESSO! OCR extraiu e conciliou ${payload.items.length} lançamentos.`, 'success');
-        }, 800);
+            showToast(`🎉 SUCESSO! IA processou e conciliou ${payload.items.length} documentos.`, 'success');
+          }, 800);
+        }
       })
       .catch(err => {
         console.error(err);
-        showToast('❌ Falha ao processar pasta via OCR API. Verifique o console.', 'error');
+        showToast('❌ Falha ao iniciar processamento na API. Verifique o console.', 'error');
         if (progressBox) progressBox.style.display = 'none';
         if (btn) btn.disabled = false;
       });

@@ -1,0 +1,63 @@
+# ========================================
+# config_template.yaml — SaaS RouanetConcilia
+# Copie para config_<pronac>.yaml e preencha por projeto.
+# NÃO coloque credenciais de banco aqui — use --db-url na linha de comando
+# (CLI) ou DATABASE_URL no .env (API).
+# ========================================
+
+projeto:
+  pronac: "20.7453"
+  campos:                      # nomes das chaves no objeto do projeto dentro do JSON
+    pronac: "pronac"
+    nome: "nome"
+    proponente: "proponente"
+    controller: "controller"
+    banco: "banco"
+    resumo_pendencias: "resumo_pendencias"   # null se não existir no seu JSON
+
+banco_captador:
+  banco_nome: "Banco do Brasil"
+  agencia: "3210-9"
+  conta: "14.209-1"
+  saldo_inicial: 0.00
+
+mapeamento_lancamentos:
+  projeto_path: "projetos"           # chave na raiz com a lista de projetos; null se o JSON já é o projeto único
+  lancamentos_field: "lancamentos"   # chave (dentro do projeto, ou na raiz se projeto_path=null) com a lista de lançamentos
+  tipo_documento_default: null       # ex: "NFE" — se este import só tiver notas fiscais; null = detecta pelo nome do arquivo
+
+  campos_obrigatorios:
+    prestador: "prestador"
+    data_pagamento: "rawDate"
+    valor_liquido: "valor"
+    rubrica_salic: "rubrica"
+    descricao: "item"
+
+  campos_opcionais:
+    razao_social: "razao"            # se ausente, usa 'prestador' como fornecedor
+    cnpj_cpf: null
+    documento_ref: "docLink"
+    confianca_ocr: "confidence"      # aceita escala 0-1 OU 0-100 (normalizado automaticamente)
+    valor_nota_fiscal: null          # se diferente de valor_liquido (ex: retenção); senão despesas.valor = valor_liquido
+
+regras_validacao:
+  valor_minimo: 0.01
+  valor_maximo: 9999999.99
+  data_inicio_projeto: "2022-01-01"
+  data_fim_projeto: "2023-12-31"
+  rubrica_obrigatoria: true
+  validar_cnpj_cpf: true
+  confianca_minima: 0.85             # abaixo disso -> status REVISAO_PENDENTE + registro em campos_revisao
+  limiar_rag: 0.75                   # score mínimo de similaridade (1 - distância cosseno) pra aceitar match RAG
+
+rubricas_salic:
+  referencia_arquivo: null           # só CLI: ex "rubricas_1961.json" ({"codigo": valor_aprovado}). Via API, use "rubricas" inline.
+  rubricas:
+    "1.1.1": 30000.00
+    "1.5.1": 11000.00
+    "3.5.1": 1200.00
+
+importacao:
+  modo: "dry_run"                    # "dry_run" | "commit" (a flag --dry-run na CLI sempre tem prioridade)
+  verbose: true
+  parar_no_primeiro_erro: false
