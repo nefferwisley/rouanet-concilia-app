@@ -17,6 +17,7 @@ from starlette.concurrency import run_in_threadpool
 
 from backend.config import settings
 from backend.database import get_conn
+from motor.drive_service import baixar_arquivo, listar_arquivos
 from motor.importar import parse_tipo_doc
 from motor.ocr_service import extract_with_gemini
 
@@ -176,6 +177,69 @@ async def enviar_documentos_projeto(
 
     logger.info("Projeto %s: %d documento(s) registrado(s) por %s", projeto_id, len(resultados), user_id)
     return {"projeto_id": projeto_id, "documentos": resultados}
+
+
+@router.post("/projeto/{projeto_id}/sincronizar-drive")
+async def sincronizar_drive(projeto_id: str, dep=Depends(get_conn)):
+    """
+    Busca de verdade os arquivos da pasta do Drive linkada no projeto —
+    até aqui o link só ficava guardado (ver enviar_documentos_projeto).
+    Requer GOOGLE_DRIVE_CREDENTIALS_JSON configurada E a pasta do Drive
+    compartilhada com a service account (ver motor/drive_service.py).
+    Sem isso, falha com 503 — nunca finge sucesso.
+    """
+    conn, user_id = dep
+
+    link_row = await conn.fetchrow(
+        """
+        select id, arquivo_ref from documentos_projeto
+        where projeto_id = $1 and origem = 'google_drive' and nome_arquivo is null
+        order by created_at desc limit 1
+        """,
+        projeto_id,
+    )
+    if not link_row:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            "Nenhum link do Google Drive pendente de sincronização pra este projeto.",
+        )
+
+    arquivos_remotos = await run_in_threadpool(listar_arquivos, link_row["arquivo_ref"])
+    if arquivos_remotos is None:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "Leitura do Google Drive indisponível: configure GOOGLE_DRIVE_CREDENTIALS_JSON e "
+            "confirme que a pasta foi compartilhada com a service account (ver SETUP.md).",
+        )
+
+    pasta_projeto = UPLOAD_DIR / projeto_id
+    pasta_projeto.mkdir(parents=True, exist_ok=True)
+
+    registrados = []
+    for arq in arquivos_remotos:
+        conteudo = await run_in_threadpool(baixar_arquivo, arq["id"])
+        if conteudo is None:
+            logger.warning("Falha ao baixar '%s' (id=%s) do Drive — pulando.", arq.get("name"), arq["id"])
+            continue
+
+        destino = pasta_projeto / Path(arq["name"]).name
+        destino.write_bytes(conteudo)
+
+        row = await conn.fetchrow(
+            """
+            insert into documentos_projeto
+                (projeto_id, origem, nome_arquivo, arquivo_ref, tamanho_bytes, status, criado_por)
+            values ($1, 'google_drive', $2, $3, $4, 'pendente', $5)
+            returning id
+            """,
+            projeto_id, arq["name"], str(destino), len(conteudo), user_id,
+        )
+        registrados.append({"id": str(row["id"]), "nome_arquivo": arq["name"]})
+
+    await conn.execute("update documentos_projeto set status = 'processado' where id = $1", link_row["id"])
+
+    logger.info("Projeto %s: %d arquivo(s) sincronizado(s) do Drive por %s", projeto_id, len(registrados), user_id)
+    return {"projeto_id": projeto_id, "sincronizados": len(registrados), "documentos": registrados}
 
 
 @router.get("/projeto/{projeto_id}")

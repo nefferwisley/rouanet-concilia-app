@@ -66,7 +66,19 @@ GOOGLE_API_KEY=...        # necessária pra POST /api/v1/documentos/ocr funciona
                            # gerar grátis em https://aistudio.google.com/apikey (não pede cartão)
 UPLOAD_DIR=/app/uploads   # onde os arquivos de POST /api/v1/documentos/projeto/{id} são salvos
                            # — local/efêmero por padrão; trocar por Supabase Storage/S3 em produção
+GOOGLE_DRIVE_CREDENTIALS_JSON=...  # necessária pra POST .../sincronizar-drive funcionar (senão 503)
 ```
+
+**Setup do Google Drive (leitura automática da pasta linkada na criação do projeto):**
+
+Não é uma chave simples como a do Gemini — precisa de uma service account:
+1. [console.cloud.google.com](https://console.cloud.google.com) → criar/reusar um projeto
+2. Ativar a **Google Drive API** (APIs & Services → Library)
+3. IAM & Admin → Contas de serviço → Criar → gerar uma chave JSON
+4. **Compartilhar a pasta do Drive** com o e-mail da service account (tipo `nome@projeto.iam.gserviceaccount.com`), papel Leitor — sem isso, todo acesso falha com 403 mesmo com a credencial certa
+5. Colar o **conteúdo** do JSON (não o caminho do arquivo) em `GOOGLE_DRIVE_CREDENTIALS_JSON`
+
+Ver `motor/drive_service.py` pro código completo — já pronto, só falta a credencial.
 
 **Manter o Supabase free ativo (não pausar após 7 dias sem uso):**
 
@@ -75,6 +87,11 @@ UPLOAD_DIR=/app/uploads   # onde os arquivos de POST /api/v1/documentos/projeto/
 2. Settings → Secrets and variables → Actions → Variables → `BACKEND_URL` = URL do backend (sem `/` no final)
 
 Testa `/health/db` (que roda `select 1` de verdade — `/health` sozinho não toca o banco, não evita a pausa).
+
+**Deploy (configs prontas, inertes até você conectar):**
+
+- `render.yaml` — backend, free tier, usa o `backend/Dockerfile` que já existe
+- `netlify.toml` — frontend, free tier, build automático a partir de `frontend/`
 
 ```bash
 # Optional: seed dummy data

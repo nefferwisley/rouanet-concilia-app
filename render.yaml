@@ -1,0 +1,38 @@
+# Deploy do backend no Render (free tier) — usa o Dockerfile que já existe
+# em backend/Dockerfile, sem mudar nada nele.
+#
+# SETUP NECESSÁRIO (não faz nada até isso ser feito):
+#   1. render.com > New > Blueprint > conectar este repositório
+#   2. Preencher os 3 valores marcados "sync: false" abaixo no painel do
+#      Render (nunca commitados — são segredos)
+#   3. Depois do primeiro deploy, copiar a URL pública que o Render dá
+#      e usar em: frontend (VITE_API_URL/VITE_WS_URL) e no repo
+#      GitHub (variable BACKEND_URL, pro .github/workflows/keepalive.yml)
+#
+# Free tier do Render: o serviço "dorme" depois de 15min sem requisição
+# (cold start de 30-60s no próximo acesso) — o projeto já tem fallback de
+# WebSocket pra polling REST (ver ARCHITECTURE.md), então isso é tolerável.
+
+services:
+  - type: web
+    name: rouanetconcilia-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        sync: false   # connection string do Supabase (Project Settings > Database)
+      - key: SUPABASE_JWT_SECRET
+        sync: false   # Project Settings > API > JWT Secret
+      - key: GOOGLE_API_KEY
+        sync: false   # opcional — sem ela, /api/v1/documentos/ocr responde 503
+      - key: GOOGLE_DRIVE_CREDENTIALS_JSON
+        sync: false   # opcional — sem ela, /sincronizar-drive responde 503
+      - key: CORS_ORIGINS
+        value: "*"     # trocar pelo domínio real do frontend depois do primeiro deploy
+      - key: UPLOAD_DIR
+        value: /app/uploads
+      - key: PYTHONUNBUFFERED
+        value: "1"

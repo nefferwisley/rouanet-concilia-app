@@ -1,0 +1,23 @@
+# Deploy do frontend no Netlify (free tier, sem limite prático pra esse
+# tamanho de app).
+#
+# SETUP NECESSÁRIO (não faz nada até isso ser feito):
+#   1. netlify.com > Add new site > Import from Git > este repositório
+#   2. Site settings > Environment variables:
+#        VITE_API_URL = https://seu-backend.onrender.com
+#        VITE_WS_URL  = wss://seu-backend.onrender.com
+#      (preencher DEPOIS que o backend estiver deployado no Render)
+
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "frontend/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA: qualquer rota cai no index.html, o React Router decide o resto.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

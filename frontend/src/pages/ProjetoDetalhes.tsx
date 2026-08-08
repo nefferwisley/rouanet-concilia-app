@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { ImportarModal } from "./ImportarModal";
 import { EditProjectModal } from "../components/EditProjectModal";
 import { DeleteProjectButton } from "../components/DeleteProjectButton";
+import { DocumentosProjeto } from "../components/DocumentosProjeto";
 import { useAPI } from "../hooks/useAPI";
 import { Projeto } from "../types";
 
@@ -52,6 +53,8 @@ export function ProjetoDetalhes() {
           + Nova Importação
         </button>
       </div>
+
+      <DocumentosProjeto projetoId={projeto.id} />
 
       {mostrarImportar && (
         <ImportarModal projetos={[projeto]} onClose={() => setMostrarImportar(false)} />
