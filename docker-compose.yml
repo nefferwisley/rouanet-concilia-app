@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  # PostgreSQL database with pgvector extension
+  # PostgreSQL database
   postgres:
-    image: pgvector/pgvector:pg16-latest
+    image: postgres:16-alpine
     container_name: rouanet_db
     environment:
       POSTGRES_USER: rouanet
@@ -13,7 +13,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./db/migrations:/docker-entrypoint-initdb.d
+      # Migrations serão rodadas manualmente pra evitar erros de inicialização
+      # - ./db/migrations:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rouanet"]
       interval: 10s
@@ -25,8 +26,8 @@ services:
   # FastAPI backend
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: rouanet_backend
     environment:
       DATABASE_URL: postgresql://rouanet:rouanet_dev_password@postgres:5432/rouanet_concilia

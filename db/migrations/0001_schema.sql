@@ -6,7 +6,8 @@
 -- ============================================================
 
 -- 0. EXTENSÕES
-create extension if not exists vector   with schema extensions;
+-- pgvector será instalado na Fase 4 (RAG/embeddings) com uma imagem custom
+-- create extension if not exists vector   with schema extensions;
 create extension if not exists pgcrypto with schema extensions;
 
 -- 1. ENUMS
@@ -89,7 +90,7 @@ create table rubricas (
   descricao          text not null,
   descricao_completa text,
   valor_orcado       numeric(15,2),
-  embedding          vector(768),
+  -- embedding          vector(768),  -- Fase 4 (RAG): instalar pgvector + migrate com ALTER TABLE
   created_at         timestamptz not null default now(),
   updated_at         timestamptz not null default now(),
   unique (projeto_id, codigo)
