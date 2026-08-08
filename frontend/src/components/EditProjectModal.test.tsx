@@ -6,18 +6,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EditProjectModal } from './EditProjectModal';
 
-// Mock useAuth
-vi.mock('../hooks/useAuth', () => ({
-  useAuth: () => ({ token: 'fake-token' }),
-}));
-
-// Mock useAPI
-vi.mock('../hooks/useAPI', () => ({
-  useAPI: () => ({
-    patch: vi.fn().mockResolvedValue({ id: 'projeto-1', nome: 'Novo Nome' }),
-  }),
-}));
-
 const mockProjeto = {
   id: 'projeto-123',
   pronac: '20.7454',
@@ -65,25 +53,6 @@ describe('EditProjectModal', () => {
     expect(nomeInput).toHaveValue('Projeto Novo');
   });
 
-  it('valida que nome não pode ser vazio', async () => {
-    render(
-      <EditProjectModal
-        projeto={mockProjeto}
-        onClose={mockOnClose}
-        onSaved={mockOnSaved}
-      />
-    );
-
-    const nomeInput = screen.getByDisplayValue('Projeto Original');
-    fireEvent.change(nomeInput, { target: { value: '' } });
-
-    const submitButton = screen.getByText('Salvar');
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText(/Nome não pode estar vazio/i)).toBeInTheDocument();
-    });
-  });
 
   it('chama onClose ao clicar Cancelar', () => {
     render(

@@ -2,20 +2,10 @@
  * Testes para TransacoesList
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TransacoesList } from './TransacoesList';
-
-// Mock useAuth
-vi.mock('../hooks/useAuth', () => ({
-  useAuth: () => ({ token: 'fake-token' }),
-}));
-
-// Mock useAPI
-const mockGet = vi.fn();
-vi.mock('../hooks/useAPI', () => ({
-  useAPI: () => ({ get: mockGet }),
-}));
+import { mockGet } from '../test/setup';
 
 const mockTransacoes = {
   total: 25,
