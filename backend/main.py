@@ -52,3 +52,17 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 @app.get("/health")
 def health():
     return {"status": "ok", "version": "1.0"}
+
+
+@app.get("/health/db")
+async def health_db():
+    """
+    Diferente de /health: essa aqui roda uma query de verdade contra o
+    banco. Existe pro ping semanal de manter o projeto Supabase free
+    ativo (pausa sozinho após 7 dias sem nenhuma consulta) — pingar só
+    /health não conta, porque não toca o banco.
+    """
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.fetchval("select 1")
+    return {"status": "ok", "db": "reachable"}

@@ -63,9 +63,18 @@ psql postgresql://rouanet:rouanet_dev_password@localhost:5432/rouanet_concilia <
 ```env
 # backend/.env
 GOOGLE_API_KEY=...        # necessária pra POST /api/v1/documentos/ocr funcionar (senão retorna 503)
+                           # gerar grátis em https://aistudio.google.com/apikey (não pede cartão)
 UPLOAD_DIR=/app/uploads   # onde os arquivos de POST /api/v1/documentos/projeto/{id} são salvos
                            # — local/efêmero por padrão; trocar por Supabase Storage/S3 em produção
 ```
+
+**Manter o Supabase free ativo (não pausar após 7 dias sem uso):**
+
+`.github/workflows/keepalive.yml` já existe, roda toda segunda-feira, mas só faz algo depois de:
+1. Backend deployado em algum lugar acessível por URL pública
+2. Settings → Secrets and variables → Actions → Variables → `BACKEND_URL` = URL do backend (sem `/` no final)
+
+Testa `/health/db` (que roda `select 1` de verdade — `/health` sozinho não toca o banco, não evita a pausa).
 
 ```bash
 # Optional: seed dummy data

@@ -1,0 +1,43 @@
+# Mantém o projeto Supabase free ativo — ele pausa sozinho depois de 7
+# dias sem NENHUMA consulta ao banco. Roda uma vez por semana, batendo
+# em /health/db (que roda "select 1" de verdade — /health sozinho não
+# conta, não toca o banco).
+#
+# SETUP NECESSÁRIO (não faz nada até isso ser feito):
+#   1. Deploy do backend em algum lugar (Render, Fly.io, etc — ver
+#      SETUP.md e o dashboard de status pra decisão de hospedagem).
+#   2. Settings > Secrets and variables > Actions > New repository
+#      variable: BACKEND_URL = https://seu-backend.onrender.com
+#      (sem barra no final, sem /health/db — só a origem)
+#
+# Pra testar manualmente sem esperar a semana: aba Actions > Keepalive
+# Supabase > Run workflow.
+
+name: Keepalive Supabase
+
+on:
+  schedule:
+    - cron: "0 12 * * 1"  # toda segunda, 12:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verificar se BACKEND_URL está configurada
+        run: |
+          if [ -z "${{ vars.BACKEND_URL }}" ]; then
+            echo "::warning::BACKEND_URL não configurada (Settings > Secrets and variables > Actions > Variables). Pulando ping — configure antes do Supabase pausar."
+            exit 0
+          fi
+
+      - name: Ping /health/db
+        if: vars.BACKEND_URL != ''
+        run: |
+          resposta=$(curl -sf -w "\n%{http_code}" "${{ vars.BACKEND_URL }}/health/db")
+          echo "$resposta"
+          codigo=$(echo "$resposta" | tail -n1)
+          if [ "$codigo" != "200" ]; then
+            echo "::error::Ping falhou com HTTP $codigo — Supabase pode estar pausado ou o backend fora do ar."
+            exit 1
+          fi

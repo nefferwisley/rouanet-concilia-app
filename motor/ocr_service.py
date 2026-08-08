@@ -15,10 +15,21 @@ Documentado assim de propósito pra não ser lido como mais rigoroso do que é.
 import base64
 import json
 import logging
+import time
 
 import google.generativeai as genai
 
 log = logging.getLogger("motor.ocr_service")
+
+MAX_TENTATIVAS = 3
+BACKOFF_BASE_S = 2  # 2s, 4s, 8s entre tentativas
+
+_MARCADORES_RATE_LIMIT = ("429", "quota", "rate limit", "resourceexhausted")
+
+
+def _e_rate_limit(erro: Exception) -> bool:
+    texto = str(erro).lower()
+    return any(marcador in texto for marcador in _MARCADORES_RATE_LIMIT)
 
 CAMPOS_ESSENCIAIS = [
     "CNPJ_CPF", "Razao_Social", "Data_Emissao", "Valor_Total",
@@ -100,17 +111,30 @@ def extract_with_gemini(bytes_data: bytes, mime_type: str, api_key: str):
         log.warning("GOOGLE_API_KEY ausente — extração OCR abortada.")
         return None
 
-    try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content([
-            {"mime_type": mime_type, "data": base64.b64encode(bytes_data).decode("utf-8")},
-            PROMPT_EXTRACAO,
-        ])
-        texto = response.text.replace("```json", "").replace("```", "").strip()
-        dados = json.loads(texto)
-    except Exception as e:
-        log.warning("Extração OCR via Gemini falhou: %s", e)
-        return None
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    payload = [
+        {"mime_type": mime_type, "data": base64.b64encode(bytes_data).decode("utf-8")},
+        PROMPT_EXTRACAO,
+    ]
+
+    dados = None
+    for tentativa in range(1, MAX_TENTATIVAS + 1):
+        try:
+            response = model.generate_content(payload)
+            texto = response.text.replace("```json", "").replace("```", "").strip()
+            dados = json.loads(texto)
+            break
+        except Exception as e:
+            if _e_rate_limit(e) and tentativa < MAX_TENTATIVAS:
+                espera = BACKOFF_BASE_S * (2 ** (tentativa - 1))
+                log.warning(
+                    "Rate limit do Gemini (tentativa %d/%d) — aguardando %ds: %s",
+                    tentativa, MAX_TENTATIVAS, espera, e,
+                )
+                time.sleep(espera)
+                continue
+            log.warning("Extração OCR via Gemini falhou (tentativa %d/%d): %s", tentativa, MAX_TENTATIVAS, e)
+            return None
 
     confianca, motivos = _calcular_confianca(dados)
     dados["confianca_ocr"] = confianca

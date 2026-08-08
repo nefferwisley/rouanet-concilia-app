@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from starlette.concurrency import run_in_threadpool
 
 from backend.config import settings
 from backend.database import get_conn
@@ -55,7 +56,10 @@ async def extrair_documento(
         )
 
     mime_type = arquivo.content_type or "application/pdf"
-    dados = extract_with_gemini(conteudo, mime_type, api_key)
+    # extract_with_gemini é síncrona e agora pode dormir (retry com backoff
+    # em rate limit) — sem threadpool, isso trava o event loop inteiro da
+    # API pra todo mundo enquanto espera o Gemini.
+    dados = await run_in_threadpool(extract_with_gemini, conteudo, mime_type, api_key)
     if dados is None:
         raise HTTPException(
             status.HTTP_502_BAD_GATEWAY,
