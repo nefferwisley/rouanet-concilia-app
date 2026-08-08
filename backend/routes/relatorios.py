@@ -1,11 +1,14 @@
 import csv
 import io
 import json
+import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import JSONResponse, PlainTextResponse, StreamingResponse
 
-from database import get_conn
+from backend.database import get_conn
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/relatorios", tags=["relatorios"])
 
@@ -62,3 +65,78 @@ async def obter_relatorio(importacao_id: str, format: str = Query("json"), dep=D
         )
 
     raise HTTPException(400, "format deve ser json|csv|markdown (pdf não implementado nesta versão).")
+
+
+@router.delete("/{importacao_id}", status_code=204)
+async def delete_relatorio(importacao_id: str, dep=Depends(get_conn)):
+    """Deleta relatório de uma importação."""
+    conn, user_id = dep
+    try:
+        result = await conn.fetchval(
+            "SELECT id FROM importacoes WHERE id = $1",
+            importacao_id
+        )
+
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Relatório não encontrado"
+            )
+
+        # Limpar relatório (não deleta importação, só o relatório)
+        await conn.execute(
+            "UPDATE importacoes SET relatorio = NULL WHERE id = $1",
+            importacao_id
+        )
+
+        logger.info(f"Relatório {importacao_id} deletado por {user_id}")
+        return None
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao deletar relatório {importacao_id}: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro ao deletar relatório"
+        )
+
+
+@router.patch("/{importacao_id}", status_code=200)
+async def atualizar_relatorio(importacao_id: str, relatorio: dict | None = None, dep=Depends(get_conn)):
+    """Atualiza relatório de uma importação."""
+    conn, user_id = dep
+    try:
+        importacao = await conn.fetchrow(
+            "SELECT * FROM importacoes WHERE id = $1",
+            importacao_id
+        )
+
+        if not importacao:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Relatório não encontrado"
+            )
+
+        if relatorio:
+            await conn.execute(
+                "UPDATE importacoes SET relatorio = $1 WHERE id = $2",
+                json.dumps(relatorio), importacao_id
+            )
+
+        logger.info(f"Relatório {importacao_id} atualizado por {user_id}")
+
+        return {
+            "importacao_id": str(importacao["id"]),
+            "status": importacao["status"],
+            "relatorio_atualizado": relatorio is not None
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao atualizar relatório {importacao_id}: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro ao atualizar relatório"
+        )
