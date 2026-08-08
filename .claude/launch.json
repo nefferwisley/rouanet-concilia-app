@@ -1,0 +1,35 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "RouanetConcilia Local Stack",
+      "runtimeExecutable": "docker-compose",
+      "runtimeArgs": ["up", "-d"],
+      "port": 5173,
+      "url": "http://localhost:5173",
+      "description": "Start PostgreSQL + FastAPI Backend + React Frontend (docker-compose)"
+    },
+    {
+      "name": "Backend Only",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "uvicorn", "backend.main:app", "--reload", "--port", "8000"],
+      "port": 8000,
+      "url": "http://localhost:8000/health",
+      "description": "FastAPI backend (requires DATABASE_URL env var + Postgres running)"
+    },
+    {
+      "name": "Frontend Only",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "frontend"],
+      "port": 5173,
+      "url": "http://localhost:5173",
+      "description": "React Vite dev server (requires backend at http://localhost:8000)"
+    },
+    {
+      "name": "Motor CLI",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "motor.importar", "--help"],
+      "description": "Display motor import CLI help (use for one-off imports)"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database with pgvector extension
+  postgres:
+    image: pgvector/pgvector:pg16-latest
+    container_name: rouanet_db
+    environment:
+      POSTGRES_USER: rouanet
+      POSTGRES_PASSWORD: rouanet_dev_password
+      POSTGRES_DB: rouanet_concilia
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rouanet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rouanet_network
+
+  # FastAPI backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rouanet_backend
+    environment:
+      DATABASE_URL: postgresql://rouanet:rouanet_dev_password@postgres:5432/rouanet_concilia
+      SUPABASE_JWT_SECRET: "dev-secret-key-min-32-chars-long-!!!"
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      CORS_ORIGINS: "http://localhost:5173,http://localhost:3000"
+      PYTHONUNBUFFERED: 1
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app/backend
+      - ./motor:/app/motor
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - rouanet_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # React frontend (dev server via Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: rouanet_frontend
+    environment:
+      VITE_API_URL: http://localhost:8000
+      VITE_WS_URL: ws://localhost:8000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    command: npm run dev
+    networks:
+      - rouanet_network
+
+volumes:
+  postgres_data:
+
+networks:
+  rouanet_network:
+    driver: bridge
