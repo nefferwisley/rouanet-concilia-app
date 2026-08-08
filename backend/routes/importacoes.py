@@ -1,10 +1,13 @@
 import json
+import logging
 
 import yaml
-from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile, status
 
-from database import get_conn
-from services.importacao import executar_importacao_bg
+from backend.database import get_conn
+from backend.services.importacao import executar_importacao_bg
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/importacoes", tags=["importacoes"])
 
@@ -83,3 +86,84 @@ async def status_importacao(importacao_id: str, dep=Depends(get_conn)):
         "mensagem": row["mensagem"],
         "erro_fatal": row["erro_fatal"],
     }
+
+
+@router.delete("/{importacao_id}", status_code=204)
+async def delete_importacao(importacao_id: str, dep=Depends(get_conn)):
+    """Deleta uma importação existente."""
+    conn, user_id = dep
+    try:
+        result = await conn.fetchval(
+            "SELECT id FROM importacoes WHERE id = $1",
+            importacao_id
+        )
+
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Importação não encontrada"
+            )
+
+        await conn.execute(
+            "DELETE FROM importacoes WHERE id = $1",
+            importacao_id
+        )
+
+        logger.info(f"Importação {importacao_id} deletada por {user_id}")
+        return None
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao deletar importação {importacao_id}: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro ao deletar importação"
+        )
+
+
+@router.patch("/{importacao_id}", status_code=200)
+async def update_importacao(importacao_id: str, modo: str | None = None, dep=Depends(get_conn)):
+    """Atualiza modo de uma importação (dry_run ou commit)."""
+    conn, user_id = dep
+    try:
+        if modo and modo not in ("dry_run", "commit"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="modo deve ser 'dry_run' ou 'commit'"
+            )
+
+        importacao = await conn.fetchrow(
+            "SELECT * FROM importacoes WHERE id = $1",
+            importacao_id
+        )
+
+        if not importacao:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Importação não encontrada"
+            )
+
+        if modo:
+            await conn.execute(
+                "UPDATE importacoes SET modo = $1 WHERE id = $2",
+                modo, importacao_id
+            )
+
+        logger.info(f"Importação {importacao_id} atualizada por {user_id}")
+
+        return {
+            "importacao_id": str(importacao["id"]),
+            "projeto_id": str(importacao["projeto_id"]),
+            "status": importacao["status"],
+            "modo": modo or importacao["modo"],
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao atualizar importação {importacao_id}: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro ao atualizar importação"
+        )
