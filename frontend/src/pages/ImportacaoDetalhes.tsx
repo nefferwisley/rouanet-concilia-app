@@ -1,79 +1,139 @@
-import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+/**
+ * RouanetConcilia — ImportacaoDetalhes Page
+ * Mostra status da importação em tempo real
+ */
 
-import { ProgressBar } from "../components/ProgressBar";
-import { StatusBadge } from "../components/StatusBadge";
-import { useAPI } from "../hooks/useAPI";
-import { useImportacaoWebSocket } from "../hooks/useWebSocket";
-import { ImportacaoStatus, WsEvento } from "../types";
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import { useAPI } from '../hooks/useAPI';
+import { ProjectStatusBadge } from '../components/ProjectStatusBadge';
+
+interface ImportacaoStatus {
+  importacao_id: string;
+  projeto_id: string;
+  status: string;
+  progresso: number;
+  linhas_processadas: number;
+  linhas_total?: number;
+  linhas_ok: number;
+  linhas_erro: number;
+  linhas_alerta: number;
+  mensagem?: string;
+}
 
 export function ImportacaoDetalhes() {
   const { id } = useParams<{ id: string }>();
-  const api = useAPI();
-  const navigate = useNavigate();
-  const [status, setStatus] = useState<ImportacaoStatus | null>(null);
+  const { token } = useAuth();
+  const { get } = useAPI(token);
 
-  const carregar = useCallback(async () => {
-    if (!id) return;
+  const [status, setStatus] = useState<ImportacaoStatus | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
+
+  const carregarStatus = async () => {
     try {
-      const data = await api.get<ImportacaoStatus>(`/api/v1/importacoes/${id}`);
+      if (!id) return;
+      const data = await get<ImportacaoStatus>(`/api/v1/importacoes/${id}`);
       setStatus(data);
-    } catch {
-      /* WS vai tentar de novo; erro pontual de polling não é fatal */
+      setErro(null);
+    } catch (err: any) {
+      setErro(err.message || 'Erro ao carregar status');
+    } finally {
+      setLoading(false);
     }
-  }, [api, id]);
+  };
 
   useEffect(() => {
-    carregar();
-  }, [carregar]);
+    carregarStatus();
+    // Poll a cada 2 segundos enquanto em progresso
+    const interval = setInterval(() => {
+      if (status?.status === 'iniciando' || status?.status === 'em_progresso') {
+        carregarStatus();
+      }
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [id, status?.status]);
 
-  // WebSocket dá o tempo real; ao "finalizado" recarregamos via REST pra
-  // pegar os campos que o WS não manda (ex: erro_fatal).
-  useImportacaoWebSocket(id ?? null, (ev: WsEvento) => {
-    setStatus((prev) =>
-      prev
-        ? {
-            ...prev,
-            status: (ev.status as ImportacaoStatus["status"]) ?? prev.status,
-            progresso: ev.progresso_pct ?? prev.progresso,
-            linhas_processadas: ev.linhas_processadas ?? prev.linhas_processadas,
-            linhas_total: ev.linhas_total ?? prev.linhas_total,
-            linhas_ok: ev.linhas_ok ?? prev.linhas_ok,
-            linhas_erro: ev.linhas_erro ?? prev.linhas_erro,
-            linhas_alerta: ev.linhas_alerta ?? prev.linhas_alerta,
-            mensagem: ev.mensagem ?? prev.mensagem,
-          }
-        : prev,
-    );
-    if (ev.tipo === "finalizado") carregar();
-  });
+  if (loading) {
+    return <div className="max-w-3xl mx-auto p-6">⏳ Carregando...</div>;
+  }
 
-  if (!status) return <div className="max-w-3xl mx-auto p-6">Carregando...</div>;
+  if (erro) {
+    return <div className="max-w-3xl mx-auto p-6 text-red-600">❌ {erro}</div>;
+  }
+
+  if (!status) {
+    return <div className="max-w-3xl mx-auto p-6">Importação não encontrada</div>;
+  }
+
+  const total = status.linhas_total || 100;
+  const pctOk = Math.round((status.linhas_ok / total) * 100);
+  const pctErro = Math.round((status.linhas_erro / total) * 100);
+  const pctAlerta = Math.round((status.linhas_alerta / total) * 100);
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-4">
-      <div className="card space-y-3">
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-bold">Importação #{status.importacao_id.slice(0, 8)}</h2>
-          <StatusBadge status={status.status} />
+    <div className="max-w-3xl mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="card">
+        <div className="flex justify-between items-start">
+          <div>
+            <h2 className="text-lg font-bold">Importação {status.importacao_id.slice(0, 8)}</h2>
+            <p className="text-sm text-gray-600">Projeto: {status.projeto_id.slice(0, 8)}</p>
+          </div>
+          <ProjectStatusBadge status={status.status as any} />
         </div>
+      </div>
 
-        <ProgressBar pct={status.progresso} label={`${status.linhas_processadas}/${status.linhas_total ?? "?"} lançamentos`} />
-
-        <div className="grid grid-cols-3 gap-2 text-sm pt-2">
-          <div className="text-emerald-600 dark:text-emerald-400">✅ OK: {status.linhas_ok}</div>
-          <div className="text-red-600 dark:text-red-400">❌ ERRO: {status.linhas_erro}</div>
-          <div className="text-amber-500">⚠️ ALERTA: {status.linhas_alerta}</div>
+      {/* Progresso */}
+      <div className="card space-y-2">
+        <div className="flex justify-between">
+          <span className="font-semibold">Progresso</span>
+          <span className="text-sm text-gray-600">{status.progresso}%</span>
         </div>
+        <div className="w-full bg-gray-200 rounded-full h-3">
+          <div
+            className="bg-blue-600 h-3 rounded-full transition-all"
+            style={{ width: `${status.progresso}%` }}
+          />
+        </div>
+        <div className="text-xs text-gray-600">
+          {status.linhas_processadas} de {status.linhas_total || '?'} linhas processadas
+        </div>
+      </div>
 
-        {status.mensagem && <p className="text-sm text-slate-500">{status.mensagem}</p>}
-        {status.erro_fatal && <p className="text-sm text-red-600">Erro fatal: {status.erro_fatal}</p>}
+      {/* Estatísticas */}
+      <div className="grid grid-cols-4 gap-4">
+        <div className="card text-center">
+          <div className="text-2xl font-bold text-green-600">{status.linhas_ok}</div>
+          <div className="text-xs text-gray-600">OK ({pctOk}%)</div>
+        </div>
+        <div className="card text-center">
+          <div className="text-2xl font-bold text-red-600">{status.linhas_erro}</div>
+          <div className="text-xs text-gray-600">Erro ({pctErro}%)</div>
+        </div>
+        <div className="card text-center">
+          <div className="text-2xl font-bold text-yellow-600">{status.linhas_alerta}</div>
+          <div className="text-xs text-gray-600">Alerta ({pctAlerta}%)</div>
+        </div>
+        <div className="card text-center">
+          <div className="text-2xl font-bold text-gray-600">{status.linhas_total}</div>
+          <div className="text-xs text-gray-600">Total</div>
+        </div>
+      </div>
 
-        {(status.status === "sucesso" || status.status === "erro") && (
-          <button className="btn-primary" onClick={() => navigate(`/relatorio/${status.importacao_id}`)}>
-            Ver relatório
-          </button>
-        )}
+      {/* Mensagem */}
+      {status.mensagem && (
+        <div className="card bg-blue-50 text-blue-700 text-sm p-4 rounded">
+          ℹ️ {status.mensagem}
+        </div>
+      )}
+
+      {/* Download Relatório */}
+      <div className="card">
+        <button className="btn-primary w-full">
+          📥 Download Relatório (JSON)
+        </button>
       </div>
     </div>
   );
