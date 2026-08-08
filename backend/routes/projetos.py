@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+import logging
+from fastapi import APIRouter, Depends, HTTPException, status
 
-from database import get_conn
-from models import ProjetoCreate, ProjetoOut
+from backend.database import get_conn
+from backend.models import ProjetoCreate, ProjetoOut, ProjetoUpdate
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/projetos", tags=["projetos"])
 
 
@@ -98,3 +100,136 @@ async def obter_projeto(projeto_id: str, dep=Depends(get_conn)):
     if not row:
         raise HTTPException(404, "Projeto não encontrado (ou sem permissão).")
     return dict(row)
+
+
+# ============================================================
+# DELETE /api/v1/projetos/{id}
+# ============================================================
+@router.delete("/{projeto_id}", status_code=204)
+async def delete_projeto(projeto_id: str, dep=Depends(get_conn)):
+    """
+    Deleta um projeto existente.
+
+    - Valida JWT via get_conn() dependency (injeta role, jwt.claims)
+    - RLS policy garante que user só acessa projetos onde é membro
+    - Retorna 204 No Content se sucesso
+    - Retorna 404 se projeto não existe
+    - Retorna 403 se sem permissão (automático via RLS)
+    """
+    conn, user_id = dep
+    try:
+        # Verificar se projeto existe
+        result = await conn.fetchval(
+            "SELECT id FROM projetos WHERE id = $1",
+            projeto_id
+        )
+
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Projeto não encontrado"
+            )
+
+        # Deletar projeto (cascata deleta membros, transações, documentos, etc)
+        await conn.execute(
+            "DELETE FROM projetos WHERE id = $1",
+            projeto_id
+        )
+
+        logger.info(f"Projeto {projeto_id} deletado pelo user {user_id}")
+        return None
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            f"Erro ao deletar projeto {projeto_id}: {str(e)}",
+            exc_info=True
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro ao deletar projeto"
+        )
+
+
+# ============================================================
+# PATCH /api/v1/projetos/{id}
+# ============================================================
+@router.patch("/{projeto_id}", response_model=ProjetoOut)
+async def update_projeto(
+    projeto_id: str,
+    update_data: ProjetoUpdate,
+    dep=Depends(get_conn)
+):
+    """
+    Atualiza um projeto existente (nome, proponente, banco, etc).
+
+    - Valida JWT via get_conn()
+    - RLS policy garante acesso
+    - Retorna 404 se projeto não existe
+    - Retorna 403 se sem permissão
+    - Retorna 200 com projeto atualizado
+    """
+    conn, user_id = dep
+    try:
+        # Verificar acesso
+        exists = await conn.fetchval(
+            "SELECT id FROM projetos WHERE id = $1",
+            projeto_id
+        )
+
+        if not exists:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Projeto não encontrado"
+            )
+
+        # Construir SET clause dinamicamente
+        update_fields = {}
+        if update_data.nome is not None:
+            update_fields['nome'] = update_data.nome
+        if update_data.proponente is not None:
+            update_fields['proponente'] = update_data.proponente
+        if update_data.controller is not None:
+            update_fields['controller'] = update_data.controller
+        if update_data.banco is not None:
+            update_fields['banco'] = update_data.banco
+
+        if not update_fields:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Nenhum campo válido pra atualizar"
+            )
+
+        # Update com SET dinamicamente construído
+        set_clause = ", ".join([f"{k} = ${i+1}" for i, k in enumerate(update_fields.keys())])
+        query = f"UPDATE projetos SET {set_clause}, updated_at = NOW() WHERE id = ${len(update_fields)+1} RETURNING *"
+
+        projeto = await conn.fetchrow(
+            query,
+            *update_fields.values(),
+            projeto_id
+        )
+
+        logger.info(f"Projeto {projeto_id} atualizado pelo user {user_id}")
+
+        return ProjetoOut(
+            id=str(projeto["id"]),
+            pronac=projeto["pronac"],
+            nome=projeto["nome"],
+            proponente=projeto["proponente"],
+            banco=projeto["banco"],
+            criado_em=projeto["created_at"]
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            f"Erro ao atualizar projeto {projeto_id}: {str(e)}",
+            exc_info=True
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro ao atualizar projeto"
+        )
