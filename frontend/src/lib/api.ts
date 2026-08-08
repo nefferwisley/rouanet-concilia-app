@@ -14,16 +14,31 @@ function headers(token: string | null, extra: Record<string, string> = {}) {
   return h;
 }
 
+function formatarDetail(detail: unknown, fallback: string): string {
+  if (typeof detail === "string") return detail;
+  // Erro de validação automático do FastAPI: detail vem como lista de
+  // {loc, msg, type} em vez de string — sem isso, o Error acaba com
+  // "[object Object]" na mensagem (Error() coage o valor pra string).
+  if (Array.isArray(detail)) {
+    const msgs = detail.map((d) => (d && typeof d === "object" && "msg" in d ? String(d.msg) : String(d)));
+    return msgs.join("; ") || fallback;
+  }
+  if (detail && typeof detail === "object") {
+    return JSON.stringify(detail);
+  }
+  return fallback;
+}
+
 async function tratar<T>(resp: Response): Promise<T> {
   if (!resp.ok) {
-    let detail = resp.statusText;
+    let detail: unknown = resp.statusText;
     try {
       const body = await resp.json();
       detail = body.detail ?? detail;
     } catch {
       /* corpo não era JSON */
     }
-    throw new ApiError(resp.status, detail);
+    throw new ApiError(resp.status, formatarDetail(detail, resp.statusText));
   }
   return resp.json() as Promise<T>;
 }
