@@ -4,7 +4,6 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
 import { useAPI } from '../hooks/useAPI';
 import { ProjectStatusBadge } from './ProjectStatusBadge';
 
@@ -27,8 +26,7 @@ interface TransacoesListProps {
 }
 
 export const TransacoesList: React.FC<TransacoesListProps> = ({ projeto_id }) => {
-  const { token } = useAuth();
-  const { get } = useAPI(token);
+  const { get } = useAPI();
 
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
   const [total, setTotal] = useState(0);

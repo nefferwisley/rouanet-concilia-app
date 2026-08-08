@@ -8,7 +8,6 @@
  */
 
 import React, { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
 import { useAPI } from '../hooks/useAPI';
 import { Trash2 } from 'lucide-react';
 
@@ -21,8 +20,7 @@ export const DeleteProjectButton: React.FC<DeleteProjectButtonProps> = ({
   projectId,
   onDeleted,
 }) => {
-  const { token } = useAuth();
-  const { delete: apiDelete } = useAPI(token);
+  const { delete: apiDelete } = useAPI();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -5,7 +5,6 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
 import { useAPI } from '../hooks/useAPI';
 import { ProjectStatusBadge } from '../components/ProjectStatusBadge';
 
@@ -24,8 +23,7 @@ interface ImportacaoStatus {
 
 export function ImportacaoDetalhes() {
   const { id } = useParams<{ id: string }>();
-  const { token } = useAuth();
-  const { get } = useAPI(token);
+  const { get } = useAPI();
 
   const [status, setStatus] = useState<ImportacaoStatus | null>(null);
   const [loading, setLoading] = useState(true);

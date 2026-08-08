@@ -2,6 +2,8 @@ export interface Projeto {
   id: string;
   pronac: string;
   nome: string;
+  proponente?: string;
+  banco?: string;
   transacoes_count?: number;
   criado_em: string;
 }

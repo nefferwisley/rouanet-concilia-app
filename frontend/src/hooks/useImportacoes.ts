@@ -4,7 +4,6 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from './useAuth';
 import { useAPI } from './useAPI';
 
 export interface Importacao {
@@ -47,8 +46,7 @@ export function useImportacoes(
   projeto_id: string,
   options: UseImportacoesOptions = {}
 ): UseImportacoesResult {
-  const { token } = useAuth();
-  const { get } = useAPI(token);
+  const { get } = useAPI();
 
   const limite = options.limite || 20;
 

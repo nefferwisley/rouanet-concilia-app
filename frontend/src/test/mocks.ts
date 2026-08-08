@@ -1,11 +1,11 @@
 import { vi } from 'vitest';
 
 export const mockUseAuth = {
-  useAuth: () => ({ token: 'fake-token-123' }),
+  useAuth: () => ({ token: 'fake-token-123', setToken: vi.fn() }),
 };
 
 export const mockUseAPI = {
-  useAPI: (token: string) => ({
+  useAPI: () => ({
     get: vi.fn().mockResolvedValue({}),
     patch: vi.fn().mockResolvedValue({}),
     post: vi.fn().mockResolvedValue({}),

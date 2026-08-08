@@ -4,7 +4,6 @@
  */
 
 import React, { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
 import { useAPI } from '../hooks/useAPI';
 
 interface EditProjectModalProps {
@@ -24,8 +23,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
   onClose,
   onSaved,
 }) => {
-  const { token } = useAuth();
-  const { patch: apiPatch } = useAPI(token);
+  const { patch: apiPatch } = useAPI();
 
   const [nome, setNome] = useState(projeto.nome);
   const [proponente, setProponente] = useState(projeto.proponente || '');

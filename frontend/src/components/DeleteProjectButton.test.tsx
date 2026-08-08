@@ -5,7 +5,7 @@
  * Execute com: npm run test -- DeleteProjectButton.test.tsx
  */
 
-import { vi, beforeEach } from 'vitest';
+import { vi, beforeEach, describe, it, expect } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { mockDelete } from '../test/setup';
 

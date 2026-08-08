@@ -6,12 +6,12 @@ export const mockPatch = vi.fn().mockResolvedValue({});
 export const mockPost = vi.fn().mockResolvedValue({});
 export const mockDelete = vi.fn().mockResolvedValue({});
 
-vi.mock('../hooks/useAuth', () => ({
-  useAuth: () => ({ token: 'fake-token-123' }),
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => ({ token: 'fake-token-123', setToken: vi.fn() }),
 }));
 
 vi.mock('../hooks/useAPI', () => ({
-  useAPI: (token: string) => ({
+  useAPI: () => ({
     get: mockGet,
     patch: mockPatch,
     post: mockPost,

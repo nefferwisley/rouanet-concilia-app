@@ -1,14 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from './useAuth';
 import { useAPI } from './useAPI';
-
-export interface Projeto {
-  id: string;
-  pronac: string;
-  nome: string;
-  proponente: string;
-  banco: string;
-}
+import { Projeto } from '../types';
 
 export interface UseProjectsResult {
   projetos: Projeto[];
@@ -19,8 +11,7 @@ export interface UseProjectsResult {
 }
 
 export function useProjects(): UseProjectsResult {
-  const { token } = useAuth();
-  const { get } = useAPI(token);
+  const { get } = useAPI();
 
   const [projetos, setProjetos] = useState<Projeto[]>([]);
   const [total, setTotal] = useState(0);
@@ -31,7 +22,7 @@ export function useProjects(): UseProjectsResult {
     setCarregando(true);
     setErro(null);
     try {
-      const response = await get('/api/v1/projetos');
+      const response = await get<{ projetos: Projeto[]; total: number }>('/api/v1/projetos');
       setProjetos(response.projetos || []);
       setTotal(response.total || 0);
     } catch (err: any) {
