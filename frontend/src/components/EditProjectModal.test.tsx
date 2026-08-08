@@ -53,6 +53,18 @@ describe('EditProjectModal', () => {
     expect(nomeInput).toHaveValue('Projeto Novo');
   });
 
+  it('renderiza componente sem quebrar', () => {
+    const { container } = render(
+      <EditProjectModal
+        projeto={mockProjeto}
+        onClose={mockOnClose}
+        onSaved={mockOnSaved}
+      />
+    );
+
+    expect(container.querySelector('form')).toBeInTheDocument();
+  });
+
 
   it('chama onClose ao clicar Cancelar', () => {
     render(

@@ -35,6 +35,11 @@ describe('DeleteProjectButton', () => {
     expect(button).toBeInTheDocument();
   });
 
+  it('tem projectId como prop', () => {
+    const { container } = render(<DeleteProjectButton projectId={projectId} />);
+    expect(container).toBeInTheDocument();
+  });
+
 
   it('fecha dialog ao cancelar', async () => {
     render(<DeleteProjectButton projectId={projectId} />);
