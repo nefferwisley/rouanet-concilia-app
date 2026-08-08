@@ -11,16 +11,26 @@ bloqueia todo mundo (inclusive o dono dos dados). get_conn() faz isso: valida
 o JWT, abre uma transação, seta o claim e o role, e só então libera a conexão
 pra rota usar.
 """
+import logging
 import re
 
 import asyncpg
 import jwt as pyjwt
 from fastapi import Header, HTTPException
+from jwt import PyJWKClient
 
 from backend.config import settings
 
+log = logging.getLogger("rouanet-api.auth")
+
 _pool: asyncpg.Pool | None = None
 _UUID_RE = re.compile(r"^[0-9a-fA-F-]{36}$")
+
+# Supabase migrou de segredo compartilhado (HS256) pra chaves assimétricas
+# (ES256, via JWKS) — projetos criados/rotacionados depois disso emitem
+# token novo, mas o segredo antigo ainda valida sessões que não expiraram.
+# PyJWKClient cacheia o JWKS internamente (não busca de novo a cada request).
+_jwks_client = PyJWKClient(f"{settings.supabase_url}/auth/v1/.well-known/jwks.json") if settings.supabase_url else None
 
 
 async def get_pool() -> asyncpg.Pool:
@@ -38,13 +48,39 @@ async def close_pool():
 
 
 def verificar_jwt(token: str) -> str:
-    """Valida o JWT do Supabase Auth e retorna o user id (sub)."""
+    """
+    Valida o JWT do Supabase Auth e retorna o user id (sub).
+
+    Tenta primeiro as chaves novas (ES256, via JWKS) — é o que login real
+    emite hoje num projeto Supabase atual. Se isso falhar (ou não tiver
+    settings.supabase_url configurada), cai pro segredo compartilhado
+    antigo (HS256), que ainda vale pra sessões emitidas antes da migração.
+    """
+    erros = []
+
+    if _jwks_client is not None:
+        try:
+            signing_key = _jwks_client.get_signing_key_from_jwt(token)
+            payload = pyjwt.decode(
+                token, signing_key.key, algorithms=["ES256"], audience="authenticated"
+            )
+            return _extrair_sub(payload)
+        except pyjwt.PyJWTError as e:
+            erros.append(f"ES256/JWKS: {e}")
+
     try:
         payload = pyjwt.decode(
             token, settings.supabase_jwt_secret, algorithms=["HS256"], audience="authenticated"
         )
+        return _extrair_sub(payload)
     except pyjwt.PyJWTError as e:
-        raise HTTPException(status_code=401, detail=f"Token inválido: {e}")
+        erros.append(f"HS256 legado: {e}")
+
+    log.warning("Falha ao validar JWT por ambos os métodos: %s", "; ".join(erros))
+    raise HTTPException(status_code=401, detail=f"Token inválido: {'; '.join(erros)}")
+
+
+def _extrair_sub(payload: dict) -> str:
     sub = payload.get("sub")
     if not sub or not _UUID_RE.match(sub):
         raise HTTPException(status_code=401, detail="Token sem 'sub' válido.")

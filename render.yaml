@@ -25,7 +25,9 @@ services:
       - key: DATABASE_URL
         sync: false   # connection string do Supabase (Project Settings > Database)
       - key: SUPABASE_JWT_SECRET
-        sync: false   # Project Settings > API > JWT Secret
+        sync: false   # Legacy JWT Secret (Project Settings > JWT Keys) — fallback pra tokens HS256 antigos
+      - key: SUPABASE_URL
+        sync: false   # https://xxxx.supabase.co — usado pro JWKS (chaves ES256 novas, o que login real emite hoje)
       - key: GOOGLE_API_KEY
         sync: false   # opcional — sem ela, /api/v1/documentos/ocr responde 503
       - key: GOOGLE_DRIVE_CREDENTIALS_JSON
