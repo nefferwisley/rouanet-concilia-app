@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 
 class ProjetoCreate(BaseModel):
@@ -42,3 +42,28 @@ class ImportacaoStatus(BaseModel):
     linhas_erro: int
     linhas_alerta: int
     mensagem: Optional[str] = None
+
+
+class ProjetoUpdate(BaseModel):
+    """Update model para PATCH /api/v1/projetos/{id}"""
+    nome: Optional[str] = Field(None, min_length=3, max_length=255)
+    proponente: Optional[str] = Field(None, max_length=255)
+    controller: Optional[str] = Field(None, max_length=255)
+    banco: Optional[str] = Field(None, max_length=255)
+
+    @field_validator('nome')
+    @classmethod
+    def nome_not_empty(cls, v):
+        if v is not None and len(v.strip()) == 0:
+            raise ValueError('Nome não pode ser vazio')
+        return v
+
+    class Config:
+        schema_extra = {
+            'example': {
+                'nome': 'Projeto Atualizado',
+                'proponente': 'Novo Proponente',
+                'controller': 'Controller Name',
+                'banco': 'Banco do Brasil'
+            }
+        }

@@ -1,0 +1,83 @@
+#!/bin/bash
+
+echo "🔍 DIAGNÓSTICO: Máquina de Desenvolvimento RouanetConcilia"
+echo "=========================================================="
+echo ""
+
+# 1. Python
+echo "1️⃣  PYTHON"
+python --version
+python -m pip --version
+echo "  Virtual envs: $(find ~ -type d -name 'venv' 2>/dev/null | wc -l)"
+echo ""
+
+# 2. Node.js
+echo "2️⃣  NODE.JS"
+node --version 2>/dev/null || echo "  ❌ Not installed"
+npm --version 2>/dev/null || echo "  ❌ Not installed"
+npx --version 2>/dev/null || echo "  ❌ Not installed"
+echo ""
+
+# 3. Git
+echo "3️⃣  GIT"
+git --version
+git config --global user.name 2>/dev/null || echo "  ⚠️  No global user.name"
+git config --global user.email 2>/dev/null || echo "  ⚠️  No global user.email"
+echo ""
+
+# 4. Docker (if available)
+echo "4️⃣  DOCKER"
+docker --version 2>/dev/null || echo "  ⚠️  Not installed"
+docker-compose --version 2>/dev/null || echo "  ⚠️  Not installed"
+echo ""
+
+# 5. Databases
+echo "5️⃣  DATABASES"
+psql --version 2>/dev/null || echo "  ⚠️  PostgreSQL client not installed"
+redis-cli --version 2>/dev/null || echo "  ⚠️  Redis not installed"
+echo ""
+
+# 6. Google Cloud Tools
+echo "6️⃣  GOOGLE CLOUD"
+gcloud --version 2>/dev/null || echo "  ⚠️  gcloud not installed"
+echo ""
+
+# 7. Ollama
+echo "7️⃣  OLLAMA"
+ollama --version 2>/dev/null || echo "  ⚠️  Not installed"
+ollama list 2>/dev/null | grep hermes || echo "  ⚠️  Hermes model not pulled"
+echo ""
+
+# 8. IDE/Editors
+echo "8️⃣  IDE/EDITORS"
+code --version 2>/dev/null | head -1 && echo "  ✅ VS Code installed" || echo "  ❌ VS Code not found"
+which vim >/dev/null 2>&1 && echo "  ✅ Vim installed" || echo "  ❌ Vim not found"
+which nano >/dev/null 2>&1 && echo "  ✅ Nano installed" || echo "  ❌ Nano not found"
+echo ""
+
+# 9. Directory Structure
+echo "9️⃣  PROJECT STRUCTURE"
+ls -la ~/rouanet-concilia/ | grep -E '^d' | awk '{print "  " $NF}'
+echo ""
+
+# 10. System Info
+echo "🔟 SYSTEM INFO"
+uname -s
+uname -m
+python -c "import platform; print(f'  Python path: {platform.python_executable()}')"
+echo ""
+
+# 11. Environment Variables
+echo "1️⃣1️⃣  ENVIRONMENT VARIABLES"
+echo "  .env file: $([ -f ~/.rouanet-concilia/.env ] && echo '✅ Found' || echo '❌ Not found')"
+echo ""
+
+# 12. Port Availability
+echo "1️⃣2️⃣  PORTS"
+echo "  8000 (FastAPI): $(nc -z localhost 8000 2>/dev/null && echo '🔴 In use' || echo '🟢 Available')"
+echo "  8080 (Frontend): $(nc -z localhost 8080 2>/dev/null && echo '🔴 In use' || echo '🟢 Available')"
+echo "  5432 (PostgreSQL): $(nc -z localhost 5432 2>/dev/null && echo '🔴 In use' || echo '🟢 Available')"
+echo "  6379 (Redis): $(nc -z localhost 6379 2>/dev/null && echo '🔴 In use' || echo '🟢 Available')"
+echo ""
+
+echo "✅ Diagnóstico completo!"

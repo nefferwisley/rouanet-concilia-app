@@ -4,9 +4,9 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from config import settings
-from database import close_pool, get_pool
-from routes import importacoes, projetos, relatorios, websocket
+from backend.config import settings
+from backend.database import close_pool, get_pool
+from backend.routes import importacoes, projetos, relatorios, websocket
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 log = logging.getLogger("rouanet-api")
