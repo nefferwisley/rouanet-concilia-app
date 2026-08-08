@@ -32,7 +32,7 @@ async def delete_projeto(projeto_id: str, conn=Depends(get_conn)):
     - Retorna 403 se sem permissão (automático via RLS)
     """
     try:
-        # Verificar se projeto existe e user tem acesso (RLS policy enforça)
+        # Verificar se projeto existe (RLS policy garante acesso)
         result = await conn.fetchval(
             "SELECT id FROM projetos WHERE id = $1",
             projeto_id
@@ -44,7 +44,8 @@ async def delete_projeto(projeto_id: str, conn=Depends(get_conn)):
                 detail="Projeto não encontrado"
             )
 
-        # Deletar projeto (cascata deleta membros, transações, etc)
+        # Deletar projeto (cascata deleta membros, transações, documentos, etc)
+        # RLS policy já foi validado em get_conn(), então delete é seguro
         await conn.execute(
             "DELETE FROM projetos WHERE id = $1",
             projeto_id
@@ -58,7 +59,11 @@ async def delete_projeto(projeto_id: str, conn=Depends(get_conn)):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Erro ao deletar projeto: {str(e)}")
+        # Log completo com traceback para debug
+        logger.error(
+            f"Erro ao deletar projeto {projeto_id}: {str(e)}",
+            exc_info=True
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erro ao deletar projeto"
