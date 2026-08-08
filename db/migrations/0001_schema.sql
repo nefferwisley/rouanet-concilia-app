@@ -268,8 +268,71 @@ create policy p_membros on membros_projeto for all
   using (user_id = auth.uid() or pode_acessar_projeto(projeto_id))
   with check (pode_acessar_projeto(projeto_id));
 
-create policy p_projetos on projetos for all
-  using (pode_acessar_projeto(id))          with check (pode_acessar_projeto(id));
+-- Sem policy de INSERT de propósito: criação de projeto NÃO passa por
+-- INSERT direto (ver criar_projeto_com_membro() abaixo) — ninguém pode
+-- ser membro de um projeto que ainda não existe, então qualquer policy
+-- de INSERT baseada em pode_acessar_projeto()/RETURNING cai num
+-- chicken-and-egg (a policy de SELECT também filtra o RETURNING de um
+-- INSERT, então mesmo `with check (true)` não resolve sozinho). Sem
+-- policy = INSERT direto negado por padrão pra `authenticated`.
+create policy p_projetos_select on projetos for select
+  using (pode_acessar_projeto(id));
+create policy p_projetos_update on projetos for update
+  using (pode_acessar_projeto(id)) with check (pode_acessar_projeto(id));
+create policy p_projetos_delete on projetos for delete
+  using (pode_acessar_projeto(id));
+
+-- Cria o projeto E a membresia do criador como admin numa única transação
+-- atômica. SECURITY DEFINER roda como o dono da função (superuser local /
+-- role com BYPASSRLS no Supabase), então as duas inserções internas
+-- ignoram RLS — é o único caminho suportado pra criar projeto,
+-- exatamente pra não precisar relaxar a policy de INSERT acima.
+create or replace function criar_projeto_com_membro(
+  p_pronac text, p_nome text, p_proponente text, p_controller text, p_banco text
+) returns projetos
+language plpgsql security definer set search_path = public as $$
+declare
+  v_projeto     projetos;
+  v_existing_id uuid;
+begin
+  -- Se o pronac já existe, só devolvemos o projeto pra quem já é membro
+  -- (idempotência do lado de quem criou). Pra qualquer outro authenticated,
+  -- isso seria um upsert "silencioso" que renomeia um projeto alheio e
+  -- auto-promove o chamador a admin dele — bloqueado aqui.
+  select id into v_existing_id from projetos where pronac = p_pronac;
+
+  if v_existing_id is not null then
+    if not exists (
+      select 1 from membros_projeto
+      where projeto_id = v_existing_id and user_id = auth.uid()
+    ) then
+      raise exception 'pronac % já pertence a outro projeto', p_pronac
+        using errcode = 'unique_violation';
+    end if;
+
+    select * into v_projeto from projetos where id = v_existing_id;
+    return v_projeto;
+  end if;
+
+  insert into projetos (pronac, nome, proponente, controller, banco)
+  values (p_pronac, p_nome, p_proponente, p_controller, p_banco)
+  returning * into v_projeto;
+
+  insert into membros_projeto (projeto_id, user_id, papel)
+  values (v_projeto.id, auth.uid(), 'admin')
+  on conflict (projeto_id, user_id) do nothing;
+
+  return v_projeto;
+exception
+  when unique_violation then
+    -- corrida: outra sessão inseriu o mesmo pronac entre o SELECT e o INSERT acima
+    raise exception 'pronac % já pertence a outro projeto', p_pronac
+      using errcode = 'unique_violation';
+end;
+$$;
+
+revoke all on function criar_projeto_com_membro(text, text, text, text, text) from public;
+grant execute on function criar_projeto_com_membro(text, text, text, text, text) to authenticated;
 create policy p_etapas on etapas for all
   using (pode_acessar_projeto(projeto_id))  with check (pode_acessar_projeto(projeto_id));
 create policy p_rubricas on rubricas for all

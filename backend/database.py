@@ -17,7 +17,7 @@ import asyncpg
 import jwt as pyjwt
 from fastapi import Header, HTTPException
 
-from config import settings
+from backend.config import settings
 
 _pool: asyncpg.Pool | None = None
 _UUID_RE = re.compile(r"^[0-9a-fA-F-]{36}$")

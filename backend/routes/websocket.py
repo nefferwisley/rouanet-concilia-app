@@ -11,7 +11,7 @@ import asyncio
 
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
 
-from database import get_pool, verificar_jwt
+from backend.database import get_pool, verificar_jwt
 
 router = APIRouter()
 

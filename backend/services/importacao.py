@@ -14,7 +14,7 @@ import json
 import psycopg2
 import psycopg2.extras
 
-from config import settings
+from backend.config import settings
 from motor.importar import (
     MotorImportacao,
     Validador,

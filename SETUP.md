@@ -33,15 +33,31 @@ cp frontend/.env.example frontend/.env 2>/dev/null || echo "No frontend .env nee
 
 ### 2️⃣ Rodar PostgreSQL via Docker
 
+`0001_schema.sql` foi escrito pra Supabase real — usa `auth.users`/`auth.uid()` e o
+schema `extensions`, que só existem lá por padrão. Contra um Postgres vanilla
+(este `docker-compose.yml`), rode `0000_local_dev_shim.sql` **primeiro** — ele
+recria só o suficiente disso (guardado com `if not exists`, nunca sobrescreve
+nada real). **Não rode o 0000 contra Supabase** — é redundante lá.
+
 ```bash
 # Start only PostgreSQL container
 docker-compose up -d postgres
 
-# Wait ~10s for healthcheck, then apply migrations
+# Wait ~10s for healthcheck, then apply migrations (ORDEM IMPORTA)
 sleep 10
+psql postgresql://rouanet:rouanet_dev_password@localhost:5432/rouanet_concilia < db/migrations/0000_local_dev_shim.sql
 psql postgresql://rouanet:rouanet_dev_password@localhost:5432/rouanet_concilia < db/migrations/0001_schema.sql
 psql postgresql://rouanet:rouanet_dev_password@localhost:5432/rouanet_concilia < db/migrations/0002_importacoes.sql
+```
 
+**Ordem de migrations por ambiente:**
+
+| Ambiente | Ordem |
+|---|---|
+| Local (Docker Postgres) | `0000_local_dev_shim.sql` → `0001_schema.sql` → `0002_importacoes.sql` |
+| Supabase (produção) | `0001_schema.sql` → `0002_importacoes.sql` (sem o 0000) |
+
+```bash
 # Optional: seed dummy data
 cd backend && python scripts/seed_db.py
 ```

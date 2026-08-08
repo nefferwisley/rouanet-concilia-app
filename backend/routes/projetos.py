@@ -1,4 +1,6 @@
 import logging
+
+import asyncpg
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from backend.database import get_conn
@@ -11,26 +13,21 @@ router = APIRouter(prefix="/api/v1/projetos", tags=["projetos"])
 @router.post("", status_code=201, response_model=ProjetoOut)
 async def criar_projeto(body: ProjetoCreate, dep=Depends(get_conn)):
     conn, user_id = dep
-    row = await conn.fetchrow(
-        """
-        insert into projetos (pronac, nome, proponente, controller, banco)
-        values ($1, $2, $3, $4, $5)
-        on conflict (pronac) do update set nome = excluded.nome
-        returning id, pronac, nome, proponente, banco, created_at
-        """,
-        body.pronac, body.nome, body.proponente, body.controller, body.banco_nome,
-    )
-
-    # Quem cria o projeto precisa virar membro dele — senão o próprio RLS que
-    # acabamos de configurar bloqueia o criador de ver o que ele mesmo criou.
-    await conn.execute(
-        """
-        insert into membros_projeto (projeto_id, user_id, papel)
-        values ($1, $2, 'admin')
-        on conflict (projeto_id, user_id) do nothing
-        """,
-        row["id"], user_id,
-    )
+    # criar_projeto_com_membro() é SECURITY DEFINER: insere em projetos +
+    # membros_projeto atomicamente, contornando RLS só internamente — não dá
+    # pra fazer isso com dois INSERTs crus porque ninguém é membro de um
+    # projeto que ainda não existe (bloqueia tanto o INSERT quanto o
+    # RETURNING, que é filtrado pela policy de SELECT). Ver db/migrations/0001_schema.sql.
+    try:
+        row = await conn.fetchrow(
+            "select * from criar_projeto_com_membro($1, $2, $3, $4, $5)",
+            body.pronac, body.nome, body.proponente, body.controller, body.banco_nome,
+        )
+    except asyncpg.UniqueViolationError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="PRONAC já cadastrado em outro projeto ao qual você não tem acesso.",
+        )
 
     if body.agencia or body.conta or body.banco_nome:
         await conn.execute(
