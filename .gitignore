@@ -13,5 +13,17 @@ __pycache__/
 # Streamlit
 .streamlit/secrets.toml
 
+# Node
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# Vitest
+coverage/
+.vitest/
+
 # Sistema
 .DS_Store
+.vscode/
+.idea/
