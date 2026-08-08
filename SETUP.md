@@ -48,14 +48,24 @@ sleep 10
 psql postgresql://rouanet:rouanet_dev_password@localhost:5432/rouanet_concilia < db/migrations/0000_local_dev_shim.sql
 psql postgresql://rouanet:rouanet_dev_password@localhost:5432/rouanet_concilia < db/migrations/0001_schema.sql
 psql postgresql://rouanet:rouanet_dev_password@localhost:5432/rouanet_concilia < db/migrations/0002_importacoes.sql
+psql postgresql://rouanet:rouanet_dev_password@localhost:5432/rouanet_concilia < db/migrations/0003_documentos_projeto.sql
 ```
 
 **Ordem de migrations por ambiente:**
 
 | Ambiente | Ordem |
 |---|---|
-| Local (Docker Postgres) | `0000_local_dev_shim.sql` → `0001_schema.sql` → `0002_importacoes.sql` |
-| Supabase (produção) | `0001_schema.sql` → `0002_importacoes.sql` (sem o 0000) |
+| Local (Docker Postgres) | `0000_local_dev_shim.sql` → `0001` → `0002` → `0003` |
+| Supabase (produção) | `0001_schema.sql` → `0002_importacoes.sql` → `0003_documentos_projeto.sql` (sem o 0000) |
+
+**Variáveis extras pro upload de documentos / OCR:**
+
+```env
+# backend/.env
+GOOGLE_API_KEY=...        # necessária pra POST /api/v1/documentos/ocr funcionar (senão retorna 503)
+UPLOAD_DIR=/app/uploads   # onde os arquivos de POST /api/v1/documentos/projeto/{id} são salvos
+                           # — local/efêmero por padrão; trocar por Supabase Storage/S3 em produção
+```
 
 ```bash
 # Optional: seed dummy data
