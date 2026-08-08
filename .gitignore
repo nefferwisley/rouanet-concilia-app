@@ -27,3 +27,6 @@ coverage/
 .DS_Store
 .vscode/
 .idea/
+
+# Repositório git aninhado, quebrado como submódulo — untracked de propósito
+agency-agents/
