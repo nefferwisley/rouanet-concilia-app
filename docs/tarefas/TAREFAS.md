@@ -5,8 +5,8 @@ NUNCA inventar campo: se não achar no documento → `null` + anotar em "observa
 
 | # | Tarefa | Modelo | Arquivos exclusivos | Status | Aceite |
 |---|--------|--------|--------------------|--------|--------|
-| 001 | Fechar parser de comprovantes | deepseek-v4-flash-free | motor/parse_comprovantes.py, motor/_parsed/comprovantes.json | ⏸️ | FALHAS == 0 |
-| 002 | Parser completo dos 32 extratos | deepseek-v4-flash-free | motor/parse_extrato_bb.py, motor/_parsed/movimentos.json | ⏸️ | >=200 movs, 0 anomalias |
+| 001 | Fechar parser de comprovantes | deepseek-v4-flash-free | motor/parse_comprovantes.py, motor/_parsed/comprovantes.json | ✅ (178 OK; FALHAS 0) | FALHAS == 0 |
+| 002 | Parser completo dos 32 extratos | deepseek-v4-flash-free | motor/parse_extrato_bb.py, motor/_parsed/movimentos.json | ✅ (265 movs; 181 D; 0 anomalias) | >=200 movs, 0 anomalias |
 | 003 | Cruzamento extrato × comprovante | opencode/big-pickle | motor/cruzamento.py, motor/_parsed/cruzamento.json, stats.json | ✅ (95.58%) | taxa >= 85% |
 | 004 | Planilha corrigida (xlsx) | opencode/north-mini-code-free | motor/gerar_planilha.py, saida/planilha/, motor/_parsed/planilha_linhas.json | ✅ (185 linhas; 178 arquivos finais) | xlsx reabre, N linhas = cruzamento |
 | 005 | Pasta final espelhada | opencode/north-mini-code-free | motor/gerar_pasta.py, saida/arquivos_finais/ | ✅ (178/178 copiados; 1 PENDENTES; faltando 0) | 0 faltantes no tally |
