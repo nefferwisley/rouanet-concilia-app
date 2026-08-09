@@ -931,308 +931,280 @@
   "numero_arquivo": 178
  },
  {
-  "arquivo_final": "0134_(a classificar)_10-11-2022_R$1.200,00_felipe_g_rosa.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2022-11-10",
-  "valor": 1200.0,
-  "numero_arquivo": 5
- },
- {
-  "arquivo_final": "0135_(a classificar)_10-11-2022_R$1.200,00_luis_felipe_labaki.pdf",
+  "arquivo_final": "0134_(a classificar)_10-11-2022_R$1.200,00_luis_felipe_labaki.pdf",
   "subpasta": "(a classificar)",
   "data": "2022-11-10",
   "valor": 1200.0,
   "numero_arquivo": 6
  },
  {
-  "arquivo_final": "0136_(a classificar)_03-07-2023_R$25.000,00_mog_produtora.pdf",
+  "arquivo_final": "0135_(a classificar)_10-11-2022_R$1.200,00_felipe_g_rosa.pdf",
   "subpasta": "(a classificar)",
-  "data": "2023-07-03",
-  "valor": 25000.0,
-  "numero_arquivo": 17
+  "data": "2022-11-10",
+  "valor": 1200.0,
+  "numero_arquivo": 5
  },
  {
-  "arquivo_final": "0137_(a classificar)_03-07-2023_R$25.000,00_circunstancia_cinematografica_e_prod.pdf",
+  "arquivo_final": "0136_(a classificar)_03-07-2023_R$25.000,00_circunstancia_cinematografica_e_prod.pdf",
   "subpasta": "(a classificar)",
   "data": "2023-07-03",
   "valor": 25000.0,
   "numero_arquivo": 16
  },
  {
-  "arquivo_final": "0138_(a classificar)_28-09-2023_R$1.000,00_sofia_v_baccarini.pdf",
+  "arquivo_final": "0137_(a classificar)_03-07-2023_R$25.000,00_mog_produtora.pdf",
   "subpasta": "(a classificar)",
-  "data": "2023-09-28",
-  "valor": 1000.0,
-  "numero_arquivo": 37
+  "data": "2023-07-03",
+  "valor": 25000.0,
+  "numero_arquivo": 17
  },
  {
-  "arquivo_final": "0139_(a classificar)_28-09-2023_R$1.000,00_andre_lima_manfrim.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-09-28",
-  "valor": 1000.0,
-  "numero_arquivo": 38
- },
- {
-  "arquivo_final": "0140_(a classificar)_29-09-2023_R$560,00_sofia_v_baccarini.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-09-29",
-  "valor": 560.0,
-  "numero_arquivo": 48
- },
- {
-  "arquivo_final": "0141_(a classificar)_29-09-2023_R$560,00_fabio_baltar_duarte.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-09-29",
-  "valor": 560.0,
-  "numero_arquivo": 49
- },
- {
-  "arquivo_final": "0142_(a classificar)_29-09-2023_R$1.050,00_luis_f_monte_cipullo.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-09-29",
-  "valor": 1050.0,
-  "numero_arquivo": 45
- },
- {
-  "arquivo_final": "0143_(a classificar)_29-09-2023_R$1.050,00_felipe_g_rosa.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-09-29",
-  "valor": 1050.0,
-  "numero_arquivo": 46
- },
- {
-  "arquivo_final": "0144_(a classificar)_29-09-2023_R$1.050,00_thiago_a_gomas_cunha.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-09-29",
-  "valor": 1050.0,
-  "numero_arquivo": 47
- },
- {
-  "arquivo_final": "0145_(a classificar)_29-09-2023_R$1.050,00_andre_lima_monfrini.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-09-29",
-  "valor": 1050.0,
-  "numero_arquivo": 50
- },
- {
-  "arquivo_final": "0146_(a classificar)_05-10-2023_R$700,00_edson_de_camargo_transportes.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-05",
-  "valor": 700.0,
-  "numero_arquivo": 56
- },
- {
-  "arquivo_final": "0147_(a classificar)_09-10-2023_R$240,00_luis_f_monte_cipullo.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-09",
-  "valor": 240.0,
-  "numero_arquivo": 67
- },
- {
-  "arquivo_final": "0148_(a classificar)_09-10-2023_R$240,00_andre_lima_monfrini.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-09",
-  "valor": 240.0,
-  "numero_arquivo": 68
- },
- {
-  "arquivo_final": "0149_(a classificar)_09-10-2023_R$240,00_felipe_g_rosa.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-09",
-  "valor": 240.0,
-  "numero_arquivo": 69
- },
- {
-  "arquivo_final": "0150_(a classificar)_09-10-2023_R$240,00_thiago_a_gomas_cunha.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-09",
-  "valor": 240.0,
-  "numero_arquivo": 70
- },
- {
-  "arquivo_final": "0151_(a classificar)_13-10-2023_R$480,00_idalina_s_r_silva.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-13",
-  "valor": 480.0,
-  "numero_arquivo": 83
- },
- {
-  "arquivo_final": "0152_(a classificar)_13-10-2023_R$480,00_anne_c_melo_santos.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-13",
-  "valor": 480.0,
-  "numero_arquivo": 84
- },
- {
-  "arquivo_final": "0153_(a classificar)_13-10-2023_R$1.200,00_andre_lima_monfrini.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-13",
-  "valor": 1200.0,
-  "numero_arquivo": 78
- },
- {
-  "arquivo_final": "0154_(a classificar)_13-10-2023_R$1.200,00_felipe_g_rosa.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-13",
-  "valor": 1200.0,
-  "numero_arquivo": 79
- },
- {
-  "arquivo_final": "0155_(a classificar)_13-10-2023_R$1.200,00_luis_f_monte_cipullo.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-13",
-  "valor": 1200.0,
-  "numero_arquivo": 80
- },
- {
-  "arquivo_final": "0156_(a classificar)_13-10-2023_R$1.200,00_thiago_a_gomas_cunha.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-13",
-  "valor": 1200.0,
-  "numero_arquivo": 81
- },
- {
-  "arquivo_final": "0157_(a classificar)_31-10-2023_R$1.020,00_felipe_g_rosa.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-31",
-  "valor": 1020.0,
-  "numero_arquivo": 114
- },
- {
-  "arquivo_final": "0158_(a classificar)_31-10-2023_R$1.020,00_luis_f_monte_cipullo.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-31",
-  "valor": 1020.0,
-  "numero_arquivo": 115
- },
- {
-  "arquivo_final": "0159_(a classificar)_31-10-2023_R$1.020,00_andre_lima_monfrini.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-31",
-  "valor": 1020.0,
-  "numero_arquivo": 116
- },
- {
-  "arquivo_final": "0160_(a classificar)_08-11-2023_R$300,00_bernardo_t_s_costa.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-11-08",
-  "valor": 300.0,
-  "numero_arquivo": 119
- },
- {
-  "arquivo_final": "0175_(a classificar)_20-09-2023_R$1.524,64_gol_linhas_aereas.pdf",
+  "arquivo_final": "0138_(a classificar)_20-09-2023_R$1.524,64_gol_linhas_aereas.pdf",
   "subpasta": "(a classificar)",
   "data": "2023-09-20",
   "valor": 1524.64,
   "numero_arquivo": 29
  },
  {
-  "arquivo_final": "0176_(a classificar)_20-09-2023_R$1.524,64_gol_linhas_aereas.pdf",
+  "arquivo_final": "0139_(a classificar)_20-09-2023_R$1.524,64_gol_linhas_aereas.pdf",
   "subpasta": "(a classificar)",
   "data": "2023-09-20",
   "valor": 1524.64,
   "numero_arquivo": 30
  },
  {
-  "arquivo_final": "0177_(a classificar)_20-09-2023_R$1.524,64_gol_linhas_aereas.pdf",
+  "arquivo_final": "0140_(a classificar)_20-09-2023_R$1.524,64_gol_linhas_aereas.pdf",
   "subpasta": "(a classificar)",
   "data": "2023-09-20",
   "valor": 1524.64,
   "numero_arquivo": 31
  },
  {
-  "arquivo_final": "0178_(a classificar)_20-09-2023_R$1.524,64_gol_linhas_aereas.pdf",
+  "arquivo_final": "0141_(a classificar)_20-09-2023_R$1.524,64_gol_linhas_aereas.pdf",
   "subpasta": "(a classificar)",
   "data": "2023-09-20",
   "valor": 1524.64,
   "numero_arquivo": 32
  },
  {
-  "arquivo_final": "0179_(a classificar)_20-09-2023_R$2.870,87_gol_linhas_aereas.pdf",
+  "arquivo_final": "0142_(a classificar)_20-09-2023_R$2.870,87_gol_linhas_aereas.pdf",
   "subpasta": "(a classificar)",
   "data": "2023-09-20",
   "valor": 2870.87,
   "numero_arquivo": 25
  },
  {
-  "arquivo_final": "0180_(a classificar)_20-09-2023_R$2.870,87_gol_linhas_aereas.pdf",
+  "arquivo_final": "0143_(a classificar)_20-09-2023_R$2.870,87_gol_linhas_aereas.pdf",
   "subpasta": "(a classificar)",
   "data": "2023-09-20",
   "valor": 2870.87,
   "numero_arquivo": 26
  },
  {
-  "arquivo_final": "0181_(a classificar)_20-09-2023_R$2.870,87_gol_linhas_aereas.pdf",
+  "arquivo_final": "0144_(a classificar)_20-09-2023_R$2.870,87_gol_linhas_aereas.pdf",
   "subpasta": "(a classificar)",
   "data": "2023-09-20",
   "valor": 2870.87,
   "numero_arquivo": 27
  },
  {
-  "arquivo_final": "0182_(a classificar)_20-09-2023_R$2.870,87_gol_linhas_aereas.pdf",
+  "arquivo_final": "0145_(a classificar)_20-09-2023_R$2.870,87_gol_linhas_aereas.pdf",
   "subpasta": "(a classificar)",
   "data": "2023-09-20",
   "valor": 2870.87,
   "numero_arquivo": 28
  },
  {
-  "arquivo_final": "0183_(a classificar)_09-10-2023_R$945,49_amir_labaki.pdf",
+  "arquivo_final": "0146_(a classificar)_28-09-2023_R$1.000,00_andre_lima_manfrim.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-09-28",
+  "valor": 1000.0,
+  "numero_arquivo": 38
+ },
+ {
+  "arquivo_final": "0147_(a classificar)_28-09-2023_R$1.000,00_sofia_v_baccarini.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-09-28",
+  "valor": 1000.0,
+  "numero_arquivo": 37
+ },
+ {
+  "arquivo_final": "0148_(a classificar)_29-09-2023_R$560,00_fabio_baltar_duarte.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-09-29",
+  "valor": 560.0,
+  "numero_arquivo": 49
+ },
+ {
+  "arquivo_final": "0149_(a classificar)_29-09-2023_R$560,00_sofia_v_baccarini.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-09-29",
+  "valor": 560.0,
+  "numero_arquivo": 48
+ },
+ {
+  "arquivo_final": "0150_(a classificar)_29-09-2023_R$1.050,00_luis_f_monte_cipullo.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-09-29",
+  "valor": 1050.0,
+  "numero_arquivo": 45
+ },
+ {
+  "arquivo_final": "0151_(a classificar)_29-09-2023_R$1.050,00_thiago_a_gomas_cunha.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-09-29",
+  "valor": 1050.0,
+  "numero_arquivo": 47
+ },
+ {
+  "arquivo_final": "0152_(a classificar)_29-09-2023_R$1.050,00_andre_lima_monfrini.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-09-29",
+  "valor": 1050.0,
+  "numero_arquivo": 50
+ },
+ {
+  "arquivo_final": "0153_(a classificar)_29-09-2023_R$1.050,00_felipe_g_rosa.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-09-29",
+  "valor": 1050.0,
+  "numero_arquivo": 46
+ },
+ {
+  "arquivo_final": "0154_(a classificar)_05-10-2023_R$700,00_edson_de_camargo_transportes.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-05",
+  "valor": 700.0,
+  "numero_arquivo": 56
+ },
+ {
+  "arquivo_final": "0155_(a classificar)_09-10-2023_R$240,00_luis_f_monte_cipullo.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-09",
+  "valor": 240.0,
+  "numero_arquivo": 67
+ },
+ {
+  "arquivo_final": "0156_(a classificar)_09-10-2023_R$240,00_thiago_a_gomas_cunha.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-09",
+  "valor": 240.0,
+  "numero_arquivo": 70
+ },
+ {
+  "arquivo_final": "0157_(a classificar)_09-10-2023_R$240,00_andre_lima_monfrini.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-09",
+  "valor": 240.0,
+  "numero_arquivo": 68
+ },
+ {
+  "arquivo_final": "0158_(a classificar)_09-10-2023_R$240,00_felipe_g_rosa.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-09",
+  "valor": 240.0,
+  "numero_arquivo": 69
+ },
+ {
+  "arquivo_final": "0159_(a classificar)_09-10-2023_R$945,49_amir_labaki.pdf",
   "subpasta": "(a classificar)",
   "data": "2023-10-09",
   "valor": 945.49,
   "numero_arquivo": 59
  },
  {
-  "arquivo_final": "0184_(a classificar)_09-10-2023_R$945,49_amir_labaki.pdf",
+  "arquivo_final": "0160_(a classificar)_13-10-2023_R$480,00_anne_c_melo_santos.pdf",
   "subpasta": "(a classificar)",
-  "data": "2023-10-09",
-  "valor": 945.49,
-  "numero_arquivo": 60
+  "data": "2023-10-13",
+  "valor": 480.0,
+  "numero_arquivo": 84
  },
  {
-  "arquivo_final": "0185_(a classificar)_16-10-2023_R$3.000,00_camila_licariao_de_carvalho_braune_4.pdf",
+  "arquivo_final": "0161_(a classificar)_13-10-2023_R$480,00_idalina_s_r_silva.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-13",
+  "valor": 480.0,
+  "numero_arquivo": 83
+ },
+ {
+  "arquivo_final": "0162_(a classificar)_13-10-2023_R$1.200,00_luis_f_monte_cipullo.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-13",
+  "valor": 1200.0,
+  "numero_arquivo": 80
+ },
+ {
+  "arquivo_final": "0163_(a classificar)_13-10-2023_R$1.200,00_thiago_a_gomas_cunha.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-13",
+  "valor": 1200.0,
+  "numero_arquivo": 81
+ },
+ {
+  "arquivo_final": "0164_(a classificar)_13-10-2023_R$1.200,00_andre_lima_monfrini.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-13",
+  "valor": 1200.0,
+  "numero_arquivo": 78
+ },
+ {
+  "arquivo_final": "0165_(a classificar)_13-10-2023_R$1.200,00_felipe_g_rosa.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-13",
+  "valor": 1200.0,
+  "numero_arquivo": 79
+ },
+ {
+  "arquivo_final": "0166_(a classificar)_16-10-2023_R$3.000,00_camila_licariao_de_carvalho_braune_4.pdf",
   "subpasta": "(a classificar)",
   "data": "2023-10-16",
   "valor": 3000.0,
   "numero_arquivo": 35
  },
  {
-  "arquivo_final": "0186_(a classificar)_16-10-2023_R$3.000,00_camila_licariao_de_carvalho_braune_4.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-10-16",
-  "valor": 3000.0,
-  "numero_arquivo": 87
- },
- {
-  "arquivo_final": "0187_(a classificar)_25-10-2023_R$10.000,00_mog_produtora.pdf",
+  "arquivo_final": "0167_(a classificar)_25-10-2023_R$10.000,00_mog_produtora.pdf",
   "subpasta": "(a classificar)",
   "data": "2023-10-25",
   "valor": 10000.0,
   "numero_arquivo": 33
  },
  {
-  "arquivo_final": "0188_(a classificar)_25-10-2023_R$10.000,00_mog_produtora.pdf",
+  "arquivo_final": "0168_(a classificar)_31-10-2023_R$1.020,00_luis_f_monte_cipullo.pdf",
   "subpasta": "(a classificar)",
-  "data": "2023-10-25",
-  "valor": 10000.0,
-  "numero_arquivo": 96
+  "data": "2023-10-31",
+  "valor": 1020.0,
+  "numero_arquivo": 115
  },
  {
-  "arquivo_final": "0189_(a classificar)_14-11-2023_R$3.724,74_monica_g_p_moraes.pdf",
+  "arquivo_final": "0169_(a classificar)_31-10-2023_R$1.020,00_andre_lima_monfrini.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-31",
+  "valor": 1020.0,
+  "numero_arquivo": 116
+ },
+ {
+  "arquivo_final": "0170_(a classificar)_31-10-2023_R$1.020,00_felipe_g_rosa.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-31",
+  "valor": 1020.0,
+  "numero_arquivo": 114
+ },
+ {
+  "arquivo_final": "0171_(a classificar)_08-11-2023_R$300,00_bernardo_t_s_costa.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-11-08",
+  "valor": 300.0,
+  "numero_arquivo": 119
+ },
+ {
+  "arquivo_final": "0172_(a classificar)_14-11-2023_R$3.724,74_monica_g_p_moraes.pdf",
   "subpasta": "(a classificar)",
   "data": "2023-11-14",
   "valor": 3724.74,
   "numero_arquivo": 122
  },
  {
-  "arquivo_final": "0190_(a classificar)_14-11-2023_R$3.724,74_monica_g_p_moraes.pdf",
-  "subpasta": "(a classificar)",
-  "data": "2023-11-14",
-  "valor": 3724.74,
-  "numero_arquivo": 123
- },
- {
-  "arquivo_final": "0191_(a classificar)_03-02-2025_R$975,04_banco_rendimento_s_a.pdf",
+  "arquivo_final": "0173_(a classificar)_03-02-2025_R$975,04_banco_rendimento_s_a.pdf",
   "subpasta": "(a classificar)",
   "data": "2025-02-03",
   "valor": 975.04,
@@ -1244,5 +1216,33 @@
   "data": "2023-10-30",
   "valor": 211.5,
   "numero_arquivo": 111
+ },
+ {
+  "arquivo_final": "0182_(a classificar)_09-10-2023_R$945,49_amir_labaki.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-09",
+  "valor": 945.49,
+  "numero_arquivo": 60
+ },
+ {
+  "arquivo_final": "0183_(a classificar)_16-10-2023_R$3.000,00_camila_licariao_de_carvalho_braune_4.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-16",
+  "valor": 3000.0,
+  "numero_arquivo": 87
+ },
+ {
+  "arquivo_final": "0184_(a classificar)_25-10-2023_R$10.000,00_mog_produtora.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-10-25",
+  "valor": 10000.0,
+  "numero_arquivo": 96
+ },
+ {
+  "arquivo_final": "0185_(a classificar)_14-11-2023_R$3.724,74_monica_g_p_moraes.pdf",
+  "subpasta": "(a classificar)",
+  "data": "2023-11-14",
+  "valor": 3724.74,
+  "numero_arquivo": 123
  }
 ]

@@ -2,12 +2,12 @@
  "stats": {
   "total_deb": 181,
   "total_comp": 178,
-  "conciliados": 160,
-  "orfaos_extrato": 6,
-  "orfaos_comprovante": 0,
+  "conciliados": 173,
+  "orfaos_extrato": 7,
+  "orfaos_comprovante": 4,
   "divergentes": 1,
-  "ambiguos": 31,
-  "taxa_pct": 88.4
+  "ambiguos": 0,
+  "taxa_pct": 95.58
  },
  "classes": [
   "conciliado",
@@ -2812,27 +2812,6 @@
   },
   {
    "debito": {
-    "doc": "111.001",
-    "data": "2022-11-10",
-    "valor": 1200.0,
-    "historico": "Pix - Enviado",
-    "favorecido": "Felipe Guimarães Rosa",
-    "pagina": 1,
-    "fonte": "2. nov.pdf"
-   },
-   "comprovante": {
-    "numero_arquivo": 5,
-    "data": "2022-11-10",
-    "valor": 1200.0,
-    "favorecido": "Felipe G Rosa",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Frico Guimarães - Diretor de Fotografia",
-    "fonte": "005 - 10-11-2022 - Frico Guimarães - Diretor de Fotografia.pdf"
-   },
-   "score_nome": 0.9176
-  },
-  {
-   "debito": {
     "doc": "111.002",
     "data": "2022-11-10",
     "valor": 1200.0,
@@ -2854,24 +2833,24 @@
   },
   {
    "debito": {
-    "doc": "70.302",
-    "data": "2023-07-03",
-    "valor": 25000.0,
+    "doc": "111.001",
+    "data": "2022-11-10",
+    "valor": 1200.0,
     "historico": "Pix - Enviado",
-    "favorecido": "MOG PRODUTORA",
+    "favorecido": "Felipe Guimarães Rosa",
     "pagina": 1,
-    "fonte": "7. jul.pdf"
+    "fonte": "2. nov.pdf"
    },
    "comprovante": {
-    "numero_arquivo": 17,
-    "data": "2023-07-03",
-    "valor": 25000.0,
-    "favorecido": "Mog Produtora",
+    "numero_arquivo": 5,
+    "data": "2022-11-10",
+    "valor": 1200.0,
+    "favorecido": "Felipe G Rosa",
     "cnpj": "11.400.274/0001-94",
-    "descricao": "MoG Produtora - Produtora Executiva",
-    "fonte": "017 - 03-07-2023 - MoG Produtora - Produtora Executiva.pdf"
+    "descricao": "Frico Guimarães - Diretor de Fotografia",
+    "fonte": "005 - 10-11-2022 - Frico Guimarães - Diretor de Fotografia.pdf"
    },
-   "score_nome": 1.0
+   "score_nome": 0.9176
   },
   {
    "debito": {
@@ -2896,24 +2875,192 @@
   },
   {
    "debito": {
-    "doc": "92.802",
-    "data": "2023-09-28",
-    "valor": 1000.0,
+    "doc": "70.302",
+    "data": "2023-07-03",
+    "valor": 25000.0,
     "historico": "Pix - Enviado",
-    "favorecido": "Sofia Vontobel Baccarini",
+    "favorecido": "MOG PRODUTORA",
+    "pagina": 1,
+    "fonte": "7. jul.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 17,
+    "data": "2023-07-03",
+    "valor": 25000.0,
+    "favorecido": "Mog Produtora",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "MoG Produtora - Produtora Executiva",
+    "fonte": "017 - 03-07-2023 - MoG Produtora - Produtora Executiva.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.005",
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
     "pagina": 1,
     "fonte": "9. set.pdf"
    },
    "comprovante": {
-    "numero_arquivo": 37,
-    "data": "2023-09-28",
-    "valor": 1000.0,
-    "favorecido": "Sofia V Baccarini",
+    "numero_arquivo": 29,
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "favorecido": "Gol Linhas Aéreas",
     "cnpj": "11.400.274/0001-94",
-    "descricao": "Sofia Vontobel - Verba de Produção",
-    "fonte": "037 - 28-09-2023 - Sofia Vontobel - Verba de Produção.pdf"
+    "descricao": "André Manfrim RJ - Passagem Aérea",
+    "fonte": "029 - 20-09-2023 - André Manfrim RJ - Passagem Aérea.pdf"
    },
-   "score_nome": 0.9402
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.006",
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 30,
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Luis Cipullo RJ - Passagem Aérea",
+    "fonte": "030 - 20-09-2023 - Luis Cipullo RJ - Passagem Aérea.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.007",
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 31,
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Frico Guimarães RJ - Passagem Aérea",
+    "fonte": "031 - 20-09-2023 - Frico Guimarães RJ - Passagem Aérea.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.008",
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 32,
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Thiago Cunha RJ - Passagem Aérea",
+    "fonte": "032 - 20-09-2023 - Thiago Cunha RJ - Passagem Aérea.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.001",
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 25,
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Manfrim - Passagem Aérea",
+    "fonte": "025 - 20-09-2023 - André Manfrim - Passagem Aérea.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.002",
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 26,
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Luis Cipullo - Passagem Aérea",
+    "fonte": "026 - 20-09-2023 - Luis Cipullo - Passagem Aérea.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.003",
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 27,
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Thiago Cunha - Passagem Aérea",
+    "fonte": "027 - 20-09-2023 - Thiago Cunha - Passagem Aérea.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.004",
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 28,
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Frico Guimarães - Passagem Aérea",
+    "fonte": "028 - 20-09-2023 - Frico Guimarães - Passagem Aérea.pdf"
+   },
+   "score_nome": 1.0
   },
   {
    "debito": {
@@ -2938,22 +3085,22 @@
   },
   {
    "debito": {
-    "doc": "92.908",
-    "data": "2023-09-29",
-    "valor": 560.0,
+    "doc": "92.802",
+    "data": "2023-09-28",
+    "valor": 1000.0,
     "historico": "Pix - Enviado",
     "favorecido": "Sofia Vontobel Baccarini",
-    "pagina": 2,
+    "pagina": 1,
     "fonte": "9. set.pdf"
    },
    "comprovante": {
-    "numero_arquivo": 48,
-    "data": "2023-09-29",
-    "valor": 560.0,
+    "numero_arquivo": 37,
+    "data": "2023-09-28",
+    "valor": 1000.0,
     "favorecido": "Sofia V Baccarini",
     "cnpj": "11.400.274/0001-94",
-    "descricao": "Sofia Vontobel - verba de alimentação",
-    "fonte": "048 - 29-09-2023 - Sofia Vontobel - verba de alimentação.pdf"
+    "descricao": "Sofia Vontobel - Verba de Produção",
+    "fonte": "037 - 28-09-2023 - Sofia Vontobel - Verba de Produção.pdf"
    },
    "score_nome": 0.9402
   },
@@ -2980,6 +3127,27 @@
   },
   {
    "debito": {
+    "doc": "92.908",
+    "data": "2023-09-29",
+    "valor": 560.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Sofia Vontobel Baccarini",
+    "pagina": 2,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 48,
+    "data": "2023-09-29",
+    "valor": 560.0,
+    "favorecido": "Sofia V Baccarini",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Sofia Vontobel - verba de alimentação",
+    "fonte": "048 - 29-09-2023 - Sofia Vontobel - verba de alimentação.pdf"
+   },
+   "score_nome": 0.9402
+  },
+  {
+   "debito": {
     "doc": "92.905",
     "data": "2023-09-29",
     "valor": 1050.0,
@@ -2998,27 +3166,6 @@
     "fonte": "045 - 29-09-2023 - Luis Cipullo - verba de alimentação.pdf"
    },
    "score_nome": 0.9611
-  },
-  {
-   "debito": {
-    "doc": "92.906",
-    "data": "2023-09-29",
-    "valor": 1050.0,
-    "historico": "Pix - Enviado",
-    "favorecido": "Felipe Guimarães Rosa",
-    "pagina": 2,
-    "fonte": "9. set.pdf"
-   },
-   "comprovante": {
-    "numero_arquivo": 46,
-    "data": "2023-09-29",
-    "valor": 1050.0,
-    "favorecido": "Felipe G Rosa",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Frico Guimarães - verba de alimentação",
-    "fonte": "046 - 29-09-2023 - Frico Guimarães - verba de alimentação.pdf"
-   },
-   "score_nome": 0.9176
   },
   {
    "debito": {
@@ -3064,6 +3211,27 @@
   },
   {
    "debito": {
+    "doc": "92.906",
+    "data": "2023-09-29",
+    "valor": 1050.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Felipe Guimarães Rosa",
+    "pagina": 2,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 46,
+    "data": "2023-09-29",
+    "valor": 1050.0,
+    "favorecido": "Felipe G Rosa",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Frico Guimarães - verba de alimentação",
+    "fonte": "046 - 29-09-2023 - Frico Guimarães - verba de alimentação.pdf"
+   },
+   "score_nome": 0.9176
+  },
+  {
+   "debito": {
     "doc": "100.502",
     "data": "2023-10-05",
     "valor": 700.0,
@@ -3103,6 +3271,27 @@
     "fonte": "067 - 09-10-2023 - Luis Cipullo - verba de alimentação.pdf"
    },
    "score_nome": 0.9611
+  },
+  {
+   "debito": {
+    "doc": "100.911",
+    "data": "2023-10-09",
+    "valor": 240.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Thiago Augusto Gomas Cunha",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 70,
+    "data": "2023-10-09",
+    "valor": 240.0,
+    "favorecido": "Thiago A Gomas Cunha",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Thiago Cunha - verba de alimentação",
+    "fonte": "070 - 09-10-2023 - Thiago Cunha - verba de alimentação.pdf"
+   },
+   "score_nome": 0.9543
   },
   {
    "debito": {
@@ -3148,45 +3337,24 @@
   },
   {
    "debito": {
-    "doc": "100.911",
+    "doc": "100.901",
     "data": "2023-10-09",
-    "valor": 240.0,
+    "valor": 945.49,
     "historico": "Pix - Enviado",
-    "favorecido": "Thiago Augusto Gomas Cunha",
+    "favorecido": "AMIR LABAKI",
     "pagina": 1,
     "fonte": "10. out.pdf"
    },
    "comprovante": {
-    "numero_arquivo": 70,
+    "numero_arquivo": 59,
     "data": "2023-10-09",
-    "valor": 240.0,
-    "favorecido": "Thiago A Gomas Cunha",
+    "valor": 945.49,
+    "favorecido": "Amir Labaki",
     "cnpj": "11.400.274/0001-94",
-    "descricao": "Thiago Cunha - verba de alimentação",
-    "fonte": "070 - 09-10-2023 - Thiago Cunha - verba de alimentação.pdf"
+    "descricao": "Amir Labaki - Verba Transporte e Alimentação",
+    "fonte": "059 - 09-10-2023 - Amir Labaki - Verba Transporte e Alimentação.pdf"
    },
-   "score_nome": 0.9543
-  },
-  {
-   "debito": {
-    "doc": "101.306",
-    "data": "2023-10-13",
-    "valor": 480.0,
-    "historico": "Pix - Enviado",
-    "favorecido": "IDALINA SOUZA RIBEIRO DA S",
-    "pagina": 2,
-    "fonte": "10. out.pdf"
-   },
-   "comprovante": {
-    "numero_arquivo": 83,
-    "data": "2023-10-13",
-    "valor": 480.0,
-    "favorecido": "Idalina S R Silva",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Ida Leal - verba de alimentação",
-    "fonte": "083 - 13-10-2023 - Ida Leal - verba de alimentação.pdf"
-   },
-   "score_nome": 0.7316
+   "score_nome": 1.0
   },
   {
    "debito": {
@@ -3211,45 +3379,24 @@
   },
   {
    "debito": {
-    "doc": "101.301",
+    "doc": "101.306",
     "data": "2023-10-13",
-    "valor": 1200.0,
+    "valor": 480.0,
     "historico": "Pix - Enviado",
-    "favorecido": "Andre Lima Monfrini",
+    "favorecido": "IDALINA SOUZA RIBEIRO DA S",
     "pagina": 2,
     "fonte": "10. out.pdf"
    },
    "comprovante": {
-    "numero_arquivo": 78,
+    "numero_arquivo": 83,
     "data": "2023-10-13",
-    "valor": 1200.0,
-    "favorecido": "Andre Lima Monfrini",
+    "valor": 480.0,
+    "favorecido": "Idalina S R Silva",
     "cnpj": "11.400.274/0001-94",
-    "descricao": "André Manfrim - verba de alimentação",
-    "fonte": "078 - 13-10-2023 - André Manfrim - verba de alimentação.pdf"
+    "descricao": "Ida Leal - verba de alimentação",
+    "fonte": "083 - 13-10-2023 - Ida Leal - verba de alimentação.pdf"
    },
-   "score_nome": 1.0
-  },
-  {
-   "debito": {
-    "doc": "101.302",
-    "data": "2023-10-13",
-    "valor": 1200.0,
-    "historico": "Pix - Enviado",
-    "favorecido": "Felipe Guimarães Rosa",
-    "pagina": 2,
-    "fonte": "10. out.pdf"
-   },
-   "comprovante": {
-    "numero_arquivo": 79,
-    "data": "2023-10-13",
-    "valor": 1200.0,
-    "favorecido": "Felipe G Rosa",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Frico Guimarães - verba de alimentação",
-    "fonte": "079 - 13-10-2023 - Frico Guimarães - verba de alimentação.pdf"
-   },
-   "score_nome": 0.9176
+   "score_nome": 0.7316
   },
   {
    "debito": {
@@ -3295,24 +3442,87 @@
   },
   {
    "debito": {
-    "doc": "103.102",
-    "data": "2023-10-31",
-    "valor": 1020.0,
+    "doc": "101.301",
+    "data": "2023-10-13",
+    "valor": 1200.0,
     "historico": "Pix - Enviado",
-    "favorecido": "Felipe Guimarães Rosa",
-    "pagina": 3,
+    "favorecido": "Andre Lima Monfrini",
+    "pagina": 2,
     "fonte": "10. out.pdf"
    },
    "comprovante": {
-    "numero_arquivo": 114,
-    "data": "2023-10-31",
-    "valor": 1020.0,
+    "numero_arquivo": 78,
+    "data": "2023-10-13",
+    "valor": 1200.0,
+    "favorecido": "Andre Lima Monfrini",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Manfrim - verba de alimentação",
+    "fonte": "078 - 13-10-2023 - André Manfrim - verba de alimentação.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "101.302",
+    "data": "2023-10-13",
+    "valor": 1200.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Felipe Guimarães Rosa",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 79,
+    "data": "2023-10-13",
+    "valor": 1200.0,
     "favorecido": "Felipe G Rosa",
     "cnpj": "11.400.274/0001-94",
-    "descricao": "Frico Guimarães - Ajuda de custo + Alimentação",
-    "fonte": "114 - 31-10-2023 - Frico Guimarães - Ajuda de custo + Alimentação.pdf"
+    "descricao": "Frico Guimarães - verba de alimentação",
+    "fonte": "079 - 13-10-2023 - Frico Guimarães - verba de alimentação.pdf"
    },
    "score_nome": 0.9176
+  },
+  {
+   "debito": {
+    "doc": "101.601",
+    "data": "2023-10-16",
+    "valor": 3000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CAMILA LICARIAO DE CARVALH",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 35,
+    "data": "2023-10-16",
+    "valor": 3000.0,
+    "favorecido": "Camila Licariao de Carvalho Braune 4",
+    "cnpj": "36.584.511/0001-",
+    "descricao": "Camila Braune - Tecnica de som SP",
+    "fonte": "035 - 26-09-2023 - Camila Braune - Tecnica de som SP.pdf"
+   },
+   "score_nome": 0.7269
+  },
+  {
+   "debito": {
+    "doc": "102.504",
+    "data": "2023-10-25",
+    "valor": 10000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MOG PRODUTORA",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 33,
+    "data": "2023-10-25",
+    "valor": 10000.0,
+    "favorecido": "Mog Produtora",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Mônica Guimarães - Produtora Executiva",
+    "fonte": "033 - 26-09-2023 - Mônica Guimarães - Produtora Executiva.pdf"
+   },
+   "score_nome": 1.0
   },
   {
    "debito": {
@@ -3358,6 +3568,27 @@
   },
   {
    "debito": {
+    "doc": "103.102",
+    "data": "2023-10-31",
+    "valor": 1020.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Felipe Guimarães Rosa",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 114,
+    "data": "2023-10-31",
+    "valor": 1020.0,
+    "favorecido": "Felipe G Rosa",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Frico Guimarães - Ajuda de custo + Alimentação",
+    "fonte": "114 - 31-10-2023 - Frico Guimarães - Ajuda de custo + Alimentação.pdf"
+   },
+   "score_nome": 0.9176
+  },
+  {
+   "debito": {
     "doc": "110.802",
     "data": "2023-11-08",
     "valor": 300.0,
@@ -3376,189 +3607,6 @@
     "fonte": "119 - 08-11-2023 - Bernardo Tavares - assistente de pesquisa.pdf"
    },
    "score_nome": 0.7427
-  }
- ],
- "ambiguos_extrato": [
-  {
-   "debito": {
-    "doc": "92.005",
-    "data": "2023-09-20",
-    "valor": 1524.64,
-    "historico": "Pix - Enviado",
-    "favorecido": "GOL Linhas Aéreas",
-    "pagina": 1,
-    "fonte": "9. set.pdf"
-   },
-   "candidatos_comprovantes": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "debito": {
-    "doc": "92.006",
-    "data": "2023-09-20",
-    "valor": 1524.64,
-    "historico": "Pix - Enviado",
-    "favorecido": "GOL Linhas Aéreas",
-    "pagina": 1,
-    "fonte": "9. set.pdf"
-   },
-   "candidatos_comprovantes": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "debito": {
-    "doc": "92.007",
-    "data": "2023-09-20",
-    "valor": 1524.64,
-    "historico": "Pix - Enviado",
-    "favorecido": "GOL Linhas Aéreas",
-    "pagina": 1,
-    "fonte": "9. set.pdf"
-   },
-   "candidatos_comprovantes": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "debito": {
-    "doc": "92.008",
-    "data": "2023-09-20",
-    "valor": 1524.64,
-    "historico": "Pix - Enviado",
-    "favorecido": "GOL Linhas Aéreas",
-    "pagina": 1,
-    "fonte": "9. set.pdf"
-   },
-   "candidatos_comprovantes": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "debito": {
-    "doc": "92.001",
-    "data": "2023-09-20",
-    "valor": 2870.87,
-    "historico": "Pix - Enviado",
-    "favorecido": "GOL Linhas Aéreas",
-    "pagina": 1,
-    "fonte": "9. set.pdf"
-   },
-   "candidatos_comprovantes": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "debito": {
-    "doc": "92.002",
-    "data": "2023-09-20",
-    "valor": 2870.87,
-    "historico": "Pix - Enviado",
-    "favorecido": "GOL Linhas Aéreas",
-    "pagina": 1,
-    "fonte": "9. set.pdf"
-   },
-   "candidatos_comprovantes": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "debito": {
-    "doc": "92.003",
-    "data": "2023-09-20",
-    "valor": 2870.87,
-    "historico": "Pix - Enviado",
-    "favorecido": "GOL Linhas Aéreas",
-    "pagina": 1,
-    "fonte": "9. set.pdf"
-   },
-   "candidatos_comprovantes": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "debito": {
-    "doc": "92.004",
-    "data": "2023-09-20",
-    "valor": 2870.87,
-    "historico": "Pix - Enviado",
-    "favorecido": "GOL Linhas Aéreas",
-    "pagina": 1,
-    "fonte": "9. set.pdf"
-   },
-   "candidatos_comprovantes": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "debito": {
-    "doc": "100.901",
-    "data": "2023-10-09",
-    "valor": 945.49,
-    "historico": "Pix - Enviado",
-    "favorecido": "AMIR LABAKI",
-    "pagina": 1,
-    "fonte": "10. out.pdf"
-   },
-   "candidatos_comprovantes": [
-    "AMIR LABAKI",
-    "AMIR LABAKI"
-   ]
-  },
-  {
-   "debito": {
-    "doc": "101.601",
-    "data": "2023-10-16",
-    "valor": 3000.0,
-    "historico": "Pix - Enviado",
-    "favorecido": "CAMILA LICARIAO DE CARVALH",
-    "pagina": 2,
-    "fonte": "10. out.pdf"
-   },
-   "candidatos_comprovantes": [
-    "CAMILA LICARIAO DE CARVALHO BRAUNE 4",
-    "CAMILA LICARIAO DE CARVALHO BRAUNE 4"
-   ]
-  },
-  {
-   "debito": {
-    "doc": "102.504",
-    "data": "2023-10-25",
-    "valor": 10000.0,
-    "historico": "Pix - Enviado",
-    "favorecido": "MOG PRODUTORA",
-    "pagina": 2,
-    "fonte": "10. out.pdf"
-   },
-   "candidatos_comprovantes": [
-    "MOG PRODUTORA",
-    "MOG PRODUTORA"
-   ]
   },
   {
    "debito": {
@@ -3570,10 +3618,16 @@
     "pagina": 1,
     "fonte": "11. nov.pdf"
    },
-   "candidatos_comprovantes": [
-    "MONICA G P MORAES",
-    "MONICA G P MORAES"
-   ]
+   "comprovante": {
+    "numero_arquivo": 122,
+    "data": "2023-11-14",
+    "valor": 3724.74,
+    "favorecido": "Monica G P Moraes",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Reembolso MG (refeição e transporte)",
+    "fonte": "122 - 14-11-2023 - Reembolso MG (refeição e transporte).pdf"
+   },
+   "score_nome": 0.9333
   },
   {
    "debito": {
@@ -3585,275 +3639,6 @@
     "pagina": 1,
     "fonte": "2. fev.pdf"
    },
-   "candidatos_comprovantes": [
-    "BANCO RENDIMENTO S A"
-   ]
-  },
-  {
-   "debito": {
-    "doc": "20.303",
-    "data": "2025-02-03",
-    "valor": 975.04,
-    "historico": "Pix - Enviado",
-    "favorecido": "BANCO RENDIMENTO S/A",
-    "pagina": 1,
-    "fonte": "2. fev.pdf"
-   },
-   "candidatos_comprovantes": [
-    "BANCO RENDIMENTO S A"
-   ]
-  }
- ],
- "ambiguos_comprovante": [
-  {
-   "comprovante": {
-    "numero_arquivo": 29,
-    "data": "2023-09-20",
-    "valor": 1524.64,
-    "favorecido": "Gol Linhas Aéreas",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "André Manfrim RJ - Passagem Aérea",
-    "fonte": "029 - 20-09-2023 - André Manfrim RJ - Passagem Aérea.pdf"
-   },
-   "candidatos_extrato": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 30,
-    "data": "2023-09-20",
-    "valor": 1524.64,
-    "favorecido": "Gol Linhas Aéreas",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Luis Cipullo RJ - Passagem Aérea",
-    "fonte": "030 - 20-09-2023 - Luis Cipullo RJ - Passagem Aérea.pdf"
-   },
-   "candidatos_extrato": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 31,
-    "data": "2023-09-20",
-    "valor": 1524.64,
-    "favorecido": "Gol Linhas Aéreas",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Frico Guimarães RJ - Passagem Aérea",
-    "fonte": "031 - 20-09-2023 - Frico Guimarães RJ - Passagem Aérea.pdf"
-   },
-   "candidatos_extrato": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 32,
-    "data": "2023-09-20",
-    "valor": 1524.64,
-    "favorecido": "Gol Linhas Aéreas",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Thiago Cunha RJ - Passagem Aérea",
-    "fonte": "032 - 20-09-2023 - Thiago Cunha RJ - Passagem Aérea.pdf"
-   },
-   "candidatos_extrato": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 25,
-    "data": "2023-09-20",
-    "valor": 2870.87,
-    "favorecido": "Gol Linhas Aéreas",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "André Manfrim - Passagem Aérea",
-    "fonte": "025 - 20-09-2023 - André Manfrim - Passagem Aérea.pdf"
-   },
-   "candidatos_extrato": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 26,
-    "data": "2023-09-20",
-    "valor": 2870.87,
-    "favorecido": "Gol Linhas Aéreas",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Luis Cipullo - Passagem Aérea",
-    "fonte": "026 - 20-09-2023 - Luis Cipullo - Passagem Aérea.pdf"
-   },
-   "candidatos_extrato": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 27,
-    "data": "2023-09-20",
-    "valor": 2870.87,
-    "favorecido": "Gol Linhas Aéreas",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Thiago Cunha - Passagem Aérea",
-    "fonte": "027 - 20-09-2023 - Thiago Cunha - Passagem Aérea.pdf"
-   },
-   "candidatos_extrato": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 28,
-    "data": "2023-09-20",
-    "valor": 2870.87,
-    "favorecido": "Gol Linhas Aéreas",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Frico Guimarães - Passagem Aérea",
-    "fonte": "028 - 20-09-2023 - Frico Guimarães - Passagem Aérea.pdf"
-   },
-   "candidatos_extrato": [
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS",
-    "GOL LINHAS AEREAS"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 59,
-    "data": "2023-10-09",
-    "valor": 945.49,
-    "favorecido": "Amir Labaki",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Amir Labaki - Verba Transporte e Alimentação",
-    "fonte": "059 - 09-10-2023 - Amir Labaki - Verba Transporte e Alimentação.pdf"
-   },
-   "candidatos_extrato": [
-    "AMIR LABAKI"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 60,
-    "data": "2023-10-09",
-    "valor": 945.49,
-    "favorecido": "Amir Labaki",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Amir Labaki - Verba Transporte e Alimentação",
-    "fonte": "060 - 09-10-2023 - Amir Labaki - Verba Transporte e Alimentação.pdf"
-   },
-   "candidatos_extrato": [
-    "AMIR LABAKI"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 35,
-    "data": "2023-10-16",
-    "valor": 3000.0,
-    "favorecido": "Camila Licariao de Carvalho Braune 4",
-    "cnpj": "36.584.511/0001-",
-    "descricao": "Camila Braune - Tecnica de som SP",
-    "fonte": "035 - 26-09-2023 - Camila Braune - Tecnica de som SP.pdf"
-   },
-   "candidatos_extrato": [
-    "CAMILA LICARIAO DE CARVALH"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 87,
-    "data": "2023-10-16",
-    "valor": 3000.0,
-    "favorecido": "Camila Licariao de Carvalho Braune 4",
-    "cnpj": "36.584.511/0001-",
-    "descricao": "Camila Braune - Tecnica de som SP",
-    "fonte": "087 - 16-10-2023 - Camila Braune - Tecnica de som SP.pdf"
-   },
-   "candidatos_extrato": [
-    "CAMILA LICARIAO DE CARVALH"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 33,
-    "data": "2023-10-25",
-    "valor": 10000.0,
-    "favorecido": "Mog Produtora",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Mônica Guimarães - Produtora Executiva",
-    "fonte": "033 - 26-09-2023 - Mônica Guimarães - Produtora Executiva.pdf"
-   },
-   "candidatos_extrato": [
-    "MOG PRODUTORA"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 96,
-    "data": "2023-10-25",
-    "valor": 10000.0,
-    "favorecido": "Mog Produtora",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Mônica Guimarães - Produtora Executiva",
-    "fonte": "096 - 25-10-2023 - Mônica Guimarães - Produtora Executiva.pdf"
-   },
-   "candidatos_extrato": [
-    "MOG PRODUTORA"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 122,
-    "data": "2023-11-14",
-    "valor": 3724.74,
-    "favorecido": "Monica G P Moraes",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Reembolso MG (refeição e transporte)",
-    "fonte": "122 - 14-11-2023 - Reembolso MG (refeição e transporte).pdf"
-   },
-   "candidatos_extrato": [
-    "MONICA GUIMARAES P MORAES"
-   ]
-  },
-  {
-   "comprovante": {
-    "numero_arquivo": 123,
-    "data": "2023-11-14",
-    "valor": 3724.74,
-    "favorecido": "Monica G P Moraes",
-    "cnpj": "11.400.274/0001-94",
-    "descricao": "Reembolso MG (refeição e transporte)",
-    "fonte": "123 - 14-11-2023 - Reembolso MG (refeição e transporte).pdf"
-   },
-   "candidatos_extrato": [
-    "MONICA GUIMARAES P MORAES"
-   ]
-  },
-  {
    "comprovante": {
     "numero_arquivo": 173,
     "data": "2025-02-03",
@@ -3863,12 +3648,11 @@
     "descricao": "La Nacion - Licenciamento",
     "fonte": "173 - 03-02-2025 - La Nacion - Licenciamento.pdf"
    },
-   "candidatos_extrato": [
-    "BANCO RENDIMENTO S A",
-    "BANCO RENDIMENTO S A"
-   ]
+   "score_nome": 1.0
   }
  ],
+ "ambiguos_extrato": [],
+ "ambiguos_comprovante": [],
  "divergentes_valor": [
   {
    "debito": {
@@ -3964,7 +3748,68 @@
     "fonte": "2. fev.pdf"
    },
    "observacao": "comprovante do mesmo valor na data já vinculado a outro débito"
+  },
+  {
+   "debito": {
+    "doc": "20.303",
+    "data": "2025-02-03",
+    "valor": 975.04,
+    "historico": "Pix - Enviado",
+    "favorecido": "BANCO RENDIMENTO S/A",
+    "pagina": 1,
+    "fonte": "2. fev.pdf"
+   },
+   "observacao": "comprovante do mesmo valor na data já vinculado a outro débito"
   }
  ],
- "orfaos_comprovante": []
+ "orfaos_comprovante": [
+  {
+   "comprovante": {
+    "numero_arquivo": 60,
+    "data": "2023-10-09",
+    "valor": 945.49,
+    "favorecido": "Amir Labaki",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Amir Labaki - Verba Transporte e Alimentação",
+    "fonte": "060 - 09-10-2023 - Amir Labaki - Verba Transporte e Alimentação.pdf"
+   },
+   "observacao": "sem débito correspondente"
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 87,
+    "data": "2023-10-16",
+    "valor": 3000.0,
+    "favorecido": "Camila Licariao de Carvalho Braune 4",
+    "cnpj": "36.584.511/0001-",
+    "descricao": "Camila Braune - Tecnica de som SP",
+    "fonte": "087 - 16-10-2023 - Camila Braune - Tecnica de som SP.pdf"
+   },
+   "observacao": "sem débito correspondente"
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 96,
+    "data": "2023-10-25",
+    "valor": 10000.0,
+    "favorecido": "Mog Produtora",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Mônica Guimarães - Produtora Executiva",
+    "fonte": "096 - 25-10-2023 - Mônica Guimarães - Produtora Executiva.pdf"
+   },
+   "observacao": "sem débito correspondente"
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 123,
+    "data": "2023-11-14",
+    "valor": 3724.74,
+    "favorecido": "Monica G P Moraes",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Reembolso MG (refeição e transporte)",
+    "fonte": "123 - 14-11-2023 - Reembolso MG (refeição e transporte).pdf"
+   },
+   "observacao": "sem débito correspondente"
+  }
+ ]
 }
