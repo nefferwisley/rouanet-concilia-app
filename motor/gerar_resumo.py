@@ -8,7 +8,7 @@ Lê somente os artefatos (não altera nada) e escreve
 Fontes:
     motor/_parsed/movimentos.json         (extrato)
     motor/_parsed/comprovantes.json       (comprovantes)
-    motor/_parsed/cruzamento.json         (task 003)
+    motor/_parsed/cruzamento.json         (task 003, formato lista)
     saida/planilha/planilha_corrigida.xlsx (task 004)
 """
 
@@ -32,8 +32,8 @@ def _br(v) -> str:
     return f"R$ {s}"
 
 
-def _soma(itens, chave) -> float:
-    return round(sum(round(float(i[chave]["valor"]), 2) for i in itens), 2)
+def _soma(linhas) -> float:
+    return round(sum(round(float(r["valor"]), 2) for r in linhas), 2)
 
 
 def main():
@@ -50,19 +50,17 @@ def main():
 
     debs = [m for m in movs if m.get("sinal") == "D"]
     creds = [m for m in movs if m.get("sinal") == "C"]
-    conc = cruz["conciliados"]
-    orf_ext = cruz["orfaos_extrato"]
-    orf_comp = cruz["orfaos_comprovante"]
-    div = cruz["divergentes_valor"]
-    amb_ext = cruz["ambiguos_extrato"]
-    amb_comp = cruz["ambiguos_comprovante"]
+    conc = [r for r in cruz if r["status"] == "CONCILIADO"]
+    orf_ext = [r for r in cruz if r["status"] == "SEM-COMPROVANTE"]
+    orf_comp = [r for r in cruz if r["status"] == "SEM-EXTRATO"]
+    div = [r for r in cruz if r["status"] == "DIVERGENTE"]
+    amb = [r for r in cruz if r["status"] == "AMBIGUO"]
 
-    soma_deb_conc = _soma(conc, "debito")
-    soma_comp_conc = _soma(conc, "comprovante")
+    soma_deb_conc = _soma(conc)
+    soma_comp_conc = _soma(conc)
 
-    # lançamentos não casados (débitos e comprovantes fora dos conciliados)
-    nao_casados_deb = _soma(orf_ext, "debito") + _soma(div, "debito") + _soma(amb_ext, "debito")
-    nao_casados_comp = _soma(orf_comp, "comprovante") + _soma(div, "comprovante") + _soma(amb_comp, "comprovante")
+    nao_casados_deb = _soma(orf_ext) + _soma(div)
+    nao_casados_comp = _soma(orf_comp) + _soma(div) + _soma(amb)
 
     difs = {
         "débitos conciliados vs comprovantes conciliados": abs(soma_deb_conc - soma_comp_conc),
@@ -71,18 +69,19 @@ def main():
     }
     batimento_ok = all(d <= TOLERANCIA for d in difs.values())
 
-    # pendências (seção 3)
     pendencias = []
-    for i in orf_ext:
-        pendencias.append(("SEM-COMPROVANTE", i["debito"]["data"], i["debito"]["favorecido"], i["debito"]["valor"], i.get("observacao", "")))
-    for i in orf_comp:
-        pendencias.append(("SEM-EXTRATO", i["comprovante"]["data"], i["comprovante"]["favorecido"], i["comprovante"]["valor"], i.get("observacao", "")))
-    for i in div:
-        pendencias.append(("DIVERGENTE", i["debito"]["data"], i["comprovante"]["favorecido"], i["debito"]["valor"], i.get("motivo", "")))
-    for i in amb_ext:
-        pendencias.append(("AMBIGUO", i["debito"]["data"], i["debito"]["favorecido"], i["debito"]["valor"], "débito disputado por comprovantes"))
-    for i in amb_comp:
-        pendencias.append(("AMBIGUO", i["comprovante"]["data"], i["comprovante"]["favorecido"], i["comprovante"]["valor"], "comprovante disputado por débitos"))
+    for r in orf_ext:
+        pendencias.append(("SEM-COMPROVANTE", r.get("data_pagamento") or "", r.get("favorecido") or "", r["valor"],
+                           r.get("observacao") or "débito no extrato sem comprovante correspondente"))
+    for r in orf_comp:
+        pendencias.append(("SEM-EXTRATO", r.get("data_pagamento") or "", r.get("favorecido") or "", r["valor"],
+                           r.get("observacao") or "comprovante sem débito correspondente"))
+    for r in div:
+        pendencias.append(("DIVERGENTE", r.get("data_pagamento") or "", r.get("favorecido") or "", r["valor"],
+                           r.get("observacao") or "valor ou condições divergem"))
+    for r in amb:
+        pendencias.append(("AMBIGUO", r.get("data_pagamento") or "", r.get("favorecido") or "", r["valor"],
+                           r.get("observacao") or "pagamento duplicado ou débito não lançado"))
 
     total_deb = len(debs)
     total_comp = len(comps)
@@ -104,7 +103,7 @@ def main():
     ap(f"- Órfãos no extrato (sem comprovante): **{len(orf_ext)}**")
     ap(f"- Órfãos comprovante (sem extrato): **{len(orf_comp)}**")
     ap(f"- Divergentes de valor: **{len(div)}**")
-    ap(f"- Ambíguos: **{len(amb_ext)}** débitos + **{len(amb_comp)}** comprovantes")
+    ap(f"- Ambíguos: **{len(amb)}**")
     ap("")
     ap("## 2. Batimento de saldo")
     ap("")
@@ -143,10 +142,10 @@ def main():
     ap("## 5. Nota metodológica")
     ap("")
     ap("- Extrações 100% determinísticas: PyMuPDF, texto nativo do PDF, sem OCR nem IA externa.")
-    ap("- Cruzamento 1:1 por chave (data + valor) e por conteúdo de nome normalizado (acentos removidos, "
-       "tokens comparados, iniciais e prefixos); quando há empate, marca-se AMBIGUO em vez de chutar.")
-    ap("- Campos ambíguos são apontados na observação de cada linha; rubrica SALIC fica '(a classificar)' "
-       "porque o cruzamento não a traz (nunca inventada).")
+    ap("- Cruzamento 1:1 por chave (data + valor); comprovante com valor ilegível assume o valor do "
+       "débito que casa por data + favorecido normalizado (registrado na observação).")
+    ap("- Comprovantes excedentes numa chave (mesmo valor/data de outro que já casou) ficam AMBIGUO; "
+       "rubrica SALIC fica '(a classificar)' porque o cruzamento não a traz (nunca inventada).")
     ap("")
 
     SAIDA.mkdir(parents=True, exist_ok=True)

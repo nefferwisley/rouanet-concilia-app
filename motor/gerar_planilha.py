@@ -1,301 +1,198 @@
 #!/usr/bin/env python3
 """
-motor/gerar_planilha.py — Task 004: planilha corrigida (xlsx) a partir do cruzamento.
+motor/gerar_planilha.py — Task 004: gera a planilha corrigida (Excel).
 
 Entrada:
-    motor/_parsed/cruzamento.json   (task 003)
+    motor/_parsed/cruzamento.json   — saída de gerar_cruzamento.py (Task 003)
 
 Saídas:
     saida/planilha/planilha_corrigida.xlsx
-    motor/_parsed/planilha_linhas.json   (referência p/ a task 005)
+        Uma linha por pagamento, colunas na ordem fixa:
+        [Nº | Data pagamento | Favorecido | CNPJ/CPF | Rubrica SALIC | Valor |
+         Status | Arquivo Final | Observação]
 
-Uma linha = um pagamento (conciliados + órfãos + divergentes + ambíguos).
-O cruzamento não traz rubrica SALIC -> coluna fica "(a classificar)" (nunca
-inventar; contagem reportada ao board).
+    motor/_parsed/planilha_linhas.json
+        Referência para a Task 005 (espelho da pasta). MESMA ordem linha a
+        linha da planilha: lista de {arquivo_final, subpasta, data, valor}.
 
-planilha_linhas.json só lista as linhas QUE TÊM comprovante (arquivo final),
-na mesma ordem das linhas da planilha — é o conjunto que a task 005 copia.
-Linhas SEM-COMPROVANTE ficam com a coluna "Arquivo Final" vazia.
-Comprovante com valor ilegível (<= 0) -> arquivo final = nome original em
-"saida/arquivos_finais/PENDENTES/" (regra da task 005).
-
-Colunas (ordem fixa): Nº, Data pagamento, Favorecido, CNPJ/CPF, Rubrica SALIC,
-Valor, Status, Arquivo Final, Observação.
+Regras:
+    - Rubrica nunca é inventada: sem código no cruzamento -> "(a classificar)".
+    - Favorecido vindo do extrato recebe a marca "(truncado)".
+    - CNPJ/CPF repetido aparece como "xxx (i de N)".
+    - Arquivo Final (quando existe comprovante) usa o padrão exato da 005:
+      NNN_RUBRICA_dd-mm-aaaa_R$valor_favorecido_slug.pdf
 """
-
 import json
 import re
+import sys
 import unicodedata
 from collections import Counter
+from datetime import date
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
-from openpyxl import Workbook
+import openpyxl
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 RAIZ = Path(__file__).resolve().parent.parent
 PARSED = RAIZ / "motor" / "_parsed"
-PASTA_PLANILHA = RAIZ / "saida" / "planilha"
-XLSX = PASTA_PLANILHA / "planilha_corrigida.xlsx"
-LINHAS_JSON = PARSED / "planilha_linhas.json"
+CRUZAMENTO = PARSED / "cruzamento.json"
+SAIDA_XLSX = RAIZ / "saida" / "planilha" / "planilha_corrigida.xlsx"
+SAIDA_JSON = PARSED / "planilha_linhas.json"
 
-RUBRICA = "(a classificar)"
-PENDENTES = "PENDENTES"
-
-# classe (task 003) -> status (vocabulário da planilha)
-CLASSE_PARA_STATUS = {
-    "conciliados": "CONCILIADO",
-    "orfaos_extrato": "SEM-COMPROVANTE",
-    "orfaos_comprovante": "SEM-EXTRATO",
-    "divergentes_valor": "DIVERGENTE",
-    "ambiguos_extrato": "AMBIGUO",
-    "ambiguos_comprovante": "AMBIGUO",
-}
-
-ORDEM = [
-    "conciliados",
-    "ambiguos_extrato",
-    "ambiguos_comprovante",
-    "divergentes_valor",
-    "orfaos_extrato",
-    "orfaos_comprovante",
+HEADERS = [
+    "Nº",
+    "Data pagamento",
+    "Favorecido",
+    "CNPJ/CPF",
+    "Rubrica SALIC",
+    "Valor",
+    "Status",
+    "Arquivo Final",
+    "Observação",
 ]
 
-CABECALHO = [
-    "Nº", "Data pagamento", "Favorecido", "CNPJ/CPF", "Rubrica SALIC",
-    "Valor", "Status", "Arquivo Final", "Observação",
-]
+RUBRICA_PADRAO = "(a classificar)"
 
 
-# ---------------------------------------------------------------- helpers
-def _normalizar(s) -> str:
-    t = unicodedata.normalize("NFKD", str(s))
-    return "".join(c for c in t if not unicodedata.combining(c))
+def slug(txt: str) -> str:
+    """ASCII em minúsculas, sem acento, tokens separados por '-'."""
+    t = unicodedata.normalize("NFKD", str(txt or ""))
+    t = "".join(c for c in t if not unicodedata.combining(c))
+    t = re.sub(r"[^0-9A-Za-z]+", "-", t).strip("-").lower()
+    return t[:60].rstrip("-") or "sem-nome"
 
 
-def _slug(s) -> str:
-    t = _normalizar(s).lower()
-    t = re.sub(r"[^a-z0-9]+", "_", t)
-    return t.strip("_")
+def br_valor(v) -> str:
+    """'1234.56' -> 'R$1.234,56' (formato usado no nome do arquivo)."""
+    try:
+        d = Decimal(str(v)).quantize(Decimal("0.01"))
+    except InvalidOperation:
+        return f"R${v}"
+    inteiro = f"{int(d):,}".replace(",", ".")
+    cent = f"{abs(int((d % 1) * 100)):02d}"
+    return f"R${inteiro},{cent}"
 
 
-def _data_ddmm(iso) -> str:
-    a, m, d = str(iso).split("-")
-    return f"{d}-{m}-{a}"
+def data_dd_mm_aaaa(iso: str) -> str:
+    """'2023-11-14' -> '14-11-2023' (pro nome do arquivo)."""
+    try:
+        d = date.fromisoformat(str(iso)[:10])
+    except ValueError:
+        return str(iso)
+    return d.strftime("%d-%m-%Y")
 
 
-def _valor_br(v) -> str:
-    s = f"{float(v):,.2f}"
-    s = s.replace(",", "X").replace(".", ",").replace("X", ".")
-    return f"R${s}"
+def nome_final(numero: int, rubrica: str, data_iso: str, valor, favorecido: str) -> str:
+    rub = slug(rubrica or RUBRICA_PADRAO)
+    return f"{numero:03d}_{rub}_{data_dd_mm_aaaa(data_iso)}_{br_valor(valor)}_{slug(favorecido)}.pdf"
 
 
-def _sem_sufixo_truncado(favorecido) -> str:
-    return re.sub(r"\(\s*truncado\s*\)\s*$", "", favorecido).strip()
+def _casa(v) -> float:
+    try:
+        return round(float(v), 2)
+    except (TypeError, ValueError):
+        return 0.0
 
 
-def _resumo_unicos(nomes) -> str:
-    vistos = []
-    for n in nomes:
-        if n and n not in vistos:
-            vistos.append(n)
-    return ", ".join(vistos)
+def main(caminho_cruzamento: Path = CRUZAMENTO) -> None:
+    if not caminho_cruzamento.exists():
+        sys.exit(f"ERRO: {caminho_cruzamento} não existe. Rode antes motor/gerar_cruzamento.py")
+    linhas = json.loads(caminho_cruzamento.read_text(encoding="utf-8"))
 
+    # ocorrências por CNPJ/CPF pra marcação "(x de N)"
+    chaves = [(r.get("cnpj_cpf") or "").strip() for r in linhas]
+    contagem = Counter(c for c in chaves if c)
+    visto = Counter()
 
-def _fav_debito(m) -> str:
-    return (m.get("favorecido") or "").strip()
-
-
-def _fav_comprovante(c) -> str:
-    return (c.get("favorecido") or c.get("descricao") or "").strip()
-
-
-def _valor_debito(m):
-    return round(float(m["valor"]), 2)
-
-
-def _valor_comprovante(c):
-    v = c.get("valor")
-    return round(float(v), 2) if v is not None else None
-
-
-def _linhas_brutas(cruz) -> list[dict]:
-    """Constrói uma linha (sem Nº/Arquivo Final) por item do cruzamento."""
-    linhas = []
-    for classe in ORDEM:
-        status = CLASSE_PARA_STATUS[classe]
-        for item in cruz.get(classe, []):
-            if classe == "conciliados":
-                d, c = item["debito"], item["comprovante"]
-                linhas.append({
-                    "data": d["data"],
-                    "favorecido": _fav_comprovante(c) or _fav_debito(d),
-                    "cnpj": c.get("cnpj"),
-                    "valor": _valor_comprovante(c) if _valor_comprovante(c) is not None else _valor_debito(d),
-                    "status": status,
-                    "obs": "",
-                    "numero_arquivo": c.get("numero_arquivo"),
-                    "fonte_comprovante": c.get("fonte"),
-                    "valor_comprovante": _valor_comprovante(c),
-                })
-            elif classe == "ambiguos_extrato":
-                d = item["debito"]
-                linhas.append({
-                    "data": d["data"],
-                    "favorecido": _fav_debito(d) + " (truncado)",
-                    "cnpj": None,
-                    "valor": _valor_debito(d),
-                    "status": status,
-                    "obs": "débito disputado por comprovantes: " + _resumo_unicos(item.get("candidatos_comprovantes", [])),
-                    "numero_arquivo": None,
-                    "fonte_comprovante": None,
-                    "valor_comprovante": None,
-                })
-            elif classe == "ambiguos_comprovante":
-                c = item["comprovante"]
-                linhas.append({
-                    "data": c["data"],
-                    "favorecido": _fav_comprovante(c),
-                    "cnpj": c.get("cnpj"),
-                    "valor": _valor_comprovante(c) if _valor_comprovante(c) is not None else 0.0,
-                    "status": status,
-                    "obs": "comprovante disputado por débitos: " + _resumo_unicos(item.get("candidatos_extrato", [])),
-                    "numero_arquivo": c.get("numero_arquivo"),
-                    "fonte_comprovante": c.get("fonte"),
-                    "valor_comprovante": _valor_comprovante(c),
-                })
-            elif classe == "divergentes_valor":
-                d, c = item["debito"], item["comprovante"]
-                linhas.append({
-                    "data": d["data"],
-                    "favorecido": _fav_comprovante(c) or _fav_debito(d),
-                    "cnpj": c.get("cnpj"),
-                    "valor": _valor_debito(d),
-                    "status": status,
-                    "obs": item.get("motivo", ""),
-                    "numero_arquivo": c.get("numero_arquivo"),
-                    "fonte_comprovante": c.get("fonte"),
-                    "valor_comprovante": _valor_comprovante(c),
-                })
-            elif classe == "orfaos_extrato":
-                d = item["debito"]
-                linhas.append({
-                    "data": d["data"],
-                    "favorecido": _fav_debito(d) + " (truncado)",
-                    "cnpj": None,
-                    "valor": _valor_debito(d),
-                    "status": status,
-                    "obs": item.get("observacao", ""),
-                    "numero_arquivo": None,
-                    "fonte_comprovante": None,
-                    "valor_comprovante": None,
-                })
-            else:  # orfaos_comprovante
-                c = item["comprovante"]
-                linhas.append({
-                    "data": c["data"],
-                    "favorecido": _fav_comprovante(c),
-                    "cnpj": c.get("cnpj"),
-                    "valor": _valor_comprovante(c) if _valor_comprovante(c) is not None else 0.0,
-                    "status": status,
-                    "obs": item.get("observacao", ""),
-                    "numero_arquivo": c.get("numero_arquivo"),
-                    "fonte_comprovante": c.get("fonte"),
-                    "valor_comprovante": _valor_comprovante(c),
-                })
-    return linhas
-
-
-def _arquivo_final(num, data, valor, favorecido):
-    slug_fav = _slug(_sem_sufixo_truncado(favorecido)) or "sem_favorecido"
-    return f"{num:04d}_{RUBRICA}_{_data_ddmm(data)}_{_valor_br(valor)}_{slug_fav}.pdf"
-
-
-def _destino_linha(ln):
-    """Subpasta + arquivo final de cada linha (None se a linha não tem comprovante)."""
-    if ln["numero_arquivo"] is None:
-        return None, None
-    if ln["valor_comprovante"] is None or ln["valor_comprovante"] <= 0:
-        return PENDENTES, ln["fonte_comprovante"]
-    return RUBRICA, _arquivo_final(ln["num"], ln["data"], ln["valor"], ln["favorecido"])
-
-
-def _gerar_xlsx(linhas):
-    wb = Workbook()
+    wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Pagamentos"
+    ws.append(HEADERS)
 
-    ws.append(CABECALHO)
-    for col, _ in enumerate(CABECALHO, start=1):
-        ws.cell(row=1, column=col).font = Font(bold=True)
-        ws.cell(row=1, column=col).fill = PatternFill("solid", fgColor="DDEBF7")
-        ws.cell(row=1, column=col).alignment = Alignment(vertical="center")
+    filas_json = []
+    for num, r in enumerate(linhas, start=1):
+        cnpj = (r.get("cnpj_cpf") or "").strip()
+        cnpj_txt = cnpj
+        if cnpj and contagem[cnpj] > 1:
+            visto[cnpj] += 1
+            cnpj_txt = f"{cnpj} ({visto[cnpj]} de {contagem[cnpj]})"
+        elif cnpj:
+            visto[cnpj] = 1
 
-    for ln in linhas:
-        arq = ln["arquivo_final"]
+        favo = (r.get("favorecido") or "").strip()
+        if r.get("favorecido_fonte") == "extrato" and favo:
+            favo_txt = f"{favo} (truncado)"
+        else:
+            favo_txt = favo
+
+        rub = (r.get("rubrica_salic") or "").strip() or RUBRICA_PADRAO
+        valor = _casa(r.get("valor"))
+
+        arq = ""
+        if r.get("status") != "SEM-COMPROVANTE":
+            arq = nome_final(num, rub, r.get("data_pagamento") or "", valor, favo)
+
+        obs = (r.get("observacao") or "").strip()
+        if r.get("status") == "SEM-COMPROVANTE" and not obs:
+            obs = "débito no extrato sem comprovante correspondente"
+
         ws.append([
-            ln["num"],
-            ln["data"],
-            ln["favorecido"],
-            ln["cnpj"] or "",
-            RUBRICA,
-            ln["valor"],
-            ln["status"],
-            (f"{ln['subpasta']}\\{arq}" if arq else ""),
-            ln["obs"],
+            num,
+            r.get("data_pagamento"),
+            favo_txt,
+            cnpj_txt,
+            rub,
+            valor,
+            r.get("status"),
+            arq,
+            obs,
         ])
-        ws.cell(row=ws.max_row, column=6).number_format = "#,##0.00"
 
+        filas_json.append({
+            "arquivo_final": arq,
+            "subpasta": rub,
+            "data": r.get("data_pagamento"),
+            "valor": valor,
+        })
+
+    # ---- formatação
+    for col in range(1, len(HEADERS) + 1):
+        cell = ws.cell(row=1, column=col)
+        cell.font = Font(bold=True)
+        cell.fill = PatternFill("solid", fgColor="D9E1F2")
+        cell.alignment = Alignment(vertical="center")
+
+    ws.auto_filter.ref = f"A1:{get_column_letter(len(HEADERS))}{ws.max_row}"
     ws.freeze_panes = "A2"
-    ws.auto_filter.ref = ws.dimensions
 
-    larguras = [6, 13, 42, 20, 17, 13, 16, 62, 60]
-    for i, w in enumerate(larguras, start=1):
-        ws.column_dimensions[get_column_letter(i)].width = w
+    for col, larg in {"A": 6, "B": 13, "C": 42, "D": 24, "E": 16,
+                      "F": 14, "G": 16, "H": 70, "I": 52}.items():
+        ws.column_dimensions[col].width = larg
 
-    PASTA_PLANILHA.mkdir(parents=True, exist_ok=True)
-    wb.save(XLSX)
+    for row in ws.iter_rows(min_row=2, min_col=1, max_col=len(HEADERS)):
+        row[1].number_format = "@"
+        row[5].number_format = "#,##0.00"
 
+    SAIDA_XLSX.parent.mkdir(parents=True, exist_ok=True)
+    wb.save(SAIDA_XLSX)
 
-def main():
-    cruz = json.loads((PARSED / "cruzamento.json").read_text(encoding="utf-8"))
-    brutas = _linhas_brutas(cruz)
+    (PARSED / "planilha_linhas.json").write_text(
+        json.dumps(filas_json, ensure_ascii=False, indent=1), encoding="utf-8")
 
-    usados = Counter()
-    linhas = []
-    for n, ln in enumerate(brutas, start=1):
-        ln = {**ln, "num": n}
-        subpasta, arq = _destino_linha(ln)
-        if arq:
-            usados[arq] += 1
-            if usados[arq] > 1:
-                arq = f"{arq[:-4]}_{usados[arq]}.pdf"
-        linhas.append({**ln, "subpasta": subpasta, "arquivo_final": arq})
+    print(f"planilha:     {SAIDA_XLSX}")
+    print(f"referência 005: {SAIDA_JSON}")
+    print(f"linhas: {len(linhas)}")
 
-    _gerar_xlsx(linhas)
+    print("\nResumo por status (reportar ao board):")
+    for st, n in Counter(r.get("status") for r in linhas).most_common():
+        print(f"  {st:16s} {n}")
 
-    ref = [
-        {
-            "arquivo_final": ln["arquivo_final"],
-            "subpasta": ln["subpasta"],
-            "data": ln["data"],
-            "valor": ln["valor"],
-            "numero_arquivo": ln["numero_arquivo"],
-        }
-        for ln in linhas
-        if ln["arquivo_final"]
-    ]
-    LINHAS_JSON.write_text(json.dumps(ref, ensure_ascii=False, indent=1), encoding="utf-8")
-
-    return {
-        "arquivo": str(XLSX),
-        "linhas": len(linhas),
-        "com_arquivo_final": len(ref),
-        "por_status": dict(Counter(ln["status"] for ln in linhas)),
-        "rubrica": RUBRICA,
-        "pendentes": sum(1 for ln in linhas if ln["subpasta"] == PENDENTES),
-    }
+    sem_rub = sum(1 for r in linhas if not (r.get("rubrica_salic") or "").strip())
+    print(f"\nRubricas: {sem_rub} linhas sem rubrica no cruzamento "
+          f"-> todas marcadas '{RUBRICA_PADRAO}' (nenhuma inventada)")
 
 
 if __name__ == "__main__":
-    print(json.dumps(main(), ensure_ascii=False, indent=1))
+    main()

@@ -457,6 +457,120 @@ def cruzamento_em_memoria(comprovantes: list[dict], movimentos: list[dict]) -> d
     return cruzador.resultado()
 
 
+def _para_linhas(resultado: dict) -> list[dict]:
+    """Converte o resultado em-memória (classes) pro formato em lista da task 003
+    (mesmo schema de motor/gerar_cruzamento.py)."""
+    def _comprovante_pdf(c):
+        return Path(str(c.get("fonte") or "")).name or None
+
+    def _extrato_ref(d):
+        if not d.get("fonte"):
+            return None
+        return f"{d['fonte']} #{d.get('doc')}" if d.get("doc") is not None else d["fonte"]
+
+    def _base_comp(c):
+        return {
+            "numero_arquivo": c.get("numero_arquivo"),
+            "favorecido": c.get("favorecido"),
+            "favorecido_fonte": "comprovante",
+            "cnpj_cpf": c.get("cnpj"),
+            "comprovante_pdf": _comprovante_pdf(c),
+        }
+
+    linhas = []
+    for item in resultado["conciliados"]:
+        d, c = item["debito"], item["comprovante"]
+        linha = _base_comp(c)
+        linha.update({
+            "data_pagamento": d["data"],
+            "favorecido": c.get("favorecido") or d["favorecido"],
+            "favorecido_fonte": "comprovante" if c.get("favorecido") else "extrato",
+            "valor": c.get("valor") if c.get("valor") is not None else d["valor"],
+            "valor_do_extrato": False,
+            "rubrica_salic": None,
+            "status": "CONCILIADO",
+            "extrato_ref": _extrato_ref(d),
+            "observacao": None,
+        })
+        linhas.append(linha)
+    for item in resultado["orfaos_extrato"]:
+        d = item["debito"]
+        linhas.append({
+            "numero_arquivo": None,
+            "data_pagamento": d["data"],
+            "favorecido": d["favorecido"],
+            "favorecido_fonte": "extrato",
+            "cnpj_cpf": None,
+            "valor": d["valor"],
+            "valor_do_extrato": False,
+            "rubrica_salic": None,
+            "status": "SEM-COMPROVANTE",
+            "comprovante_pdf": None,
+            "extrato_ref": _extrato_ref(d),
+            "observacao": item.get("observacao") or "débito no extrato sem comprovante correspondente",
+        })
+    for item in resultado["orfaos_comprovante"]:
+        c = item["comprovante"]
+        linha = _base_comp(c)
+        linha.update({
+            "data_pagamento": c["data"],
+            "valor": c.get("valor"),
+            "valor_do_extrato": False,
+            "rubrica_salic": None,
+            "status": "SEM-EXTRATO",
+            "extrato_ref": None,
+            "observacao": item.get("observacao") or "comprovante sem débito correspondente",
+        })
+        linhas.append(linha)
+    for item in resultado["divergentes_valor"]:
+        d, c = item["debito"], item["comprovante"]
+        linha = _base_comp(c)
+        linha.update({
+            "data_pagamento": d["data"],
+            "favorecido": c.get("favorecido") or d["favorecido"],
+            "favorecido_fonte": "comprovante" if c.get("favorecido") else "extrato",
+            "valor": d["valor"],
+            "valor_do_extrato": False,
+            "rubrica_salic": None,
+            "status": "DIVERGENTE",
+            "extrato_ref": _extrato_ref(d),
+            "observacao": item.get("motivo"),
+        })
+        linhas.append(linha)
+    for item in resultado["ambiguos_extrato"]:
+        d = item["debito"]
+        linhas.append({
+            "numero_arquivo": None,
+            "data_pagamento": d["data"],
+            "favorecido": d["favorecido"],
+            "favorecido_fonte": "extrato",
+            "cnpj_cpf": None,
+            "valor": d["valor"],
+            "valor_do_extrato": False,
+            "rubrica_salic": None,
+            "status": "AMBIGUO",
+            "comprovante_pdf": None,
+            "extrato_ref": _extrato_ref(d),
+            "observacao": "débito disputado por comprovantes: " + ", ".join(item.get("candidatos_comprovantes", [])),
+        })
+    for item in resultado["ambiguos_comprovante"]:
+        c = item["comprovante"]
+        linha = _base_comp(c)
+        linha.update({
+            "data_pagamento": c["data"],
+            "valor": c.get("valor"),
+            "valor_do_extrato": False,
+            "rubrica_salic": None,
+            "status": "AMBIGUO",
+            "extrato_ref": None,
+            "observacao": "comprovante disputado por débitos: " + ", ".join(item.get("candidatos_extrato", [])),
+        })
+        linhas.append(linha)
+
+    linhas.sort(key=lambda r: (r["data_pagamento"], r["numero_arquivo"] or 0))
+    return linhas
+
+
 def main():
     movs = json.loads((PARSED / "movimentos.json").read_text(encoding="utf-8"))
     comps = json.loads((PARSED / "comprovantes.json").read_text(encoding="utf-8"))
@@ -464,7 +578,7 @@ def main():
 
     PARSED.mkdir(parents=True, exist_ok=True)
     (PARSED / "cruzamento.json").write_text(
-        json.dumps(resultado, ensure_ascii=False, indent=1), encoding="utf-8"
+        json.dumps(_para_linhas(resultado), ensure_ascii=False, indent=1), encoding="utf-8"
     )
     (PARSED / "stats.json").write_text(
         json.dumps(resultado["stats"], ensure_ascii=False, indent=1), encoding="utf-8"
