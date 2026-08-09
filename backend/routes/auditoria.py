@@ -4,14 +4,28 @@ routes/auditoria.py — painel de auditoria do projeto (dados reais do banco).
 Substitui as telas simuladas do protótipo gh-pages: aqui os números vêm de
 transacoes/rubricas/documentos_transacao de verdade, filtrados por RLS.
 """
+import csv
+import io
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 
 from backend.database import get_conn
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/projetos", tags=["auditoria"])
+
+WHERE_STATUS = {
+    "pendente": "t.status = 'PENDENTE'",
+    "ok": "t.status in ('CONCILIADA', 'OK')",
+    "com_docs": "t.tem_nf and t.tem_comprovante",
+    "sem_docs": "not (t.tem_nf and t.tem_comprovante)",
+}
+
+
+def _filtro_status(f: str | None) -> str:
+    return WHERE_STATUS.get((f or "").lower(), "true")
 
 
 @router.get("/{projeto_id}/auditoria")
@@ -19,6 +33,8 @@ async def auditoria_projeto(
     projeto_id: str,
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
+    status: str | None = Query(None, description="pendente|ok|com_docs|sem_docs"),
+    format: str = Query("json", pattern="^(json|csv)$"),
     dep=Depends(get_conn),
 ):
     conn, _ = dep
@@ -27,14 +43,16 @@ async def auditoria_projeto(
     if not projeto:
         raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
 
-    # ---- resumo financeiro ----
+    filtro = _filtro_status(status)
+    where = "where t.projeto_id = $1" + (f" and {filtro}" if filtro else "")
+
+    # ---- resumo financeiro (SEM filtro — totais do projeto) ----
     orcado = await conn.fetchval(
         "select coalesce(sum(valor_orcado), 0)::float from rubricas where projeto_id = $1",
         projeto_id,
     )
-    debitado = await conn.fetchval(
-        "select coalesce(sum(valor_bruto), 0)::float from transacoes where projeto_id = $1",
-        projeto_id,
+    total = await conn.fetchval(
+        "select count(*) from transacoes where projeto_id = $1", projeto_id
     )
     com_docs = await conn.fetchval(
         """
@@ -48,46 +66,73 @@ async def auditoria_projeto(
         projeto_id,
     )
 
-    total = await conn.fetchval(
-        "select count(*) from transacoes where projeto_id = $1", projeto_id
-    )
-
-    # --- transações paginadas ----
+    # ---- transações (com filtro se pedido) paginadas ----
+    total_filtrado = await conn.fetchval(f"select count(*) from transacoes t {where}", projeto_id)
     rows = await conn.fetch(
-        """
-        select id, fornecedor, cnpj_fornecedor, data_pagamento, valor_bruto,
-               tem_nf, tem_comprovante, status, score_conciliacao
-        from transacoes
-        where projeto_id = $1
-        order by data_pagamento nulls last, created_at
+        f"""
+        select t.id, t.fornecedor, t.cnpj_fornecedor, t.data_pagamento, t.valor_bruto,
+               t.tem_nf, t.tem_comprovante, t.status, t.score_conciliacao,
+               dt.arquivo_ref as documento, dt.confianca_ocr
+        from transacoes t
+        left join lateral (
+            select arquivo_ref, confianca_ocr from documentos_transacao d
+            where d.transacao_id = t.id order by created_at desc limit 1
+        ) dt on true
+        {where}
+        order by t.data_pagamento nulls last, t.created_at
         limit $2 offset $3
         """,
         projeto_id, limit, (page - 1) * limit,
     )
 
+    resumo = {
+        "total": total,
+        "orcado": orcado,
+        "debitado": await conn.fetchval(
+            "select coalesce(sum(t.valor_bruto), 0)::float from transacoes t where t.projeto_id = $1",
+            projeto_id,
+        ),
+        "com_docs": com_docs,
+        "sem_docs": total - com_docs,
+        "por_status": [{"status": r["status"], "total": r["total"]} for r in por_status],
+        "filtro_status": status,
+        "total_filtrado": total_filtrado,
+    }
+    transacoes = [
+        {
+            "id": str(r["id"]),
+            "fornecedor": r["fornecedor"],
+            "cnpj_fornecedor": r["cnpj_fornecedor"],
+            "data_pagamento": r["data_pagamento"].isoformat() if r["data_pagamento"] else None,
+            "valor_bruto": r["valor_bruto"],
+            "tem_nf": r["tem_nf"],
+            "tem_comprovante": r["tem_comprovante"],
+            "status": r["status"],
+            "score_conciliacao": r["score_conciliacao"],
+            "documento": r["documento"],
+            "confianca_ocr": r["confianca_ocr"],
+        }
+        for r in rows
+    ]
+
+    if format == "csv":
+        buf = io.StringIO()
+        w = csv.writer(buf)
+        w.writerow(["data", "fornecedor", "valor", "status", "nf", "comprovante", "documento", "confianca"])
+        for t in transacoes:
+            w.writerow([
+                t["data_pagamento"] or "", t["fornecedor"] or "", t["valor_bruto"] or "",
+                t["status"], "sim" if t["tem_nf"] else "", "sim" if t["tem_comprovante"] else "",
+                t["documento"] or "", t["confianca_ocr"] or "",
+            ])
+        buf.seek(0)
+        return StreamingResponse(
+            iter([buf.getvalue()]), media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename=auditoria_{projeto_id}.csv"},
+        )
+
     return {
-        "resumo": {
-            "total": total,
-            "orcado": orcado,
-            "debitado": debitado,
-            "saldo": orcado - debitado,
-            "com_docs": com_docs,
-            "sem_docs": total - com_docs,
-            "por_status": [{"status": r["status"], "total": r["total"]} for r in por_status],
-        },
-        "transacoes": [
-            {
-                "id": str(r["id"]),
-                "fornecedor": r["fornecedor"],
-                "cnpj_fornecedor": r["cnpj_fornecedor"],
-                "data_pagamento": r["data_pagamento"].isoformat() if r["data_pagamento"] else None,
-                "valor_bruto": r["valor_bruto"],
-                "tem_nf": r["tem_nf"],
-                "tem_comprovante": r["tem_comprovante"],
-                "status": r["status"],
-                "score_conciliacao": r["score_conciliacao"],
-            }
-            for r in rows
-        ],
-        "paginacao": {"page": page, "limit": limit, "total": total},
+        "resumo": resumo,
+        "transacoes": transacoes,
+        "paginacao": {"page": page, "limit": limit, "total": total_filtrado},
     }
