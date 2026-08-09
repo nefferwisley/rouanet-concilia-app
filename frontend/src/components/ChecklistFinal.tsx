@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 
 import { useAPI } from "../hooks/useAPI";
 
+const brl = (v: number | null | undefined) =>
+  (v ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
 interface PendenciaChecklist {
   transacao_id: string;
   fornecedor?: string | null;
@@ -19,17 +22,15 @@ interface ChecklistResponse {
   pronto_para_prestacao: boolean;
 }
 
-const brl = (v: number | null | undefined) =>
-  (v ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
 /** P6 — Organização final: checklist agregado de prontidão da prestação de
  *  contas (documentação + revisões + regularizações), sem gravar nada —
  *  só computa sobre o que já existe nas etapas anteriores. */
 export function ChecklistFinal({ projetoId }: { projetoId: string }) {
-  const { get } = useAPI();
+  const { get, postForm } = useAPI();
   const [dados, setDados] = useState<ChecklistResponse | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+  const [iniciando, setIniciando] = useState<string | null>(null);
 
   const carregar = async () => {
     try {
@@ -40,6 +41,19 @@ export function ChecklistFinal({ projetoId }: { projetoId: string }) {
     } catch (e) {
       setErro(e instanceof Error ? e.message : "Erro ao carregar checklist final.");
       setCarregando(false);
+    }
+  };
+
+  const iniciarRegularizacao = async (transacaoId: string) => {
+    setIniciando(transacaoId);
+    try {
+      const form = new FormData();
+      await postForm(`/api/v1/projetos/${projetoId}/transacoes/${transacaoId}/regularizacao`, form);
+      await carregar();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Erro ao iniciar regularização.");
+    } finally {
+      setIniciando(null);
     }
   };
 
@@ -92,6 +106,7 @@ export function ChecklistFinal({ projetoId }: { projetoId: string }) {
                 <th className="py-2 px-3 font-medium">Data</th>
                 <th className="py-2 px-3 font-medium text-right">Valor</th>
                 <th className="py-2 px-3 font-medium">Regularização</th>
+                <th className="py-2 px-3 font-medium text-right">Ação</th>
               </tr>
             </thead>
             <tbody>
@@ -104,6 +119,17 @@ export function ChecklistFinal({ projetoId }: { projetoId: string }) {
                   <td className="py-2 px-3 text-right font-semibold whitespace-nowrap">{brl(p.valor_bruto)}</td>
                   <td className="py-2 px-3 text-xs text-slate-500">
                     {p.regularizacao_status || "não iniciada"}
+                  </td>
+                  <td className="py-2 px-3 text-right whitespace-nowrap">
+                    {!p.regularizacao_status && (
+                      <button
+                        className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"
+                        disabled={iniciando === p.transacao_id}
+                        onClick={() => iniciarRegularizacao(p.transacao_id)}
+                      >
+                        {iniciando === p.transacao_id ? "…" : "Iniciar regularização"}
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

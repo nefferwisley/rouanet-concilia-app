@@ -3,9 +3,9 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ChecklistFinal } from './ChecklistFinal';
-import { mockGet } from '../test/setup';
+import { mockGet, mockPostForm } from '../test/setup';
 
 const mockPronto = {
   total_transacoes: 10,
@@ -33,9 +33,24 @@ const mockNaoPronto = {
   pronto_para_prestacao: false,
 };
 
+const mockSemRegularizacao = {
+  ...mockNaoPronto,
+  pendencias: [
+    {
+      transacao_id: 'trans-2',
+      fornecedor: 'Ana Beatriz Hermanson Poma',
+      data_pagamento: '2023-09-26',
+      valor_bruto: 3000,
+      regularizacao_status: null,
+    },
+  ],
+};
+
 describe('ChecklistFinal', () => {
   beforeEach(() => {
     mockGet.mockClear();
+    mockPostForm.mockClear();
+    mockPostForm.mockResolvedValue({ id: 'reg-2', status: 'PENDENTE_GERACAO' });
   });
 
   it('mostra "pronto" quando não há pendências', async () => {
@@ -55,6 +70,38 @@ describe('ChecklistFinal', () => {
       expect(screen.getByText(/Organização Final/i)).toBeInTheDocument();
       expect(screen.getByText(/Fornecedor X/i)).toBeInTheDocument();
       expect(screen.getByText(/PENDENTE_GERACAO: 1/i)).toBeInTheDocument();
+    });
+  });
+
+  it('mostra botão "Iniciar regularização" só pra pendência sem regularização', async () => {
+    mockGet.mockResolvedValue(mockSemRegularizacao);
+    render(<ChecklistFinal projetoId="projeto-123" />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Iniciar regularização/i)).toBeInTheDocument();
+    });
+  });
+
+  it('não mostra o botão quando já existe regularização em andamento', async () => {
+    mockGet.mockResolvedValue(mockNaoPronto);
+    render(<ChecklistFinal projetoId="projeto-123" />);
+
+    await waitFor(() => screen.getByText(/Fornecedor X/i));
+    expect(screen.queryByText(/Iniciar regularização/i)).not.toBeInTheDocument();
+  });
+
+  it('clicar em "Iniciar regularização" chama a API e recarrega', async () => {
+    mockGet.mockResolvedValueOnce(mockSemRegularizacao).mockResolvedValueOnce(mockPronto);
+    render(<ChecklistFinal projetoId="projeto-123" />);
+
+    await waitFor(() => screen.getByText(/Iniciar regularização/i));
+    fireEvent.click(screen.getByText(/Iniciar regularização/i));
+
+    await waitFor(() => {
+      expect(mockPostForm).toHaveBeenCalledWith(
+        '/api/v1/projetos/projeto-123/transacoes/trans-2/regularizacao',
+        expect.any(FormData)
+      );
     });
   });
 
