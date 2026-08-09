@@ -278,3 +278,77 @@ async def conciliar_manual(
         "update extrato_movimentos set status_conciliacao = 'CONCILIADO' where id = $1", movimento_id
     )
     return {"movimento_id": movimento_id, "transacao_id": transacao_id, "status_conciliacao": "CONCILIADO"}
+
+
+@router.post("/api/v1/projetos/{projeto_id}/extrato/{movimento_id}/criar-lancamento", status_code=201)
+async def criar_lancamento_a_partir_do_movimento(
+    projeto_id: str,
+    movimento_id: str,
+    fornecedor: str | None = Form(None),
+    rubrica_codigo: str | None = Form(None),
+    dep=Depends(get_conn),
+):
+    """Etapa 2 — completa a execução financeira: cria a transação que faltava
+    a partir de um pagamento que já existe no extrato mas nunca foi lançado.
+    Diferente de conciliar_manual (que vincula a um lançamento JÁ existente),
+    aqui a transação nasce agora, com os dados vindos do próprio movimento
+    bancário, e já sai vinculada a ele (evita ficar 'órfã' de novo)."""
+    conn, user_id = dep
+
+    movimento = await conn.fetchrow(
+        """
+        select m.id, m.data, m.historico, m.documento, m.valor
+        from extrato_movimentos m
+        join contas_captadoras c on c.id = m.conta_id
+        where m.id = $1 and c.projeto_id = $2
+        """,
+        movimento_id, projeto_id,
+    )
+    if not movimento:
+        raise HTTPException(404, "Movimento não encontrado (ou sem permissão via RLS).")
+
+    ja_vinculado = await conn.fetchval(
+        "select transacao_id from conciliacao_extrato where movimento_id = $1", movimento_id
+    )
+    if ja_vinculado:
+        raise HTTPException(409, "Este movimento já está vinculado a um lançamento.")
+
+    nome = fornecedor or movimento["historico"] or movimento["documento"] or "A identificar"
+    transacao = await conn.fetchrow(
+        """
+        insert into transacoes (projeto_id, fornecedor, data_pagamento, valor_bruto, status)
+        values ($1, $2, $3, $4, 'CONCILIADO_OK')
+        returning id, fornecedor, data_pagamento, valor_bruto, status
+        """,
+        projeto_id, nome, movimento["data"], abs(movimento["valor"]),
+    )
+
+    if rubrica_codigo:
+        rubrica = await conn.fetchrow(
+            "select id from rubricas where projeto_id = $1 and codigo = $2", projeto_id, rubrica_codigo
+        )
+        if rubrica:
+            await conn.execute(
+                "insert into despesas (transacao_id, projeto_id, rubrica_id, valor) values ($1, $2, $3, $4)",
+                transacao["id"], projeto_id, rubrica["id"], abs(movimento["valor"]),
+            )
+
+    await conn.execute(
+        """
+        insert into conciliacao_extrato (movimento_id, transacao_id, metodo, conciliado_por)
+        values ($1, $2, 'MANUAL', $3)
+        """,
+        movimento_id, transacao["id"], user_id,
+    )
+    await conn.execute(
+        "update extrato_movimentos set status_conciliacao = 'CONCILIADO' where id = $1", movimento_id
+    )
+
+    return {
+        "transacao_id": str(transacao["id"]),
+        "fornecedor": transacao["fornecedor"],
+        "data_pagamento": transacao["data_pagamento"].isoformat(),
+        "valor_bruto": float(transacao["valor_bruto"]),
+        "status": transacao["status"],
+        "movimento_id": movimento_id,
+    }

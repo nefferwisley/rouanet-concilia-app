@@ -107,6 +107,29 @@ describe('ConciliacaoManual', () => {
     });
   });
 
+  it('botão "Criar lançamento" só aparece pra movimento PENDENTE', async () => {
+    render(<ConciliacaoManual projetoId="projeto-123" />);
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/\+ Criar lançamento/i)).toHaveLength(1);
+    });
+  });
+
+  it('criar lançamento chama o endpoint certo via postForm', async () => {
+    mockPostForm.mockResolvedValue({ transacao_id: 'trans-nova', status: 'CONCILIADO_OK' });
+    render(<ConciliacaoManual projetoId="projeto-123" />);
+
+    await waitFor(() => screen.getByText(/\+ Criar lançamento/i));
+    fireEvent.click(screen.getByText(/\+ Criar lançamento/i));
+
+    await waitFor(() => {
+      expect(mockPostForm).toHaveBeenCalledWith(
+        '/api/v1/projetos/projeto-123/extrato/mov-1/criar-lancamento',
+        expect.any(FormData)
+      );
+    });
+  });
+
   it('exibe erro se a busca de pares falhar', async () => {
     mockGet.mockRejectedValue(new Error('Erro ao carregar extrato.'));
     render(<ConciliacaoManual projetoId="projeto-123" />);

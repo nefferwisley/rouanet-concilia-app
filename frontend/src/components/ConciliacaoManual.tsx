@@ -74,6 +74,21 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
     }
   };
 
+  const criarLancamento = async (movimentoId: string) => {
+    setSalvando(movimentoId);
+    try {
+      await postForm(
+        `/api/v1/projetos/${projetoId}/extrato/${movimentoId}/criar-lancamento`,
+        new FormData()
+      );
+      await carregar();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Falha ao criar lançamento.");
+    } finally {
+      setSalvando(null);
+    }
+  };
+
   const importarExtrato = async () => {
     setImportando(true);
     setMensagemImportacao(null);
@@ -195,6 +210,16 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
                     >
                       {salvando === m.id ? "…" : "🔗 Vincular"}
                     </button>
+                    {m.status_conciliacao === "PENDENTE" && (
+                      <button
+                        className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded"
+                        disabled={salvando === m.id}
+                        onClick={() => criarLancamento(m.id)}
+                        title="Cria um lançamento novo a partir deste movimento do extrato"
+                      >
+                        + Criar lançamento
+                      </button>
+                    )}
                     {m.status_conciliacao === "CONCILIADO" && (
                       <button
                         className="px-2 py-1 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 text-xs rounded"

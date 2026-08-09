@@ -51,6 +51,17 @@ def test_download_artefato_tipo_invalido_requires_auth():
 
 
 # ============================================================
+# Conciliação — F2: criar lançamento a partir de movimento do extrato
+# ============================================================
+
+def test_criar_lancamento_a_partir_do_movimento_requires_auth():
+    response = client.post(
+        "/api/v1/projetos/fake-uuid/extrato/fake-uuid/criar-lancamento"
+    )
+    assert response.status_code == 401
+
+
+# ============================================================
 # Auditoria — GET /api/v1/projetos/{id}/auditoria
 # ============================================================
 
