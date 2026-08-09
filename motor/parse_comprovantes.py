@@ -40,7 +40,8 @@ ROTULOS_LABEL = [
     "DATA DO PAGAMENTO", "DATA DE PAGAMENTO", "DATA TRANSFERENCIA",
     "DATA DO VENCIMENTO", "DATA DE VENCIMENTO", "DATA",
     "PAGO PARA", "BENEFICIARIO", "BENEFICIARIA", "NOME FAVORECIDO",
-    "FAVORECIDO", "NOME DO FAVORECIDO", "NOME", "CONVENIO", "CNPJ", "CPF",
+    "FAVORECIDO", "NOME DO FAVORECIDO", "NOME", "CONVENIO",
+    "CNPJ DO PAGADOR", "CPF DO PAGADOR", "CNPJ", "CPF",
 ]
 RE_ITEM = re.compile(
     r"^\s*(?P<rotulo>" + "|".join(ROTULOS_LABEL) + r")\s*:?\s*(?P<conteudo>[^\n]+?)\s*$",
@@ -161,6 +162,7 @@ def parse_comprovante_pdf(caminho: Path) -> dict | None:
 
     # ---- favorecido ----
     favorecido = None
+    pos_fav = -1
     if "CREDITADO" in texto.upper():
         # "Transferências entre contas BB": bloco "Creditado / Nome / ANJO AZUL FILMES LTDA."
         pos = texto.upper().find("CREDITADO")
@@ -170,23 +172,37 @@ def parse_comprovante_pdf(caminho: Path) -> dict | None:
     if favorecido is None:
         for rotulo in ("PAGO PARA", "BENEFICIARIO", "NOME FAVORECIDO",
                        "FAVORECIDO", "NOME DO FAVORECIDO", "NOME"):
-            for r, conteudo, _ in itens:
+            for r, conteudo, i in itens:
                 if r == rotulo and conteudo:
                     favorecido = conteudo
+                    pos_fav = i
                     break
             if favorecido:
                 break
     if favorecido:
         favorecido = re.sub(r"[-=]+\s*$", "", favorecido).strip()
 
-    # ---- CNPJ (primeiro CNPJ/CPF encontrado) ----
+    # ---- CNPJ/CPF do favorecido ----
+    # "CNPJ DO PAGADOR" virou rótulo próprio acima e nunca é cogitado.
+    # Prefere o CNPJ listado após o favorecido (SISBB: "CNPJ: 26.591.927/0001-37");
+    # senão, o primeiro CNPJ/CPF do documento (boleto imprime o do beneficiário).
     cnpj = None
-    for r, conteudo, _ in itens:
+    primeiro = None
+    for r, conteudo, i in itens:
         if r in ("CNPJ", "CPF"):
+            # "CNPJ/CPF DO PAGADOR: ..." vira item CNPJ/CPF quando o texto é
+            # "CNPJ/CPF DO PAGADOR" (rótulo composto não listado em ROTULOS_LABEL).
+            if re.search(r"pagador", conteudo, re.IGNORECASE):
+                continue
             m = RE_CNPJ.search(conteudo)
             if m:
-                cnpj = m.group(1)
-                break
+                if primeiro is None:
+                    primeiro = m.group(1)
+                if i > pos_fav:
+                    cnpj = m.group(1)
+                    break
+    if cnpj is None:
+        cnpj = primeiro
 
     return {
         "valor": valor,
