@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { ImportarModal } from "./ImportarModal";
+import { AuditoriaProjeto } from "../components/AuditoriaProjeto";
 import { EditProjectModal } from "../components/EditProjectModal";
 import { DeleteProjectButton } from "../components/DeleteProjectButton";
 import { DocumentosProjeto } from "../components/DocumentosProjeto";
@@ -55,6 +56,8 @@ export function ProjetoDetalhes() {
       </div>
 
       <DocumentosProjeto projetoId={projeto.id} />
+
+      <AuditoriaProjeto projetoId={projeto.id} />
 
       {mostrarImportar && (
         <ImportarModal projetos={[projeto]} onClose={() => setMostrarImportar(false)} />
