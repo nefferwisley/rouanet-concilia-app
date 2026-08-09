@@ -1,0 +1,34 @@
+{
+  "pronac": "20-7453",
+  "modo": "commit",
+  "total_lancamentos": 184,
+  "resumo": {
+    "linhas_ok": 183,
+    "linhas_erro": 1,
+    "linhas_alerta": 1,
+    "rubricas": 24,
+    "transacoes": 183,
+    "documentos": 183,
+    "despesas": 183,
+    "movimentos": 183,
+    "conciliacoes": 183,
+    "logs": 183,
+    "revisoes": 0
+  },
+  "erros": [
+    {
+      "linha": 10,
+      "motivos": [
+        "Rubrica '3.1.1' não está no orçamento SALIC."
+      ]
+    }
+  ],
+  "alertas": [
+    {
+      "linha": 12,
+      "motivos": [
+        "Valor R$ 19550.0 maior que o orçado (R$ 19500.0) para 1.7.0."
+      ]
+    }
+  ]
+}
