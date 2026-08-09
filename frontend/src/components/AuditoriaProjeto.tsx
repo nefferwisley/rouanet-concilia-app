@@ -79,7 +79,7 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
   if (!resumo) return <div className="text-sm text-slate-500">Carregando auditoria...</div>;
 
   const totalPaginas = Math.max(1, Math.ceil(total / limit));
-  const pct = resumo.total ? Math.round((resumo.com_docs / resumo.total) * 100) : 0;
+  const pctDocs = resumo.total ? Math.round((resumo.com_docs / resumo.total) * 100) : 0;
 
   return (
     <div className="space-y-4">
