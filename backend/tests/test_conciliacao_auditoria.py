@@ -108,3 +108,22 @@ def test_media_types_dos_artefatos():
     # artefatos gerados em conciliacao_service: .xlsx, .json e .zip
     for sufixo in (".xlsx", ".json", ".zip"):
         assert sufixo in conciliacao._MEDIA
+
+
+# ============================================================
+# Conciliação manual — extrato real × lançamento (P3)
+# ============================================================
+
+def test_importar_extrato_requires_auth():
+    response = client.post("/api/v1/projetos/fake-uuid/extrato/importar")
+    assert response.status_code == 401
+
+
+def test_listar_extrato_pendentes_requires_auth():
+    response = client.get("/api/v1/projetos/fake-uuid/extrato/pendentes")
+    assert response.status_code == 401
+
+
+def test_conciliar_manual_requires_auth():
+    response = client.post("/api/v1/projetos/fake-uuid/conciliar/manual")
+    assert response.status_code == 401

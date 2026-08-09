@@ -10,7 +10,9 @@ ou caminho de pasta local (form 'pasta'), ou link de pasta do Google Drive
 (form 'drive_link'). Sem nenhum deles, usa a pasta padrão do servidor
 (PASTA_1961 ou '3. 1961/' na raiz do repo) — ver services/conciliacao_service.py.
 """
+import json
 import logging
+from decimal import Decimal
 from pathlib import Path
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile
@@ -19,11 +21,13 @@ from fastapi.responses import FileResponse
 from backend.config import settings
 from backend.database import get_conn
 from backend.services import conciliacao_service
+from motor.extrato_importer import calcular_status_movimentos, tipo_por_sinal
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["conciliacao"])
 
 _MEDIA = conciliacao_service._MEDIA_POR_SUFIXO
+_PARSED_DIR = conciliacao_service._REPO_RAIZ / "motor" / "_parsed"
 
 
 @router.post("/api/v1/conciliar", status_code=202)
@@ -111,3 +115,166 @@ async def baixar_artefato(
         media_type=media,
         headers={"Content-Disposition": f'attachment; filename="{nome}"'},
     )
+
+
+# ============================================================
+# Conciliação manual — extrato real × lançamento (P3)
+# ============================================================
+#
+# Ponte entre o pipeline de arquivo (001→006, acima) e o schema do banco:
+# importar_extrato lê motor/_parsed/movimentos.json + cruzamento.json (já
+# gerados por uma execução do fluxo acima) e grava em extrato_movimentos,
+# com o status resolvido pelo cruzamento — CONCILIADO fica só marcado,
+# PENDENTE é o que a tela de conciliação manual existe pra resolver.
+# Ligar um movimento a uma transação real é sempre decisão humana aqui:
+# comprovante_pdf (cruzamento) e docLink (transações importadas) usam
+# nomenclaturas diferentes, não dá pra casar com segurança automaticamente.
+
+
+@router.post("/api/v1/projetos/{projeto_id}/extrato/importar", status_code=201)
+async def importar_extrato(projeto_id: str, dep=Depends(get_conn)):
+    conn, _ = dep
+    projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
+    if not projeto:
+        raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
+
+    caminho_mov = _PARSED_DIR / "movimentos.json"
+    caminho_cruz = _PARSED_DIR / "cruzamento.json"
+    if not caminho_mov.exists() or not caminho_cruz.exists():
+        raise HTTPException(
+            409, "Extrato ainda não foi parseado — rode 'Conciliar Pasta 1961' primeiro."
+        )
+
+    movimentos = json.loads(caminho_mov.read_text(encoding="utf-8"))
+    cruzamento = json.loads(caminho_cruz.read_text(encoding="utf-8"))
+    status_por_chave = calcular_status_movimentos(cruzamento)
+
+    conta = await conn.fetchrow("select id from contas_captadoras where projeto_id = $1", projeto_id)
+    if not conta:
+        conta = await conn.fetchrow(
+            "insert into contas_captadoras (projeto_id) values ($1) returning id", projeto_id
+        )
+    conta_id = conta["id"]
+
+    importados = 0
+    for m in movimentos:
+        chave = (m["fonte"], m["doc"])
+        status = status_por_chave.get(chave, "PENDENTE")
+        valor = Decimal(str(m["valor"]))
+        if m["sinal"] == "D":
+            valor = -valor
+        await conn.execute(
+            """
+            insert into extrato_movimentos (conta_id, data, historico, documento, tipo, valor, status_conciliacao)
+            values ($1, $2, $3, $4, $5, $6, $7)
+            on conflict (conta_id, data, documento, valor) do update set
+                historico = excluded.historico, status_conciliacao = excluded.status_conciliacao
+            """,
+            conta_id, m["data"], m.get("historico") or m.get("favorecido"),
+            m["doc"], tipo_por_sinal(m["sinal"]), valor, status,
+        )
+        importados += 1
+
+    return {"importados": importados, "conta_id": str(conta_id)}
+
+
+@router.get("/api/v1/projetos/{projeto_id}/extrato/pendentes")
+async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
+    conn, _ = dep
+    projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
+    if not projeto:
+        raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
+
+    movimentos = await conn.fetch(
+        """
+        select m.id, m.data, m.historico, m.documento, m.valor, m.status_conciliacao
+        from extrato_movimentos m
+        join contas_captadoras c on c.id = m.conta_id
+        where c.projeto_id = $1
+        order by m.status_conciliacao = 'PENDENTE' desc, m.data desc
+        """,
+        projeto_id,
+    )
+    transacoes = await conn.fetch(
+        """
+        select id, fornecedor, data_pagamento, valor_bruto, status
+        from transacoes where projeto_id = $1
+        order by data_pagamento nulls last, created_at
+        """,
+        projeto_id,
+    )
+
+    return {
+        "movimentos": [
+            {
+                "id": str(m["id"]),
+                "data": m["data"].isoformat(),
+                "historico": m["historico"],
+                "documento": m["documento"],
+                "valor": float(m["valor"]),
+                "status_conciliacao": m["status_conciliacao"],
+            }
+            for m in movimentos
+        ],
+        "transacoes": [
+            {
+                "id": str(t["id"]),
+                "fornecedor": t["fornecedor"],
+                "data_pagamento": t["data_pagamento"].isoformat() if t["data_pagamento"] else None,
+                "valor_bruto": float(t["valor_bruto"]) if t["valor_bruto"] is not None else None,
+                "status": t["status"],
+            }
+            for t in transacoes
+        ],
+    }
+
+
+@router.post("/api/v1/projetos/{projeto_id}/conciliar/manual")
+async def conciliar_manual(
+    projeto_id: str,
+    movimento_id: str = Form(...),
+    transacao_id: str | None = Form(None),
+    dep=Depends(get_conn),
+):
+    """Vincula (ou desfaz, se transacao_id vier vazio) um movimento do
+    extrato a uma transação real — decisão manual do auditor."""
+    conn, user_id = dep
+
+    movimento = await conn.fetchrow(
+        """
+        select m.id from extrato_movimentos m
+        join contas_captadoras c on c.id = m.conta_id
+        where m.id = $1 and c.projeto_id = $2
+        """,
+        movimento_id, projeto_id,
+    )
+    if not movimento:
+        raise HTTPException(404, "Movimento não encontrado (ou sem permissão via RLS).")
+
+    if not transacao_id:
+        await conn.execute("delete from conciliacao_extrato where movimento_id = $1", movimento_id)
+        await conn.execute(
+            "update extrato_movimentos set status_conciliacao = 'PENDENTE' where id = $1", movimento_id
+        )
+        return {"movimento_id": movimento_id, "status_conciliacao": "PENDENTE"}
+
+    transacao = await conn.fetchrow(
+        "select id from transacoes where id = $1 and projeto_id = $2", transacao_id, projeto_id
+    )
+    if not transacao:
+        raise HTTPException(404, "Transação não encontrada (ou sem permissão via RLS).")
+
+    await conn.execute(
+        """
+        insert into conciliacao_extrato (movimento_id, transacao_id, metodo, conciliado_por)
+        values ($1, $2, 'MANUAL', $3)
+        on conflict (movimento_id) do update set
+            transacao_id = excluded.transacao_id, metodo = 'MANUAL',
+            conciliado_por = excluded.conciliado_por, conciliado_em = now()
+        """,
+        movimento_id, transacao_id, user_id,
+    )
+    await conn.execute(
+        "update extrato_movimentos set status_conciliacao = 'CONCILIADO' where id = $1", movimento_id
+    )
+    return {"movimento_id": movimento_id, "transacao_id": transacao_id, "status_conciliacao": "CONCILIADO"}

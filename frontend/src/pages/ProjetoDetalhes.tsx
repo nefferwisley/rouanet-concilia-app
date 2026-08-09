@@ -8,6 +8,7 @@ import { DeleteProjectButton } from "../components/DeleteProjectButton";
 import { DocumentosProjeto } from "../components/DocumentosProjeto";
 import { RevisaoDocumental } from "../components/RevisaoDocumental";
 import { RevisaoManual } from "../components/RevisaoManual";
+import { ConciliacaoManual } from "../components/ConciliacaoManual";
 import { useAPI } from "../hooks/useAPI";
 import { Projeto } from "../types";
 
@@ -60,6 +61,8 @@ export function ProjetoDetalhes() {
       <DocumentosProjeto projetoId={projeto.id} />
 
       <AuditoriaProjeto projetoId={projeto.id} />
+
+      <ConciliacaoManual projetoId={projeto.id} />
 
       <RevisaoDocumental projetoId={projeto.id} />
 

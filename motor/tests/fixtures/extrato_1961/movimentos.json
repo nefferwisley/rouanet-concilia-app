@@ -1,0 +1,2652 @@
+[
+ {
+  "data": "2022-10-31",
+  "historico": "Recebimento Fornecedor",
+  "doc": "220.005",
+  "valor": 835000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "1. out.pdf"
+ },
+ {
+  "data": "2022-11-04",
+  "historico": "Pix - Enviado",
+  "doc": "110.401",
+  "valor": 11000.0,
+  "sinal": "D",
+  "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+  "pagina": 1,
+  "fonte": "2. nov.pdf"
+ },
+ {
+  "data": "2022-11-04",
+  "historico": "Pix - Enviado",
+  "doc": "110.402",
+  "valor": 5000.0,
+  "sinal": "D",
+  "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+  "pagina": 1,
+  "fonte": "2. nov.pdf"
+ },
+ {
+  "data": "2022-11-04",
+  "historico": "Pix - Enviado",
+  "doc": "110.403",
+  "valor": 20000.0,
+  "sinal": "D",
+  "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+  "pagina": 1,
+  "fonte": "2. nov.pdf"
+ },
+ {
+  "data": "2022-11-04",
+  "historico": "Pix - Enviado",
+  "doc": "110.404",
+  "valor": 30000.0,
+  "sinal": "D",
+  "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+  "pagina": 1,
+  "fonte": "2. nov.pdf"
+ },
+ {
+  "data": "2022-11-04",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 66000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "2. nov.pdf"
+ },
+ {
+  "data": "2022-11-10",
+  "historico": "Pix - Enviado",
+  "doc": "111.001",
+  "valor": 1200.0,
+  "sinal": "D",
+  "favorecido": "Felipe Guimarães Rosa",
+  "pagina": 1,
+  "fonte": "2. nov.pdf"
+ },
+ {
+  "data": "2022-11-10",
+  "historico": "Pix - Enviado",
+  "doc": "111.002",
+  "valor": 1200.0,
+  "sinal": "D",
+  "favorecido": "LUIS FELIPE LABAKI",
+  "pagina": 1,
+  "fonte": "2. nov.pdf"
+ },
+ {
+  "data": "2022-11-10",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 2400.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "2. nov.pdf"
+ },
+ {
+  "data": "2022-11-21",
+  "historico": "Pix - Enviado",
+  "doc": "112.101",
+  "valor": 800.0,
+  "sinal": "D",
+  "favorecido": "LUIS FELIPE MONTE CIPULLO",
+  "pagina": 1,
+  "fonte": "2. nov.pdf"
+ },
+ {
+  "data": "2022-11-21",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 800.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "2. nov.pdf"
+ },
+ {
+  "data": "2022-11-28",
+  "historico": "Pix - Enviado",
+  "doc": "112.801",
+  "valor": 20000.0,
+  "sinal": "D",
+  "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+  "pagina": 1,
+  "fonte": "2. nov.pdf"
+ },
+ {
+  "data": "2022-11-28",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 20000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "2. nov.pdf"
+ },
+ {
+  "data": "2022-12-12",
+  "historico": "Pix - Enviado",
+  "doc": "121.201",
+  "valor": 30000.0,
+  "sinal": "D",
+  "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+  "pagina": 1,
+  "fonte": "3. dez.pdf"
+ },
+ {
+  "data": "2022-12-12",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 30000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "3. dez.pdf"
+ },
+ {
+  "data": "2022-12-14",
+  "historico": "Pix - Enviado",
+  "doc": "121.401",
+  "valor": 6000.0,
+  "sinal": "D",
+  "favorecido": "JULIA BARBARA MELO DE SOUS",
+  "pagina": 1,
+  "fonte": "3. dez.pdf"
+ },
+ {
+  "data": "2022-12-14",
+  "historico": "Pix - Enviado",
+  "doc": "121.402",
+  "valor": 2000.0,
+  "sinal": "D",
+  "favorecido": "PLANIFILMES LTDA",
+  "pagina": 1,
+  "fonte": "3. dez.pdf"
+ },
+ {
+  "data": "2022-12-14",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 8000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "3. dez.pdf"
+ },
+ {
+  "data": "2022-12-20",
+  "historico": "Pix - Enviado",
+  "doc": "122.001",
+  "valor": 20000.0,
+  "sinal": "D",
+  "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+  "pagina": 1,
+  "fonte": "3. dez.pdf"
+ },
+ {
+  "data": "2022-12-20",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 20000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "3. dez.pdf"
+ },
+ {
+  "data": "2023-01-23",
+  "historico": "Pix - Enviado",
+  "doc": "12.301",
+  "valor": 30000.0,
+  "sinal": "D",
+  "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+  "pagina": 1,
+  "fonte": "1. jan.pdf"
+ },
+ {
+  "data": "2023-01-23",
+  "historico": "Pix - Enviado",
+  "doc": "12.302",
+  "valor": 4500.0,
+  "sinal": "D",
+  "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+  "pagina": 1,
+  "fonte": "1. jan.pdf"
+ },
+ {
+  "data": "2023-01-23",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 34500.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "1. jan.pdf"
+ },
+ {
+  "data": "2023-10-02",
+  "historico": "Pix - Enviado",
+  "doc": "100.201",
+  "valor": 1610.0,
+  "sinal": "D",
+  "favorecido": "PATEO MOINHOS DE VENTO ADM",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-02",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 1610.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-03",
+  "historico": "Pix - Enviado",
+  "doc": "100.301",
+  "valor": 200.0,
+  "sinal": "D",
+  "favorecido": "Glademir Martins Machado",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-03",
+  "historico": "Pix - Enviado",
+  "doc": "100.302",
+  "valor": 3020.0,
+  "sinal": "D",
+  "favorecido": "MATRON INFORMATICA",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-03",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 3220.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-05",
+  "historico": "Pix - Rejeitado",
+  "doc": "5.041.778.180",
+  "valor": 700.0,
+  "sinal": "C",
+  "favorecido": "Pagamento rejeitado pelo P",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-05",
+  "historico": "Pix - Enviado",
+  "doc": "100.501",
+  "valor": 700.0,
+  "sinal": "D",
+  "favorecido": "EDSON DE CAMARGO",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-05",
+  "historico": "Pix - Enviado",
+  "doc": "100.502",
+  "valor": 700.0,
+  "sinal": "D",
+  "favorecido": "EDSON DE CAMARGO TRANSPORT",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-05",
+  "historico": "Pix - Enviado",
+  "doc": "100.503",
+  "valor": 500.0,
+  "sinal": "D",
+  "favorecido": "AMIR LABAKI",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-05",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 1200.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-06",
+  "historico": "Pix - Enviado",
+  "doc": "100.601",
+  "valor": 10500.0,
+  "sinal": "D",
+  "favorecido": "MEMORIA COLETIVA IMAGENS E",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-06",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 10500.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-09",
+  "historico": "Pix - Enviado",
+  "doc": "100.901",
+  "valor": 945.49,
+  "sinal": "D",
+  "favorecido": "AMIR LABAKI",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-09",
+  "historico": "Pix - Enviado",
+  "doc": "100.902",
+  "valor": 13500.0,
+  "sinal": "D",
+  "favorecido": "MOG PRODUTORA",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-09",
+  "historico": "Pix - Enviado",
+  "doc": "100.903",
+  "valor": 7500.0,
+  "sinal": "D",
+  "favorecido": "LUIS FELIPE MONTE CIPULLO",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-09",
+  "historico": "Pix - Enviado",
+  "doc": "100.904",
+  "valor": 4800.0,
+  "sinal": "D",
+  "favorecido": "THIAGO AUGUSTO GOMAS CUNHA",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-09",
+  "historico": "Pix - Enviado",
+  "doc": "100.905",
+  "valor": 1800.0,
+  "sinal": "D",
+  "favorecido": "FABIO BALTAR DUARTE",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-09",
+  "historico": "Pix - Enviado",
+  "doc": "100.906",
+  "valor": 1800.01,
+  "sinal": "D",
+  "favorecido": "FABIO BALTAR DUARTE",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-09",
+  "historico": "Pix - Enviado",
+  "doc": "100.907",
+  "valor": 9502.77,
+  "sinal": "D",
+  "favorecido": "MANDALA TOURS",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-09",
+  "historico": "Pix - Enviado",
+  "doc": "100.908",
+  "valor": 240.0,
+  "sinal": "D",
+  "favorecido": "LUIS FELIPE MONTE CIPULLO",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-09",
+  "historico": "Pix - Enviado",
+  "doc": "100.909",
+  "valor": 240.0,
+  "sinal": "D",
+  "favorecido": "Andre Lima Monfrini",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-09",
+  "historico": "Pix - Enviado",
+  "doc": "100.910",
+  "valor": 240.0,
+  "sinal": "D",
+  "favorecido": "Felipe Guimarães Rosa",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-09",
+  "historico": "Pix - Enviado",
+  "doc": "100.911",
+  "valor": 240.0,
+  "sinal": "D",
+  "favorecido": "Thiago Augusto Gomas Cunha",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-09",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 40808.27,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-10",
+  "historico": "Pix - Enviado",
+  "doc": "101.001",
+  "valor": 500.0,
+  "sinal": "D",
+  "favorecido": "Andre Lima Monfrini",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-10",
+  "historico": "Pix - Enviado",
+  "doc": "101.002",
+  "valor": 2300.0,
+  "sinal": "D",
+  "favorecido": "CONTA RECEITAS D F",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-10",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 2800.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-11",
+  "historico": "Pix - Enviado",
+  "doc": "101.101",
+  "valor": 1500.0,
+  "sinal": "D",
+  "favorecido": "ANA BEATRIZ HERMANSON POMA",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-11",
+  "historico": "Pix - Enviado",
+  "doc": "101.102",
+  "valor": 400.0,
+  "sinal": "D",
+  "favorecido": "AAMAC",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-11",
+  "historico": "Pix - Enviado",
+  "doc": "101.103",
+  "valor": 500.0,
+  "sinal": "D",
+  "favorecido": "Malnes Transporte e Produç",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-11",
+  "historico": "Pix - Enviado",
+  "doc": "101.104",
+  "valor": 4000.0,
+  "sinal": "D",
+  "favorecido": "VONDOC FILMES LTDA",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-11",
+  "historico": "Pix - Enviado",
+  "doc": "101.105",
+  "valor": 1000.0,
+  "sinal": "D",
+  "favorecido": "IDALINA SOUZA RIBEIRO DA S",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-11",
+  "historico": "Pix - Enviado",
+  "doc": "101.106",
+  "valor": 9672.0,
+  "sinal": "D",
+  "favorecido": "MANDALA TOURS",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-11",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 17072.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-13",
+  "historico": "Pix - Enviado",
+  "doc": "101.301",
+  "valor": 1200.0,
+  "sinal": "D",
+  "favorecido": "Andre Lima Monfrini",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-13",
+  "historico": "Pix - Enviado",
+  "doc": "101.302",
+  "valor": 1200.0,
+  "sinal": "D",
+  "favorecido": "Felipe Guimarães Rosa",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-13",
+  "historico": "Pix - Enviado",
+  "doc": "101.303",
+  "valor": 1200.0,
+  "sinal": "D",
+  "favorecido": "LUIS FELIPE MONTE CIPULLO",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-13",
+  "historico": "Pix - Enviado",
+  "doc": "101.304",
+  "valor": 1200.0,
+  "sinal": "D",
+  "favorecido": "Thiago Augusto Gomas Cunha",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-13",
+  "historico": "Pix - Enviado",
+  "doc": "101.305",
+  "valor": 1000.0,
+  "sinal": "D",
+  "favorecido": "André Lima Manfrim",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-13",
+  "historico": "Pix - Enviado",
+  "doc": "101.306",
+  "valor": 480.0,
+  "sinal": "D",
+  "favorecido": "IDALINA SOUZA RIBEIRO DA S",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-13",
+  "historico": "Pix - Enviado",
+  "doc": "101.307",
+  "valor": 480.0,
+  "sinal": "D",
+  "favorecido": "ANNE CAROLINA MELO DOS SAN",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-13",
+  "historico": "Pix - Enviado",
+  "doc": "101.308",
+  "valor": 300.0,
+  "sinal": "D",
+  "favorecido": "RICARDO DIAS DOS SANTOS",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-13",
+  "historico": "Pix - Enviado",
+  "doc": "101.309",
+  "valor": 2000.0,
+  "sinal": "D",
+  "favorecido": "MAGA PROJETOS CULTURAIS",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-13",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 9060.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-16",
+  "historico": "Pix - Enviado",
+  "doc": "101.601",
+  "valor": 3000.0,
+  "sinal": "D",
+  "favorecido": "CAMILA LICARIAO DE CARVALH",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-16",
+  "historico": "Pix - Enviado",
+  "doc": "101.602",
+  "valor": 1100.0,
+  "sinal": "D",
+  "favorecido": "LUZ RIO LOCACAO DE EQUIPAM",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-16",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 4100.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-17",
+  "historico": "Pix - Enviado",
+  "doc": "101.701",
+  "valor": 4375.0,
+  "sinal": "D",
+  "favorecido": "CRISTHIANO RODRIGUES DE JE",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-17",
+  "historico": "Pix - Enviado",
+  "doc": "101.702",
+  "valor": 4900.0,
+  "sinal": "D",
+  "favorecido": "CLAUDIA",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-17",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 9275.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-18",
+  "historico": "Pix - Enviado",
+  "doc": "101.801",
+  "valor": 550.0,
+  "sinal": "D",
+  "favorecido": "Fernando Miguel Efron",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-18",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 550.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-24",
+  "historico": "Pix - Enviado",
+  "doc": "102.401",
+  "valor": 9427.38,
+  "sinal": "D",
+  "favorecido": "MONICA GUIMARAES P MORAES",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-24",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 9427.38,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-25",
+  "historico": "Pix - Enviado",
+  "doc": "102.501",
+  "valor": 20625.0,
+  "sinal": "D",
+  "favorecido": "FOGO FILMES LTDA",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-25",
+  "historico": "Pix - Enviado",
+  "doc": "102.502",
+  "valor": 3600.0,
+  "sinal": "D",
+  "favorecido": "ANNE SANTOS",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-25",
+  "historico": "Pix - Enviado",
+  "doc": "102.503",
+  "valor": 13500.0,
+  "sinal": "D",
+  "favorecido": "MOG PRODUTORA",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-25",
+  "historico": "Pix - Enviado",
+  "doc": "102.504",
+  "valor": 10000.0,
+  "sinal": "D",
+  "favorecido": "MOG PRODUTORA",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-25",
+  "historico": "Pix - Enviado",
+  "doc": "102.505",
+  "valor": 2000.0,
+  "sinal": "D",
+  "favorecido": "MAGA PROJETOS CULTURAIS",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-25",
+  "historico": "Pix - Enviado",
+  "doc": "102.506",
+  "valor": 1800.0,
+  "sinal": "D",
+  "favorecido": "THIAGO AUGUSTO GOMAS CUNHA",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-25",
+  "historico": "Pix - Enviado",
+  "doc": "102.507",
+  "valor": 4800.0,
+  "sinal": "D",
+  "favorecido": "THIAGO AUGUSTO GOMAS CUNHA",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-25",
+  "historico": "Pix - Enviado",
+  "doc": "102.508",
+  "valor": 816.42,
+  "sinal": "D",
+  "favorecido": "Sofia Vontobel Baccarini",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-25",
+  "historico": "Pix - Enviado",
+  "doc": "102.509",
+  "valor": 450.0,
+  "sinal": "D",
+  "favorecido": "CALEIDOSKOPICA PRODUCOES",
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-25",
+  "historico": "Pix - Enviado",
+  "doc": "102.510",
+  "valor": 4500.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 2,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-25",
+  "historico": "Pagamento de Boleto",
+  "doc": "102.511",
+  "valor": 600.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-25",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 62691.42,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-26",
+  "historico": "Pix - Recebido",
+  "doc": "4.471.883.754",
+  "valor": 326.91,
+  "sinal": "C",
+  "favorecido": "00009906831766 IDALINA SOU",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-26",
+  "historico": "Transferência enviada",
+  "doc": "550.101.000.061.344",
+  "valor": 6550.0,
+  "sinal": "D",
+  "favorecido": "GRIFE RIO LOCADORA LTDA",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-26",
+  "historico": "Pix - Enviado",
+  "doc": "102.601",
+  "valor": 995.0,
+  "sinal": "D",
+  "favorecido": "LOC ALL DE CINEMA E TELEVI",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-26",
+  "historico": "Pix - Enviado",
+  "doc": "102.602",
+  "valor": 7500.0,
+  "sinal": "D",
+  "favorecido": "LUIS FELIPE MONTE CIPULLO",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-26",
+  "historico": "Pix - Enviado",
+  "doc": "102.603",
+  "valor": 11250.0,
+  "sinal": "D",
+  "favorecido": "FILMES DE TAIPA PROD",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-26",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 25968.09,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-30",
+  "historico": "Pix - Enviado",
+  "doc": "103.001",
+  "valor": 2529.85,
+  "sinal": "D",
+  "favorecido": "WINDSOR ADMINISTRACAO DE H",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-30",
+  "historico": "Pix - Enviado",
+  "doc": "103.002",
+  "valor": 1559.33,
+  "sinal": "D",
+  "favorecido": "WINDSOR ADMINISTRACAO DE H",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-30",
+  "historico": "Pix - Enviado",
+  "doc": "103.003",
+  "valor": 450.0,
+  "sinal": "D",
+  "favorecido": "-",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-30",
+  "historico": "Pix - Enviado",
+  "doc": "103.004",
+  "valor": 211.5,
+  "sinal": "D",
+  "favorecido": "BRILHO",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-30",
+  "historico": "Pix - Enviado",
+  "doc": "103.005",
+  "valor": 1500.0,
+  "sinal": "D",
+  "favorecido": "MARTINA MILLA RAFFAELLI ME",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-30",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 6250.68,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-31",
+  "historico": "Pix - Enviado",
+  "doc": "103.101",
+  "valor": 320.0,
+  "sinal": "D",
+  "favorecido": "JEFFERSON MARCOS SILVA DE",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-31",
+  "historico": "Pix - Enviado",
+  "doc": "103.102",
+  "valor": 1020.0,
+  "sinal": "D",
+  "favorecido": "Felipe Guimarães Rosa",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-31",
+  "historico": "Pix - Enviado",
+  "doc": "103.103",
+  "valor": 1020.0,
+  "sinal": "D",
+  "favorecido": "LUIS FELIPE MONTE CIPULLO",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-31",
+  "historico": "Pix - Enviado",
+  "doc": "103.104",
+  "valor": 1020.0,
+  "sinal": "D",
+  "favorecido": "Andre Lima Monfrini",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-31",
+  "historico": "Pix - Enviado",
+  "doc": "103.105",
+  "valor": 200.0,
+  "sinal": "D",
+  "favorecido": "André Lima Manfrim",
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-10-31",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 3580.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 3,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2023-11-01",
+  "historico": "Pix - Enviado",
+  "doc": "110.101",
+  "valor": 316.23,
+  "sinal": "D",
+  "favorecido": "WINDSOR ADMINISTRACAO DE H",
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-01",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 316.23,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-08",
+  "historico": "Pix - Rejeitado",
+  "doc": "5.327.067.019",
+  "valor": 300.0,
+  "sinal": "C",
+  "favorecido": "Pagamento rejeitado pelo P",
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-08",
+  "historico": "Pix - Enviado",
+  "doc": "110.801",
+  "valor": 300.0,
+  "sinal": "D",
+  "favorecido": "BERNARDO TAVARES ROSA",
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-08",
+  "historico": "Pix - Enviado",
+  "doc": "110.802",
+  "valor": 300.0,
+  "sinal": "D",
+  "favorecido": "BERNARDO TAVARES E SILVA C",
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-08",
+  "historico": "Pix - Enviado",
+  "doc": "110.803",
+  "valor": 4750.0,
+  "sinal": "D",
+  "favorecido": "CRISTHIANO RODRIGUES DE JE",
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-08",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 5050.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-10",
+  "historico": "TED-Crédito em Conta",
+  "doc": "34.286.747",
+  "valor": 650.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-14",
+  "historico": "Pix - Enviado",
+  "doc": "111.401",
+  "valor": 27000.0,
+  "sinal": "D",
+  "favorecido": "MOG PRODUTORA",
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-14",
+  "historico": "Pix - Enviado",
+  "doc": "111.402",
+  "valor": 3724.74,
+  "sinal": "D",
+  "favorecido": "MONICA GUIMARAES P MORAES",
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-14",
+  "historico": "Pix - Enviado",
+  "doc": "111.403",
+  "valor": 750.0,
+  "sinal": "D",
+  "favorecido": "BIE CINEMA E TV LTDA ME",
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-14",
+  "historico": "Pix - Enviado",
+  "doc": "111.404",
+  "valor": 400.0,
+  "sinal": "D",
+  "favorecido": "FILMES DE TAIPA PROD",
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-14",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 31874.74,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-27",
+  "historico": "Pix - Enviado",
+  "doc": "112.701",
+  "valor": 20625.0,
+  "sinal": "D",
+  "favorecido": "FOGO FILMES LTDA",
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-11-27",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 20625.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2023-12-11",
+  "historico": "Pix - Enviado",
+  "doc": "121.101",
+  "valor": 2000.0,
+  "sinal": "D",
+  "favorecido": "MEMORIA COLETIVA IMAGENS E",
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2023-12-11",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 2000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2023-12-20",
+  "historico": "Pix - Enviado",
+  "doc": "122.001",
+  "valor": 585.0,
+  "sinal": "D",
+  "favorecido": "RAQUEL DE OLIVEIRA LAZARO",
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2023-12-20",
+  "historico": "Pix - Enviado",
+  "doc": "122.002",
+  "valor": 20625.0,
+  "sinal": "D",
+  "favorecido": "FOGO FILMES LTDA",
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2023-12-20",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 21210.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2023-02-22",
+  "historico": "Pix - Enviado",
+  "doc": "22.201",
+  "valor": 19550.0,
+  "sinal": "D",
+  "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+  "pagina": 1,
+  "fonte": "2. fev.pdf"
+ },
+ {
+  "data": "2023-02-22",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 19550.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "2. fev.pdf"
+ },
+ {
+  "data": "2023-07-03",
+  "historico": "Pix - Enviado",
+  "doc": "70.301",
+  "valor": 25000.0,
+  "sinal": "D",
+  "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+  "pagina": 1,
+  "fonte": "7. jul.pdf"
+ },
+ {
+  "data": "2023-07-03",
+  "historico": "Pix - Enviado",
+  "doc": "70.302",
+  "valor": 25000.0,
+  "sinal": "D",
+  "favorecido": "MOG PRODUTORA",
+  "pagina": 1,
+  "fonte": "7. jul.pdf"
+ },
+ {
+  "data": "2023-07-03",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 50000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "7. jul.pdf"
+ },
+ {
+  "data": "2023-08-18",
+  "historico": "Pix - Enviado",
+  "doc": "81.801",
+  "valor": 380.0,
+  "sinal": "D",
+  "favorecido": "RADIO E TELEVISAO BANDEIRA",
+  "pagina": 1,
+  "fonte": "8. ago.pdf"
+ },
+ {
+  "data": "2023-08-18",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 380.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "8. ago.pdf"
+ },
+ {
+  "data": "2023-08-25",
+  "historico": "Pix - Enviado",
+  "doc": "82.501",
+  "valor": 10500.0,
+  "sinal": "D",
+  "favorecido": "MEMORIA COLETIVA IMAGENS E",
+  "pagina": 1,
+  "fonte": "8. ago.pdf"
+ },
+ {
+  "data": "2023-08-25",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 10500.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "8. ago.pdf"
+ },
+ {
+  "data": "2023-09-04",
+  "historico": "Pix - Enviado",
+  "doc": "90.401",
+  "valor": 700.0,
+  "sinal": "D",
+  "favorecido": "PORVIROSCOPIO PROJETOS C.",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-04",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 700.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-05",
+  "historico": "TED Transf.Eletr.Disponiv",
+  "doc": "90.501",
+  "valor": 33000.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-05",
+  "historico": "Impostos",
+  "doc": "90.502",
+  "valor": 120.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-05",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 33120.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-06",
+  "historico": "Pix - Enviado",
+  "doc": "90.601",
+  "valor": 4900.0,
+  "sinal": "D",
+  "favorecido": "JULIA BARBARA MELO DE SOUS",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-06",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 4900.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-11",
+  "historico": "Pix - Enviado",
+  "doc": "91.101",
+  "valor": 3000.0,
+  "sinal": "D",
+  "favorecido": "ANA BEATRIZ HERMANSON POMA",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-11",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 3000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-20",
+  "historico": "Pix - Enviado",
+  "doc": "92.001",
+  "valor": 2870.87,
+  "sinal": "D",
+  "favorecido": "GOL Linhas Aéreas",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-20",
+  "historico": "Pix - Enviado",
+  "doc": "92.002",
+  "valor": 2870.87,
+  "sinal": "D",
+  "favorecido": "GOL Linhas Aéreas",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-20",
+  "historico": "Pix - Enviado",
+  "doc": "92.003",
+  "valor": 2870.87,
+  "sinal": "D",
+  "favorecido": "GOL Linhas Aéreas",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-20",
+  "historico": "Pix - Enviado",
+  "doc": "92.004",
+  "valor": 2870.87,
+  "sinal": "D",
+  "favorecido": "GOL Linhas Aéreas",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-20",
+  "historico": "Pix - Enviado",
+  "doc": "92.005",
+  "valor": 1524.64,
+  "sinal": "D",
+  "favorecido": "GOL Linhas Aéreas",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-20",
+  "historico": "Pix - Enviado",
+  "doc": "92.006",
+  "valor": 1524.64,
+  "sinal": "D",
+  "favorecido": "GOL Linhas Aéreas",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-20",
+  "historico": "Pix - Enviado",
+  "doc": "92.007",
+  "valor": 1524.64,
+  "sinal": "D",
+  "favorecido": "GOL Linhas Aéreas",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-20",
+  "historico": "Pix - Enviado",
+  "doc": "92.008",
+  "valor": 1524.64,
+  "sinal": "D",
+  "favorecido": "GOL Linhas Aéreas",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-20",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 17582.04,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-26",
+  "historico": "Pix - Enviado",
+  "doc": "92.601",
+  "valor": 10000.0,
+  "sinal": "D",
+  "favorecido": "LUIS FELIPE LABAKI",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-26",
+  "historico": "Pix - Enviado",
+  "doc": "92.602",
+  "valor": 11250.0,
+  "sinal": "D",
+  "favorecido": "FILMES DE TAIPA PROD",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-26",
+  "historico": "Pix - Enviado",
+  "doc": "92.603",
+  "valor": 3000.0,
+  "sinal": "D",
+  "favorecido": "ANA BEATRIZ HERMANSON POMA",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-26",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 24250.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-28",
+  "historico": "Pix - Enviado",
+  "doc": "92.801",
+  "valor": 350.0,
+  "sinal": "D",
+  "favorecido": "CASA DO ROADIE",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-28",
+  "historico": "Pix - Enviado",
+  "doc": "92.802",
+  "valor": 1000.0,
+  "sinal": "D",
+  "favorecido": "Sofia Vontobel Baccarini",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-28",
+  "historico": "Pix - Enviado",
+  "doc": "92.803",
+  "valor": 1000.0,
+  "sinal": "D",
+  "favorecido": "André Lima Manfrim",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-28",
+  "historico": "Pix - Enviado",
+  "doc": "92.804",
+  "valor": 15.3,
+  "sinal": "D",
+  "favorecido": "CASA DO ROADIE",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-28",
+  "historico": "Pix - Enviado",
+  "doc": "92.805",
+  "valor": 8800.0,
+  "sinal": "D",
+  "favorecido": "CITYHOME SERVICOS IMOBILIA",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-28",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 11165.3,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-29",
+  "historico": "Pix - Enviado",
+  "doc": "92.901",
+  "valor": 5768.4,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-29",
+  "historico": "Pix - Enviado",
+  "doc": "92.902",
+  "valor": 500.0,
+  "sinal": "D",
+  "favorecido": "CITYHOME SERVICOS IMOBILIA",
+  "pagina": 2,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-29",
+  "historico": "Pix - Enviado",
+  "doc": "92.903",
+  "valor": 35000.0,
+  "sinal": "D",
+  "favorecido": "MARTINA MILLA RAFFAELLI ME",
+  "pagina": 2,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-29",
+  "historico": "Pix - Enviado",
+  "doc": "92.904",
+  "valor": 3116.0,
+  "sinal": "D",
+  "favorecido": "MATRON INFORMATICA",
+  "pagina": 2,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-29",
+  "historico": "Pix - Enviado",
+  "doc": "92.905",
+  "valor": 1050.0,
+  "sinal": "D",
+  "favorecido": "LUIS FELIPE MONTE CIPULLO",
+  "pagina": 2,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-29",
+  "historico": "Pix - Enviado",
+  "doc": "92.906",
+  "valor": 1050.0,
+  "sinal": "D",
+  "favorecido": "Felipe Guimarães Rosa",
+  "pagina": 2,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-29",
+  "historico": "Pix - Enviado",
+  "doc": "92.907",
+  "valor": 1050.0,
+  "sinal": "D",
+  "favorecido": "Thiago Augusto Gomas Cunha",
+  "pagina": 2,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-29",
+  "historico": "Pix - Enviado",
+  "doc": "92.908",
+  "valor": 560.0,
+  "sinal": "D",
+  "favorecido": "Sofia Vontobel Baccarini",
+  "pagina": 2,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-29",
+  "historico": "Pix - Enviado",
+  "doc": "92.909",
+  "valor": 560.0,
+  "sinal": "D",
+  "favorecido": "Fábio Baltar Duarte",
+  "pagina": 2,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-29",
+  "historico": "Pix - Enviado",
+  "doc": "92.910",
+  "valor": 1050.0,
+  "sinal": "D",
+  "favorecido": "Andre Lima Monfrini",
+  "pagina": 2,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-29",
+  "historico": "Pix - Enviado",
+  "doc": "92.911",
+  "valor": 150.0,
+  "sinal": "D",
+  "favorecido": "CITYHOME SERVICOS IMOBILIA",
+  "pagina": 2,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-29",
+  "historico": "Pix - Enviado",
+  "doc": "92.912",
+  "valor": 35.1,
+  "sinal": "D",
+  "favorecido": "SCM PREST SERV POSTAIS LTD",
+  "pagina": 2,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2023-09-29",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 49889.5,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 2,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-01-24",
+  "historico": "Pix - Enviado",
+  "doc": "12.401",
+  "valor": 20625.0,
+  "sinal": "D",
+  "favorecido": "FOGO FILMES LTDA",
+  "pagina": 1,
+  "fonte": "1. jan.pdf"
+ },
+ {
+  "data": "2024-01-24",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 20625.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "1. jan.pdf"
+ },
+ {
+  "data": "2024-01-31",
+  "historico": "Pix - Enviado",
+  "doc": "13.101",
+  "valor": 487.2,
+  "sinal": "D",
+  "favorecido": "IN SAMPA COURIER ENTREGAS",
+  "pagina": 1,
+  "fonte": "1. jan.pdf"
+ },
+ {
+  "data": "2024-01-31",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 487.2,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "1. jan.pdf"
+ },
+ {
+  "data": "2024-10-10",
+  "historico": "Pix - Enviado",
+  "doc": "101.001",
+  "valor": 1836.22,
+  "sinal": "D",
+  "favorecido": "COTACAO D.T.V.M. S/A - SEF",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2024-10-10",
+  "historico": "Pix - Enviado",
+  "doc": "101.002",
+  "valor": 372.0,
+  "sinal": "D",
+  "favorecido": "SOCIEDADE AMIGOS DA CINEMA",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2024-10-10",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 2208.22,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2024-10-31",
+  "historico": "Pix - Enviado",
+  "doc": "103.101",
+  "valor": 5000.0,
+  "sinal": "D",
+  "favorecido": "PORVIROSCOPIO PROJETOS C.",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2024-10-31",
+  "historico": "Pix - Enviado",
+  "doc": "103.102",
+  "valor": 5500.0,
+  "sinal": "D",
+  "favorecido": "CALIBAN PRODUCOES CINEMATO",
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2024-10-31",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 10500.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "10. out.pdf"
+ },
+ {
+  "data": "2024-11-01",
+  "historico": "Impostos",
+  "doc": "110.101",
+  "valor": 140.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2024-11-01",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 140.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2024-11-04",
+  "historico": "Pagto via Auto-Atend.BB",
+  "doc": "110.401",
+  "valor": 400.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2024-11-04",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 400.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2024-11-08",
+  "historico": "Pix - Enviado",
+  "doc": "110.801",
+  "valor": 600.0,
+  "sinal": "D",
+  "favorecido": "ECHO S COMUNICACAO SONORA",
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2024-11-08",
+  "historico": "Pix - Enviado",
+  "doc": "110.802",
+  "valor": 1000.0,
+  "sinal": "D",
+  "favorecido": "ROBERTO FERRARETTO D AVILA",
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2024-11-08",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 1600.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2024-11-12",
+  "historico": "Impostos",
+  "doc": "111.201",
+  "valor": 12.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2024-11-12",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 12.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2024-11-14",
+  "historico": "Pagto via Auto-Atend.BB",
+  "doc": "111.401",
+  "valor": 200.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2024-11-14",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 200.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2024-11-28",
+  "historico": "Pix - Enviado",
+  "doc": "112.801",
+  "valor": 230.0,
+  "sinal": "D",
+  "favorecido": "MARACH SERVICOS AUDIOVISUA",
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2024-11-28",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 230.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "11. nov.pdf"
+ },
+ {
+  "data": "2024-12-05",
+  "historico": "Pagamento de Boleto",
+  "doc": "120.501",
+  "valor": 6400.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2024-12-05",
+  "historico": "Pix - Enviado",
+  "doc": "120.502",
+  "valor": 1500.0,
+  "sinal": "D",
+  "favorecido": "GEISA DA SILVA DE JESUS",
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2024-12-05",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 7900.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2024-12-10",
+  "historico": "Pagamento de Boleto",
+  "doc": "121.001",
+  "valor": 100.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2024-12-10",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 100.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2024-12-17",
+  "historico": "Pix - Enviado",
+  "doc": "121.701",
+  "valor": 3000.0,
+  "sinal": "D",
+  "favorecido": "EDITORA E IMPORTADORA MUSI",
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2024-12-17",
+  "historico": "Pix - Enviado",
+  "doc": "121.702",
+  "valor": 2000.0,
+  "sinal": "D",
+  "favorecido": "SOM LIVRE",
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2024-12-17",
+  "historico": "Pix - Enviado",
+  "doc": "121.703",
+  "valor": 3500.0,
+  "sinal": "D",
+  "favorecido": "CARLOS LYRA EDICOES MUSICA",
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2024-12-17",
+  "historico": "Pix - Enviado",
+  "doc": "121.704",
+  "valor": 8393.3,
+  "sinal": "D",
+  "favorecido": "COTACAO D.T.V.M. S/A - SEF",
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2024-12-17",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 16893.3,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2024-12-26",
+  "historico": "Pix - Enviado",
+  "doc": "122.601",
+  "valor": 5000.0,
+  "sinal": "D",
+  "favorecido": "GIOVANA AMANO",
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2024-12-26",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 5000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "12. dez.pdf"
+ },
+ {
+  "data": "2024-02-23",
+  "historico": "Pix - Enviado",
+  "doc": "22.301",
+  "valor": 6000.0,
+  "sinal": "D",
+  "favorecido": "JUBA PRODUCOES",
+  "pagina": 1,
+  "fonte": "2. fev.pdf"
+ },
+ {
+  "data": "2024-02-23",
+  "historico": "Pix - Enviado",
+  "doc": "22.302",
+  "valor": 22500.0,
+  "sinal": "D",
+  "favorecido": "FOGO FILMES",
+  "pagina": 1,
+  "fonte": "2. fev.pdf"
+ },
+ {
+  "data": "2024-02-23",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 28500.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "2. fev.pdf"
+ },
+ {
+  "data": "2024-05-07",
+  "historico": "Pix - Enviado",
+  "doc": "50.701",
+  "valor": 4000.0,
+  "sinal": "D",
+  "favorecido": "JULIA BARBARA MELO DE SOUS",
+  "pagina": 1,
+  "fonte": "5. mai.pdf"
+ },
+ {
+  "data": "2024-05-07",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 4000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "5. mai.pdf"
+ },
+ {
+  "data": "2024-05-31",
+  "historico": "Pix - Enviado",
+  "doc": "53.101",
+  "valor": 5000.0,
+  "sinal": "D",
+  "favorecido": "GANZAH",
+  "pagina": 1,
+  "fonte": "5. mai.pdf"
+ },
+ {
+  "data": "2024-05-31",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 5000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "5. mai.pdf"
+ },
+ {
+  "data": "2024-06-03",
+  "historico": "Pix - Enviado",
+  "doc": "60.301",
+  "valor": 13500.0,
+  "sinal": "D",
+  "favorecido": "FOGO FILMES",
+  "pagina": 1,
+  "fonte": "6. jun.pdf"
+ },
+ {
+  "data": "2024-06-03",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 13500.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "6. jun.pdf"
+ },
+ {
+  "data": "2024-07-03",
+  "historico": "Pix - Enviado",
+  "doc": "70.301",
+  "valor": 5000.0,
+  "sinal": "D",
+  "favorecido": "GIOVANA AMANO",
+  "pagina": 1,
+  "fonte": "7. jul.pdf"
+ },
+ {
+  "data": "2024-07-03",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 5000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "7. jul.pdf"
+ },
+ {
+  "data": "2024-07-30",
+  "historico": "Pix - Enviado",
+  "doc": "73.001",
+  "valor": 8000.0,
+  "sinal": "D",
+  "favorecido": "BRASIL IMAGEM",
+  "pagina": 1,
+  "fonte": "7. jul.pdf"
+ },
+ {
+  "data": "2024-07-30",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 8000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "7. jul.pdf"
+ },
+ {
+  "data": "2024-08-09",
+  "historico": "Transferência enviada",
+  "doc": "550.525.000.034.632",
+  "valor": 2815.0,
+  "sinal": "D",
+  "favorecido": "ANJO AZUL FILMES LTDA.",
+  "pagina": 1,
+  "fonte": "8. ago.pdf"
+ },
+ {
+  "data": "2024-08-09",
+  "historico": "Pix - Enviado",
+  "doc": "80.901",
+  "valor": 2873.0,
+  "sinal": "D",
+  "favorecido": "SOCIEDADE AMIGOS DA CINEMA",
+  "pagina": 1,
+  "fonte": "8. ago.pdf"
+ },
+ {
+  "data": "2024-08-09",
+  "historico": "Pix - Enviado",
+  "doc": "80.902",
+  "valor": 4000.0,
+  "sinal": "D",
+  "favorecido": "F. Werneck Barcinski Ltda",
+  "pagina": 1,
+  "fonte": "8. ago.pdf"
+ },
+ {
+  "data": "2024-08-09",
+  "historico": "Pagto via Auto-Atend.BB",
+  "doc": "80.903",
+  "valor": 550.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "8. ago.pdf"
+ },
+ {
+  "data": "2024-08-09",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 10238.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "8. ago.pdf"
+ },
+ {
+  "data": "2024-08-16",
+  "historico": "Pagamento de Boleto",
+  "doc": "81.601",
+  "valor": 130.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "8. ago.pdf"
+ },
+ {
+  "data": "2024-08-16",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 130.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "8. ago.pdf"
+ },
+ {
+  "data": "2024-08-19",
+  "historico": "Pix - Enviado",
+  "doc": "81.901",
+  "valor": 8627.0,
+  "sinal": "D",
+  "favorecido": "SOCIEDADE AMIGOS DA CINEMA",
+  "pagina": 1,
+  "fonte": "8. ago.pdf"
+ },
+ {
+  "data": "2024-08-19",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 8627.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "8. ago.pdf"
+ },
+ {
+  "data": "2024-09-03",
+  "historico": "Pix - Enviado",
+  "doc": "90.301",
+  "valor": 600.0,
+  "sinal": "D",
+  "favorecido": "CAMILA BRAUNE",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-09-03",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 600.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-09-05",
+  "historico": "Pagamento de Boleto",
+  "doc": "90.501",
+  "valor": 938.5,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-09-05",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 938.5,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-09-17",
+  "historico": "Transferência enviada",
+  "doc": "553.560.000.010.518",
+  "valor": 2250.0,
+  "sinal": "D",
+  "favorecido": "LAPFILME P C LTDA",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-09-17",
+  "historico": "Pagamento de Boleto",
+  "doc": "91.701",
+  "valor": 2632.45,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-09-17",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 4882.45,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-09-23",
+  "historico": "Pagamento de Boleto",
+  "doc": "92.301",
+  "valor": 5500.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-09-23",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 5500.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-09-25",
+  "historico": "Pix - Enviado",
+  "doc": "92.501",
+  "valor": 6726.23,
+  "sinal": "D",
+  "favorecido": "COTACAO D.T.V.M. S/A - SEF",
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-09-25",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 6726.23,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-09-30",
+  "historico": "Pagto via Auto-Atend.BB",
+  "doc": "93.001",
+  "valor": 700.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-09-30",
+  "historico": "Pagto via Auto-Atend.BB",
+  "doc": "93.002",
+  "valor": 2400.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2024-09-30",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 3100.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "9. set.pdf"
+ },
+ {
+  "data": "2025-01-16",
+  "historico": "Pagto via Auto-Atend.BB",
+  "doc": "11.601",
+  "valor": 50.0,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "1. jan.pdf"
+ },
+ {
+  "data": "2025-01-16",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 50.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "1. jan.pdf"
+ },
+ {
+  "data": "2025-02-03",
+  "historico": "Pix - Rejeitado",
+  "doc": "31.738.289.149.552",
+  "valor": 975.04,
+  "sinal": "C",
+  "favorecido": "CPF/CNPJ NAO PERTENCE AO T",
+  "pagina": 1,
+  "fonte": "2. fev.pdf"
+ },
+ {
+  "data": "2025-02-03",
+  "historico": "Pix - Rejeitado",
+  "doc": "31.740.076.433.202",
+  "valor": 975.04,
+  "sinal": "C",
+  "favorecido": "PIX NAO EFETUADO. ERRO NO",
+  "pagina": 1,
+  "fonte": "2. fev.pdf"
+ },
+ {
+  "data": "2025-02-03",
+  "historico": "Pix - Enviado",
+  "doc": "20.301",
+  "valor": 975.04,
+  "sinal": "D",
+  "favorecido": "CIRCUNSTANC 1961 FSAMPJFN",
+  "pagina": 1,
+  "fonte": "2. fev.pdf"
+ },
+ {
+  "data": "2025-02-03",
+  "historico": "Pix - Enviado",
+  "doc": "20.302",
+  "valor": 975.04,
+  "sinal": "D",
+  "favorecido": "BANCO RENDIMENTO S/A",
+  "pagina": 1,
+  "fonte": "2. fev.pdf"
+ },
+ {
+  "data": "2025-02-03",
+  "historico": "Pix - Enviado",
+  "doc": "20.303",
+  "valor": 975.04,
+  "sinal": "D",
+  "favorecido": "BANCO RENDIMENTO S/A",
+  "pagina": 1,
+  "fonte": "2. fev.pdf"
+ },
+ {
+  "data": "2025-02-03",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 975.04,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "2. fev.pdf"
+ },
+ {
+  "data": "2025-02-27",
+  "historico": "Pix - Enviado",
+  "doc": "22.701",
+  "valor": 7000.0,
+  "sinal": "D",
+  "favorecido": "GANZAH",
+  "pagina": 1,
+  "fonte": "2. fev.pdf"
+ },
+ {
+  "data": "2025-02-27",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 7000.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "2. fev.pdf"
+ },
+ {
+  "data": "2025-03-25",
+  "historico": "Pagamento de Boleto",
+  "doc": "32.501",
+  "valor": 626.3,
+  "sinal": "D",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "3. mar.pdf"
+ },
+ {
+  "data": "2025-03-25",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 626.3,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "3. mar.pdf"
+ },
+ {
+  "data": "2025-04-30",
+  "historico": "Pix - Enviado",
+  "doc": "43.001",
+  "valor": 3000.0,
+  "sinal": "D",
+  "favorecido": "GIOVANA AMANO",
+  "pagina": 1,
+  "fonte": "4. abr.pdf"
+ },
+ {
+  "data": "2025-04-30",
+  "historico": "Pix - Enviado",
+  "doc": "43.002",
+  "valor": 1200.0,
+  "sinal": "D",
+  "favorecido": "PLANIFILMES LTDA",
+  "pagina": 1,
+  "fonte": "4. abr.pdf"
+ },
+ {
+  "data": "2025-04-30",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 4200.0,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "4. abr.pdf"
+ },
+ {
+  "data": "2025-05-07",
+  "historico": "Pix - Enviado",
+  "doc": "50.701",
+  "valor": 18093.63,
+  "sinal": "D",
+  "favorecido": "FOGO FILMES",
+  "pagina": 1,
+  "fonte": "5. maio.pdf"
+ },
+ {
+  "data": "2025-05-07",
+  "historico": "Resgate Automático",
+  "doc": "1.972",
+  "valor": 18093.63,
+  "sinal": "C",
+  "favorecido": null,
+  "pagina": 1,
+  "fonte": "5. maio.pdf"
+ }
+]
