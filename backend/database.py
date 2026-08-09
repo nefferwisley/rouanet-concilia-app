@@ -87,13 +87,17 @@ def _extrair_sub(payload: dict) -> str:
     return sub
 
 
-async def get_conn(authorization: str = Header(...)):
+async def get_conn(authorization: str | None = Header(None)):
     """
     Dependency FastAPI: entrega (conn, user_id) com o contexto RLS já
     configurado. Toda a requisição roda em UMA transação asyncpg — correto
     pro padrão de uso desta API (poucas queries por rota, sempre lidas/escritas
     de forma consistente entre si).
     """
+    if not authorization:
+        raise HTTPException(
+            status_code=401, detail="Faça login para continuar (Authorization ausente)."
+        )
     if not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Header Authorization: Bearer <token> obrigatório.")
     token = authorization.removeprefix("Bearer ").strip()

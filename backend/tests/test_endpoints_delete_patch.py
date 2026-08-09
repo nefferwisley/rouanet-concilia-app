@@ -16,39 +16,39 @@ client = TestClient(app)
 # ============================================================
 
 def test_delete_projeto_requires_auth():
-    """DELETE /projetos/{id} - sem auth deve retornar 422"""
+    """DELETE /projetos/{id} - sem auth deve retornar 401"""
     response = client.delete("/api/v1/projetos/fake-uuid")
-    assert response.status_code == 422  # Missing Authorization header
+    assert response.status_code == 401  # Missing Authorization header
 
 
 def test_patch_projeto_requires_auth():
-    """PATCH /projetos/{id} - sem auth deve retornar 422"""
+    """PATCH /projetos/{id} - sem auth deve retornar 401"""
     response = client.patch("/api/v1/projetos/fake-uuid", json={})
-    assert response.status_code == 422
+    assert response.status_code == 401
 
 
 def test_delete_importacao_requires_auth():
-    """DELETE /importacoes/{id} - sem auth deve retornar 422"""
+    """DELETE /importacoes/{id} - sem auth deve retornar 401"""
     response = client.delete("/api/v1/importacoes/fake-uuid")
-    assert response.status_code == 422
+    assert response.status_code == 401
 
 
 def test_patch_importacao_requires_auth():
-    """PATCH /importacoes/{id} - sem auth deve retornar 422"""
+    """PATCH /importacoes/{id} - sem auth deve retornar 401"""
     response = client.patch("/api/v1/importacoes/fake-uuid")
-    assert response.status_code == 422
+    assert response.status_code == 401
 
 
 def test_delete_relatorio_requires_auth():
-    """DELETE /relatorios/{id} - sem auth deve retornar 422"""
+    """DELETE /relatorios/{id} - sem auth deve retornar 401"""
     response = client.delete("/api/v1/relatorios/fake-uuid")
-    assert response.status_code == 422
+    assert response.status_code == 401
 
 
 def test_patch_relatorio_requires_auth():
-    """PATCH /relatorios/{id} - sem auth deve retornar 422"""
+    """PATCH /relatorios/{id} - sem auth deve retornar 401"""
     response = client.patch("/api/v1/relatorios/fake-uuid", json={})
-    assert response.status_code == 422
+    assert response.status_code == 401
 
 
 # ============================================================
