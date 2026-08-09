@@ -17,7 +17,7 @@ from starlette.concurrency import run_in_threadpool
 
 from backend.config import settings
 from backend.database import get_conn
-from motor.drive_service import baixar_arquivo, listar_arquivos
+from motor.drive_service import baixar_arquivo, extrair_folder_id, listar_arquivos
 from motor.importar import parse_tipo_doc
 from motor.ocr_service import extract_with_gemini
 
@@ -204,6 +204,35 @@ async def sincronizar_drive(projeto_id: str, dep=Depends(get_conn)):
             "Nenhum link do Google Drive pendente de sincronização pra este projeto.",
         )
 
+    # F0 — reconhecer se esta pasta do Drive já foi sincronizada antes (neste
+    # projeto ou em outro que o usuário acessa): evita tratar um reprocessamento
+    # como se fosse a primeira vez, e sinaliza pra quem chamou que correções
+    # feitas anteriormente (ver motor/correcoes_manuais.py) continuam valendo.
+    folder_id = extrair_folder_id(link_row["arquivo_ref"])
+    ja_sincronizado_antes = False
+    outros_projetos_mesma_pasta: list[str] = []
+    if folder_id:
+        candidatos = await conn.fetch(
+            """
+            select distinct projeto_id, arquivo_ref from documentos_projeto
+            where origem = 'google_drive' and nome_arquivo is not null and projeto_id != $1
+            """,
+            projeto_id,
+        )
+        for row in candidatos:
+            if extrair_folder_id(row["arquivo_ref"]) == folder_id:
+                outros_projetos_mesma_pasta.append(str(row["projeto_id"]))
+        ja_sincronizado_alguma_vez = await conn.fetchval(
+            """
+            select exists(
+                select 1 from documentos_projeto
+                where projeto_id = $1 and origem = 'google_drive' and nome_arquivo is not null
+            )
+            """,
+            projeto_id,
+        )
+        ja_sincronizado_antes = bool(ja_sincronizado_alguma_vez)
+
     arquivos_remotos = await run_in_threadpool(listar_arquivos, link_row["arquivo_ref"])
     if arquivos_remotos is None:
         raise HTTPException(
@@ -239,7 +268,13 @@ async def sincronizar_drive(projeto_id: str, dep=Depends(get_conn)):
     await conn.execute("update documentos_projeto set status = 'processado' where id = $1", link_row["id"])
 
     logger.info("Projeto %s: %d arquivo(s) sincronizado(s) do Drive por %s", projeto_id, len(registrados), user_id)
-    return {"projeto_id": projeto_id, "sincronizados": len(registrados), "documentos": registrados}
+    return {
+        "projeto_id": projeto_id,
+        "sincronizados": len(registrados),
+        "documentos": registrados,
+        "ja_sincronizado_antes": ja_sincronizado_antes,
+        "outros_projetos_mesma_pasta": sorted(set(outros_projetos_mesma_pasta)),
+    }
 
 
 @router.get("/projeto/{projeto_id}")

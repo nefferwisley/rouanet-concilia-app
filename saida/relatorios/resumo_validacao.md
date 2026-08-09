@@ -1,6 +1,6 @@
 # Resumo de Validação — Projeto 1961 (PRONAC 20-7453)
 
-Gerado automaticamente por `motor/gerar_resumo.py` em 2026-08-09 17:29:23.
+Gerado automaticamente por `motor/gerar_resumo.py` em 2026-08-09 18:58:50.
 
 ## 1. Resumo
 

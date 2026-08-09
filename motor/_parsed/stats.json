@@ -1,10 +1,10 @@
 {
  "total_deb": 181,
  "total_comp": 178,
- "conciliados": 173,
+ "conciliados": 174,
  "orfaos_extrato": 7,
  "orfaos_comprovante": 4,
- "divergentes": 1,
+ "divergentes": 0,
  "ambiguos": 0,
- "taxa_pct": 95.58
+ "taxa_pct": 96.13
 }

@@ -46,8 +46,10 @@ from pathlib import Path
 
 try:
     from .lib_normalizacao import normalizar, score_nome, subconjunto, tokens, nome_curto
+    from .correcoes_manuais import aplicar_correcoes
 except ImportError:  # execução direta (python motor/cruzamento.py)
     from lib_normalizacao import normalizar, score_nome, subconjunto, tokens, nome_curto
+    from correcoes_manuais import aplicar_correcoes
 
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -450,7 +452,7 @@ def cruzamento_em_memoria(comprovantes: list[dict], movimentos: list[dict]) -> d
     Aceita date/Decimal nativos (saída dos parsers) ou data/valor em string
     (formato das _parsed/*.json). Retorna o dict completo com stats + classes.
     """
-    comps = [_normalizar(c) for c in comprovantes]
+    comps = aplicar_correcoes([_normalizar(c) for c in comprovantes])
     movs = [_normalizar(m) for m in movimentos]
     cruzador = Cruzador(comps, movs)
     cruzador.executar()

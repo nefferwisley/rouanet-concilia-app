@@ -12,7 +12,21 @@ para 2 débitos.
 from datetime import date
 from decimal import Decimal
 
+import pytest
+
+import motor.correcoes_manuais as correcoes_manuais
 from motor.cruzamento import _para_linhas, cruzamento_em_memoria
+
+
+@pytest.fixture(autouse=True)
+def _isola_correcoes_manuais_reais(tmp_path, monkeypatch):
+    """Todo teste deste arquivo usa um correcoes_manuais.json isolado e vazio
+    por padrão — sem isso, os testes ficam acoplados ao arquivo real do
+    projeto 1961 (motor/_parsed/correcoes_manuais.json), que muda conforme
+    correções reais são registradas e quebraria testes que reusam os mesmos
+    numero_arquivo por coincidência (ex.: 111, o caso real do "Brilho")."""
+    monkeypatch.setattr(correcoes_manuais, "CORRECOES_PATH", tmp_path / "correcoes_manuais.json")
+    monkeypatch.setattr(correcoes_manuais, "PARSED", tmp_path)
 
 
 def deb(data, valor, nome, doc="100.001"):
@@ -208,3 +222,23 @@ def test_nao_muta_as_entradas():
     cruzamento_em_memoria([c], [d])
     assert c == antes[0]
     assert d == antes[1]
+
+
+def test_cruzamento_aplica_correcao_manual_de_valor(tmp_path, monkeypatch):
+    """F0 — comprovante com valor ilegível (0.00, como o caso real do 'Brilho')
+    reconcilia certo depois de registrada a correção manual, mesmo sem editar
+    o comprovante bruto."""
+    monkeypatch.setattr(correcoes_manuais, "CORRECOES_PATH", tmp_path / "correcoes_manuais.json")
+    monkeypatch.setattr(correcoes_manuais, "PARSED", tmp_path)
+
+    d = deb(date(2023, 10, 30), Decimal("211.50"), "BRILHO")
+    c = comp(date(2023, 10, 30), Decimal("0.00"), "Brilho", num=111)
+
+    # sem correção: valor não bate -> não concilia direto pela chave
+    sem_correcao = cruzamento_em_memoria([dict(c)], [dict(d)])
+    assert len(sem_correcao["conciliados"]) == 0
+
+    correcoes_manuais.registrar_correcao(111, "valor", 211.50, "PDF sem total extraível.")
+    com_correcao = cruzamento_em_memoria([dict(c)], [dict(d)])
+    assert len(com_correcao["conciliados"]) == 1
+    assert com_correcao["conciliados"][0]["comprovante"]["valor"] == 211.50
