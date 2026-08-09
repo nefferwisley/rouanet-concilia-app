@@ -3,8 +3,11 @@ import { vi } from 'vitest';
 
 export const mockGet = vi.fn().mockResolvedValue({});
 export const mockPatch = vi.fn().mockResolvedValue({});
+export const mockPatchForm = vi.fn().mockResolvedValue({});
 export const mockPost = vi.fn().mockResolvedValue({});
+export const mockPostForm = vi.fn().mockResolvedValue({});
 export const mockDelete = vi.fn().mockResolvedValue({});
+export const mockDownload = vi.fn().mockResolvedValue(undefined);
 
 vi.mock('../context/AuthContext', () => ({
   useAuth: () => ({ token: 'fake-token-123', setToken: vi.fn() }),
@@ -14,8 +17,11 @@ vi.mock('../hooks/useAPI', () => ({
   useAPI: () => ({
     get: mockGet,
     patch: mockPatch,
+    patchForm: mockPatchForm,
     post: mockPost,
+    postForm: mockPostForm,
     delete: mockDelete,
+    download: mockDownload,
   }),
 }));
 

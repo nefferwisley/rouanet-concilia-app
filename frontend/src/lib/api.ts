@@ -87,6 +87,9 @@ export function apiClient(token: string | null) {
         body: JSON.stringify(data),
       }).then((r) => tratar<T>(r)),
 
+    patchForm: <T,>(path: string, form: FormData) =>
+      fetch(`${API_URL}${path}`, { method: "PATCH", headers: headers(token), body: form }).then((r) => tratar<T>(r)),
+
     delete: <T,>(path: string) =>
       fetch(`${API_URL}${path}`, { method: "DELETE", headers: headers(token) }).then((r) => tratar<T>(r)),
   };

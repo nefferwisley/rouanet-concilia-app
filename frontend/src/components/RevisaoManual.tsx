@@ -22,7 +22,7 @@ const brl = (v: number | undefined) =>
 /** P2 — Revisão manual de dados extraídos por OCR (campos_revisao):
  *  permite ao auditor aprovar (confirmar), corrigir valor ou descartar. */
 export function RevisaoManual({ projetoId }: { projetoId: string }) {
-  const { get, patch } = useAPI();
+  const { get, patchForm } = useAPI();
   const [revisoes, setRevisoes] = useState<RevisaoItem[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
@@ -63,7 +63,7 @@ export function RevisaoManual({ projetoId }: { projetoId: string }) {
         form.append("valor_corrigido", val.trim());
       }
 
-      await patch(`/api/v1/revisoes/${revisaoId}`, form);
+      await patchForm(`/api/v1/revisoes/${revisaoId}`, form);
       await carregar();
     } catch (e) {
       alert(e instanceof Error ? e.message : "Erro ao salvar decisão.");
