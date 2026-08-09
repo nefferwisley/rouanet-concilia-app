@@ -33,7 +33,7 @@ services:
       - key: GOOGLE_DRIVE_CREDENTIALS_JSON
         sync: false   # opcional — sem ela, /sincronizar-drive responde 503
       - key: CORS_ORIGINS
-        value: "*"     # trocar pelo domínio real do frontend depois do primeiro deploy
+        value: "https://taupe-shortbread-e4d403.netlify.app"
       - key: UPLOAD_DIR
         value: /app/uploads
       - key: PYTHONUNBUFFERED
