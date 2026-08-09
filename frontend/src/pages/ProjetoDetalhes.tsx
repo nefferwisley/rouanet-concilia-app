@@ -9,6 +9,7 @@ import { DocumentosProjeto } from "../components/DocumentosProjeto";
 import { RevisaoDocumental } from "../components/RevisaoDocumental";
 import { RevisaoManual } from "../components/RevisaoManual";
 import { ConciliacaoManual } from "../components/ConciliacaoManual";
+import { OrganizacaoDocumental } from "../components/OrganizacaoDocumental";
 import { useAPI } from "../hooks/useAPI";
 import { Projeto } from "../types";
 
@@ -67,6 +68,8 @@ export function ProjetoDetalhes() {
       <RevisaoDocumental projetoId={projeto.id} />
 
       <RevisaoManual projetoId={projeto.id} />
+
+      <OrganizacaoDocumental projetoId={projeto.id} />
 
       {mostrarImportar && (
         <ImportarModal projetos={[projeto]} onClose={() => setMostrarImportar(false)} />
