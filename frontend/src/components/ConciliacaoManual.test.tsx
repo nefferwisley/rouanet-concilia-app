@@ -91,6 +91,22 @@ describe('ConciliacaoManual', () => {
     });
   });
 
+  it('botão Importar extrato chama /extrato/importar via postForm', async () => {
+    mockPostForm.mockResolvedValue({ importados: 265, conta_id: 'conta-1' });
+    render(<ConciliacaoManual projetoId="projeto-123" />);
+
+    await waitFor(() => screen.getByText(/Importar extrato/i));
+    fireEvent.click(screen.getByText(/Importar extrato/i));
+
+    await waitFor(() => {
+      expect(mockPostForm).toHaveBeenCalledWith(
+        '/api/v1/projetos/projeto-123/extrato/importar',
+        expect.any(FormData)
+      );
+      expect(screen.getByText(/265 movimento\(s\) importado\(s\)/i)).toBeInTheDocument();
+    });
+  });
+
   it('exibe erro se a busca de pares falhar', async () => {
     mockGet.mockRejectedValue(new Error('Erro ao carregar extrato.'));
     render(<ConciliacaoManual projetoId="projeto-123" />);

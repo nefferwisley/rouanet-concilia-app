@@ -38,6 +38,8 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
   const [selecoes, setSelecoes] = useState<Record<string, string>>({});
   const [salvando, setSalvando] = useState<string | null>(null);
   const [filtroStatus, setFiltroStatus] = useState("TODOS");
+  const [importando, setImportando] = useState(false);
+  const [mensagemImportacao, setMensagemImportacao] = useState<string | null>(null);
 
   const carregar = async () => {
     try {
@@ -69,6 +71,23 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
       alert(e instanceof Error ? e.message : "Falha ao vincular movimento.");
     } finally {
       setSalvando(null);
+    }
+  };
+
+  const importarExtrato = async () => {
+    setImportando(true);
+    setMensagemImportacao(null);
+    try {
+      const resp = await postForm<{ importados: number }>(
+        `/api/v1/projetos/${projetoId}/extrato/importar`,
+        new FormData()
+      );
+      setMensagemImportacao(`${resp.importados} movimento(s) importado(s) do extrato.`);
+      await carregar();
+    } catch (e) {
+      setMensagemImportacao(e instanceof Error ? `Falha: ${e.message}` : "Falha ao importar extrato.");
+    } finally {
+      setImportando(false);
     }
   };
 
@@ -107,8 +126,12 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
             <button className="btn-secondary text-xs" onClick={carregar}>
               🔄 Atualizar
             </button>
+            <button className="btn-primary text-xs" disabled={importando} onClick={importarExtrato}>
+              {importando ? "Importando…" : "📥 Importar extrato"}
+            </button>
           </div>
         </div>
+        {mensagemImportacao && <p className="text-xs text-slate-500 mt-2">{mensagemImportacao}</p>}
       </div>
 
       <div className="card p-0 overflow-hidden">
