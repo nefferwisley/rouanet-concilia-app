@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 
 import { useAPI } from "../hooks/useAPI";
+import { SalicConsulta } from "../components/SalicConsulta";
 
 type FonteDados = "pasta" | "drive";
 
@@ -64,6 +65,9 @@ export function NovoProjetoModal({ onClose, onCriado }: { onClose: () => void; o
       <div className="card w-full max-w-md space-y-3 max-h-[90vh] overflow-y-auto">
         <h2 className="text-lg font-bold">Novo Projeto</h2>
         <input className="input" placeholder="PRONAC *" value={form.pronac} onChange={set("pronac")} />
+
+        <SalicConsulta pronacInicial={form.pronac} />
+
         <input className="input" placeholder="Nome do Projeto *" value={form.nome} onChange={set("nome")} />
         <input className="input" placeholder="Proponente" value={form.proponente} onChange={set("proponente")} />
         <input className="input" placeholder="Banco Captador" value={form.banco_nome} onChange={set("banco_nome")} />

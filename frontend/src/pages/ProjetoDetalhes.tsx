@@ -6,6 +6,8 @@ import { AuditoriaProjeto } from "../components/AuditoriaProjeto";
 import { EditProjectModal } from "../components/EditProjectModal";
 import { DeleteProjectButton } from "../components/DeleteProjectButton";
 import { DocumentosProjeto } from "../components/DocumentosProjeto";
+import { RevisaoDocumental } from "../components/RevisaoDocumental";
+import { RevisaoManual } from "../components/RevisaoManual";
 import { useAPI } from "../hooks/useAPI";
 import { Projeto } from "../types";
 
@@ -58,6 +60,10 @@ export function ProjetoDetalhes() {
       <DocumentosProjeto projetoId={projeto.id} />
 
       <AuditoriaProjeto projetoId={projeto.id} />
+
+      <RevisaoDocumental projetoId={projeto.id} />
+
+      <RevisaoManual projetoId={projeto.id} />
 
       {mostrarImportar && (
         <ImportarModal projetos={[projeto]} onClose={() => setMostrarImportar(false)} />
