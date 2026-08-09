@@ -10,6 +10,8 @@ threadpool (Starlette faz isso por baixo dos panos) — por isso esta função
 o event loop inteiro da API enquanto a importação roda.
 """
 import json
+import logging
+import time
 
 import psycopg2
 import psycopg2.extras
@@ -27,6 +29,7 @@ from motor.matching_rag import BuscadorRubricaRAG
 def _atualizar(importacao_id: str, **campos):
     """Conexão curta e autocommit — não compete com a transação da importação,
     então o progresso aparece pros clientes ANTES do commit final."""
+    logger = logging.getLogger("rouanet-api.importacao")
     sets, valores = [], []
     for k, v in campos.items():
         if v == "__NOW__":
@@ -35,15 +38,31 @@ def _atualizar(importacao_id: str, **campos):
             sets.append(f"{k} = %s")
             valores.append(v)
     valores.append(importacao_id)
-    with psycopg2.connect(settings.database_url) as conn:
-        conn.autocommit = True
-        with conn.cursor() as cur:
-            cur.execute(f"update importacoes set {', '.join(sets)} where id = %s", valores)
+    logger.info("bg update importacoes %s: %s | db=%s", importacao_id, list(campos), settings.database_url)
+    # A linha `importacoes` é inserida dentro da transação do request (get_conn),
+    # que só encerra DEPOIS que a background task começa. Pra não perder o
+    # primeiro UPDATE por linha ainda não visível, retenta até enxergar a
+    # importação (ou timeout).
+    deadline = time.monotonic() + 30
+    while True:
+        with psycopg2.connect(settings.database_url) as conn:
+            conn.autocommit = True
+            with conn.cursor() as cur:
+                cur.execute(f"update importacoes set {', '.join(sets)} where id = %s", valores)
+                if cur.rowcount > 0:
+                    logger.info("bg update %s aplicado (%s linhas)", importacao_id, cur.rowcount)
+                    return
+        if time.monotonic() >= deadline:
+            logger.warning("bg update %s não visível após 30s (abandonando)", importacao_id)
+            return
+        time.sleep(0.25)
 
 
 def executar_importacao_bg(
     importacao_id: str, projeto_id: str, cfg: dict, json_data: dict, commit: bool, api_key_gemini: str | None
 ):
+    logger = logging.getLogger("rouanet-api.importacao")
+    logger.info("Iniciando importacao bg %s", importacao_id)
     conn = None
     try:
         # Via API não há caminho de arquivo real pro YAML enviado, então
@@ -52,6 +71,7 @@ def executar_importacao_bg(
         orcamento = carregar_rubricas_salic(cfg, config_dir=None)
         raiz, lancamentos = resolver_projeto_e_lancamentos(json_data, cfg)
         total = len(lancamentos)
+        logger.info("bg %s: %d lancamentos resolvidos", importacao_id, total)
         _atualizar(importacao_id, status="em_progresso", linhas_total=total)
 
         usar_rag = bool(api_key_gemini)
@@ -117,6 +137,7 @@ def executar_importacao_bg(
                     (psycopg2.extras.Json(relatorio), importacao_id),
                 )
     except Exception as e:
+        logger.exception("Falha na importacao bg %s", importacao_id)
         if conn is not None:
             try:
                 conn.rollback()

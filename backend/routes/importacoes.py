@@ -4,7 +4,7 @@ import logging
 import yaml
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile, status
 
-from backend.database import get_conn
+from backend.database import get_conn, get_pool
 from backend.services.importacao import executar_importacao_bg
 
 logger = logging.getLogger(__name__)
@@ -41,13 +41,25 @@ async def iniciar_importacao(
     if not projeto:
         raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
 
-    row = await conn.fetchrow(
-        """
-        insert into importacoes (projeto_id, criado_por, status, modo, arquivo_json)
-        values ($1, $2, 'iniciando', $3, $4::jsonb) returning id
-        """,
-        projeto_id, user_id, modo, json.dumps(conteudo_json),
-    )
+    # A linha `importacoes` é criada numa transação própria e commitada ANTES
+    # de agendar a background task. Se usássemos o conn do get_conn, o commit
+    # só aconteceria no teardown da dependency — que no FastAPI roda DEPOIS
+    # que BackgroundTasks começa, então a task nunca veria a importação e o
+    # progresso ficaria preso em "iniciando" (bug real observado em runtime).
+    pool = await get_pool()
+    async with pool.acquire() as conn2:
+        async with conn2.transaction():
+            await conn2.execute(
+                "select set_config('request.jwt.claims', $1, true)", f'{{"sub":"{user_id}"}}'
+            )
+            await conn2.execute("set local role authenticated")
+            row = await conn2.fetchrow(
+                """
+                insert into importacoes (projeto_id, criado_por, status, modo, arquivo_json)
+                values ($1, $2, 'iniciando', $3, $4::jsonb) returning id
+                """,
+                projeto_id, user_id, modo, json.dumps(conteudo_json),
+            )
     importacao_id = str(row["id"])
 
     background_tasks.add_task(
