@@ -1,0 +1,3970 @@
+{
+ "stats": {
+  "total_deb": 181,
+  "total_comp": 178,
+  "conciliados": 160,
+  "orfaos_extrato": 6,
+  "orfaos_comprovante": 0,
+  "divergentes": 1,
+  "ambiguos": 31,
+  "taxa_pct": 88.4
+ },
+ "classes": [
+  "conciliado",
+  "orfao_extrato",
+  "orfao_comprovante",
+  "divergente_valor",
+  "ambiguo"
+ ],
+ "conciliados": [
+  {
+   "debito": {
+    "doc": "110.402",
+    "data": "2022-11-04",
+    "valor": 5000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+    "pagina": 1,
+    "fonte": "2. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 4,
+    "data": "2022-11-04",
+    "valor": 5000.0,
+    "favorecido": "Circunstancia Cinematografica e Prod",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Amir Labaki - Obras pré-existentes",
+    "fonte": "004 - 04-11-2022 - Amir Labaki - Obras pré-existentes.pdf"
+   },
+   "score_nome": 0.6185
+  },
+  {
+   "debito": {
+    "doc": "110.401",
+    "data": "2022-11-04",
+    "valor": 11000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+    "pagina": 1,
+    "fonte": "2. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 1,
+    "data": "2022-11-04",
+    "valor": 11000.0,
+    "favorecido": "Circunstancia Cinematografica e Prod",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Mônica Guimarães - Produtora Executiva",
+    "fonte": "001 - 04-11-2022 - Mônica Guimarães - Produtora Executiva.pdf"
+   },
+   "score_nome": 0.6185
+  },
+  {
+   "debito": {
+    "doc": "110.403",
+    "data": "2022-11-04",
+    "valor": 20000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+    "pagina": 1,
+    "fonte": "2. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 3,
+    "data": "2022-11-04",
+    "valor": 20000.0,
+    "favorecido": "Circunstancia Cinematografica e Prod",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Amir Labaki - Diretor",
+    "fonte": "003 - 04-11-2022 - Amir Labaki - Diretor.pdf"
+   },
+   "score_nome": 0.6185
+  },
+  {
+   "debito": {
+    "doc": "110.404",
+    "data": "2022-11-04",
+    "valor": 30000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+    "pagina": 1,
+    "fonte": "2. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 2,
+    "data": "2022-11-04",
+    "valor": 30000.0,
+    "favorecido": "Circunstancia Cinematografica e Prod",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Amir Labaki - Roteirista",
+    "fonte": "002 - 04-11-2022 - Amir Labaki - Roteirista.pdf"
+   },
+   "score_nome": 0.6185
+  },
+  {
+   "debito": {
+    "doc": "112.101",
+    "data": "2022-11-21",
+    "valor": 800.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "LUIS FELIPE MONTE CIPULLO",
+    "pagina": 1,
+    "fonte": "2. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 7,
+    "data": "2022-11-21",
+    "valor": 800.0,
+    "favorecido": "Luis F Monte Cipullo",
+    "cnpj": "442.561.298-12",
+    "descricao": "Luis Cipullo (1961)",
+    "fonte": "007 - 21-11-2022 - Luis Cipullo (1961).pdf"
+   },
+   "score_nome": 0.9611
+  },
+  {
+   "debito": {
+    "doc": "112.801",
+    "data": "2022-11-28",
+    "valor": 20000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+    "pagina": 1,
+    "fonte": "2. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 8,
+    "data": "2022-11-28",
+    "valor": 20000.0,
+    "favorecido": "Circunstancia Cinematografica e Prod",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Amir Labaki - Diretor",
+    "fonte": "008 - 28-11-2022 - Amir Labaki - Diretor.pdf"
+   },
+   "score_nome": 0.6185
+  },
+  {
+   "debito": {
+    "doc": "121.201",
+    "data": "2022-12-12",
+    "valor": 30000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+    "pagina": 1,
+    "fonte": "3. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 9,
+    "data": "2022-12-12",
+    "valor": 30000.0,
+    "favorecido": "Circunstancia Cinematografica e Prod",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Amir Labaki - Diretor",
+    "fonte": "009 - 12-12-2022 - Amir Labaki - Diretor.pdf"
+   },
+   "score_nome": 0.6185
+  },
+  {
+   "debito": {
+    "doc": "121.402",
+    "data": "2022-12-14",
+    "valor": 2000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "PLANIFILMES LTDA",
+    "pagina": 1,
+    "fonte": "3. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 11,
+    "data": "2022-12-14",
+    "valor": 2000.0,
+    "favorecido": "Planifilmes Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Lia Pini - Coordenador de Produção",
+    "fonte": "011 - 14-12-2022 - Lia Pini - Coordenador de Produção.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "121.401",
+    "data": "2022-12-14",
+    "valor": 6000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "JULIA BARBARA MELO DE SOUS",
+    "pagina": 1,
+    "fonte": "3. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 10,
+    "data": "2022-12-14",
+    "valor": 6000.0,
+    "favorecido": "Julia Barbara Melo de Sousa 40926175",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Júlia Sousa - Controller",
+    "fonte": "010 - 14-12-2022 - Júlia Sousa - Controller.pdf"
+   },
+   "score_nome": 0.8352
+  },
+  {
+   "debito": {
+    "doc": "122.001",
+    "data": "2022-12-20",
+    "valor": 20000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+    "pagina": 1,
+    "fonte": "3. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 12,
+    "data": "2022-12-20",
+    "valor": 20000.0,
+    "favorecido": "Circunstancia Cinematografica e Prod",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Circunstância - Gerenciamento",
+    "fonte": "012 - 20-12-2022 - Circunstância - Gerenciamento.pdf"
+   },
+   "score_nome": 0.6185
+  },
+  {
+   "debito": {
+    "doc": "12.302",
+    "data": "2023-01-23",
+    "valor": 4500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+    "pagina": 1,
+    "fonte": "1. jan.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 14,
+    "data": "2023-01-23",
+    "valor": 4500.0,
+    "favorecido": "Circunstancia Cinematografica e Prod",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Circunstância - Gerenciamento",
+    "fonte": "014 - 23-01-2023 - Circunstância - Gerenciamento.pdf"
+   },
+   "score_nome": 0.6185
+  },
+  {
+   "debito": {
+    "doc": "12.301",
+    "data": "2023-01-23",
+    "valor": 30000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+    "pagina": 1,
+    "fonte": "1. jan.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 13,
+    "data": "2023-01-23",
+    "valor": 30000.0,
+    "favorecido": "Circunstancia Cinematografica e Prod",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Circunstância - Gerenciamento",
+    "fonte": "013 - 23-01-2023 - Circunstância - Gerenciamento.pdf"
+   },
+   "score_nome": 0.6185
+  },
+  {
+   "debito": {
+    "doc": "22.201",
+    "data": "2023-02-22",
+    "valor": 19550.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+    "pagina": 1,
+    "fonte": "2. fev.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 15,
+    "data": "2023-02-22",
+    "valor": 19550.0,
+    "favorecido": "Circunstancia Cinematografica e Prod",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Circunstância - Gerenciamento",
+    "fonte": "015 - 22-02-2023 - Circunstância - Gerenciamento.pdf"
+   },
+   "score_nome": 0.6185
+  },
+  {
+   "debito": {
+    "doc": "81.801",
+    "data": "2023-08-18",
+    "valor": 380.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "RADIO E TELEVISAO BANDEIRA",
+    "pagina": 1,
+    "fonte": "8. ago.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 18,
+    "data": "2023-08-18",
+    "valor": 380.0,
+    "favorecido": "Radio e Televisao Bandeirantes S.a.",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Bandeirantes - Pesquisa",
+    "fonte": "018 - 18-08-2023 - Bandeirantes - Pesquisa.pdf"
+   },
+   "score_nome": 0.7367
+  },
+  {
+   "debito": {
+    "doc": "82.501",
+    "data": "2023-08-25",
+    "valor": 10500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MEMORIA COLETIVA IMAGENS E",
+    "pagina": 1,
+    "fonte": "8. ago.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 19,
+    "data": "2023-08-25",
+    "valor": 10500.0,
+    "favorecido": "Memoria Coletiva Imagens e Textos Lt",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Eloa Chouzal (primeira parcela) - Pesquisa",
+    "fonte": "019 - 25-08-2023 - Eloa Chouzal (primeira parcela) - Pesquisa.pdf"
+   },
+   "score_nome": 0.7269
+  },
+  {
+   "debito": {
+    "doc": "90.401",
+    "data": "2023-09-04",
+    "valor": 700.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "PORVIROSCOPIO PROJETOS C.",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 20,
+    "data": "2023-09-04",
+    "valor": 700.0,
+    "favorecido": "Porviroscopio Projetos C. C. Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Porviroscopio Projetos - Pesquisa",
+    "fonte": "020 - 04-09-2023 - Porviroscopio Projetos - Pesquisa.pdf"
+   },
+   "score_nome": 0.6955
+  },
+  {
+   "debito": {
+    "doc": "90.502",
+    "data": "2023-09-05",
+    "valor": 120.0,
+    "historico": "Impostos",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 22,
+    "data": "2023-09-05",
+    "valor": 120.0,
+    "favorecido": ":",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Guia de Arrecadação - Pesquisa",
+    "fonte": "022 - 05-09-2023 - Guia de Arrecadação - Pesquisa.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "90.501",
+    "data": "2023-09-05",
+    "valor": 33000.0,
+    "historico": "TED Transf.Eletr.Disponiv",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 21,
+    "data": "2023-09-05",
+    "valor": 33000.0,
+    "favorecido": "favorecido",
+    "cnpj": "05.111.581/0001-52",
+    "descricao": "Fogo Filmes - Finalização",
+    "fonte": "021 - 05-09-2023 - Fogo Filmes - Finalização.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "90.601",
+    "data": "2023-09-06",
+    "valor": 4900.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "JULIA BARBARA MELO DE SOUS",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 23,
+    "data": "2023-09-06",
+    "valor": 4900.0,
+    "favorecido": "Julia Barbara Melo de Sousa 40926175",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Júlia Sousa - Controller",
+    "fonte": "023 - 06-09-2023 - Júlia Sousa - Controller.pdf"
+   },
+   "score_nome": 0.8352
+  },
+  {
+   "debito": {
+    "doc": "91.101",
+    "data": "2023-09-11",
+    "valor": 3000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "ANA BEATRIZ HERMANSON POMA",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 24,
+    "data": "2023-09-11",
+    "valor": 3000.0,
+    "favorecido": "Ana Beatriz Hermanson Pomar Servicos",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Beatriz Pomar - Assistente de Produção",
+    "fonte": "024 - 11-09-2023 - Beatriz Pomar - Assistente de Produção.pdf"
+   },
+   "score_nome": 0.8135
+  },
+  {
+   "debito": {
+    "doc": "92.602",
+    "data": "2023-09-26",
+    "valor": 11250.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "FILMES DE TAIPA PROD",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 107,
+    "data": "2023-09-26",
+    "valor": 11250.0,
+    "favorecido": "Filmes de Taipa Prod",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Manfrim_dir producao",
+    "fonte": "107 - 26-10-2023 - Manfrim_dir producao.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.804",
+    "data": "2023-09-28",
+    "valor": 15.3,
+    "historico": "Pix - Enviado",
+    "favorecido": "CASA DO ROADIE",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 39,
+    "data": "2023-09-28",
+    "valor": 15.3,
+    "favorecido": "Casa do Roadie",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Casa do Rodie (complemento) - Material de consumo",
+    "fonte": "039 - 28-09-2023 - Casa do Rodie (complemento) - Material de consumo.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.801",
+    "data": "2023-09-28",
+    "valor": 350.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CASA DO ROADIE",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 36,
+    "data": "2023-09-28",
+    "valor": 350.0,
+    "favorecido": "Casa do Roadie",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Casa do Rodie - Material de Consumo",
+    "fonte": "036 - 28-09-2023 - Casa do Rodie - Material de Consumo.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.805",
+    "data": "2023-09-28",
+    "valor": 8800.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CITYHOME SERVICOS IMOBILIA",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 40,
+    "data": "2023-09-28",
+    "valor": 8800.0,
+    "favorecido": "Cityhome Servicos Imobiliarios Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Cityhome - Hospedagem sem alimentação",
+    "fonte": "040 - 28-09-2023 - Cityhome - Hospedagem sem alimentação.pdf"
+   },
+   "score_nome": 0.7859
+  },
+  {
+   "debito": {
+    "doc": "92.912",
+    "data": "2023-09-29",
+    "valor": 35.1,
+    "historico": "Pix - Enviado",
+    "favorecido": "SCM PREST SERV POSTAIS LTD",
+    "pagina": 2,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 52,
+    "data": "2023-09-29",
+    "valor": 35.1,
+    "favorecido": "Scm Prest Serv Postais Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Correios - envio de livros",
+    "fonte": "052 - 29-09-2023 - Correios - envio de livros.pdf"
+   },
+   "score_nome": 0.9934
+  },
+  {
+   "debito": {
+    "doc": "92.911",
+    "data": "2023-09-29",
+    "valor": 150.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CITYHOME SERVICOS IMOBILIA",
+    "pagina": 2,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 51,
+    "data": "2023-09-29",
+    "valor": 150.0,
+    "favorecido": "Cityhome Servicos Imobiliarios Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Cityhome Amir Labaki complemento - Hospedagem sem alimentação",
+    "fonte": "051 - 29-09-2023 - Cityhome Amir Labaki complemento - Hospedagem sem alimentação.pdf"
+   },
+   "score_nome": 0.7859
+  },
+  {
+   "debito": {
+    "doc": "92.902",
+    "data": "2023-09-29",
+    "valor": 500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CITYHOME SERVICOS IMOBILIA",
+    "pagina": 2,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 42,
+    "data": "2023-09-29",
+    "valor": 500.0,
+    "favorecido": "Cityhome Servicos Imobiliarios Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Cityhome Amir Labaki - Hospedagem sem alimentação",
+    "fonte": "042 - 29-09-2023 - Cityhome Amir Labaki - Hospedagem sem alimentação.pdf"
+   },
+   "score_nome": 0.7859
+  },
+  {
+   "debito": {
+    "doc": "92.904",
+    "data": "2023-09-29",
+    "valor": 3116.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MATRON INFORMATICA",
+    "pagina": 2,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 44,
+    "data": "2023-09-29",
+    "valor": 3116.0,
+    "favorecido": "Matron Informatica",
+    "cnpj": "10.372.701/0001-05",
+    "descricao": "HDS - Hds externos",
+    "fonte": "044 - 29-09-2023 - HDS - Hds externos.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.901",
+    "data": "2023-09-29",
+    "valor": 5768.4,
+    "historico": "Pix - Enviado",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 41,
+    "data": "2023-09-29",
+    "valor": 5768.4,
+    "favorecido": "Pateo Moinhos de Vento Adm e Part Lt",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Hospedagem Amir Labaki - Hospedagem sem alimentação",
+    "fonte": "041 - 29-09-2023 - Hospedagem Amir Labaki - Hospedagem sem alimentação.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "92.903",
+    "data": "2023-09-29",
+    "valor": 35000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MARTINA MILLA RAFFAELLI ME",
+    "pagina": 2,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 43,
+    "data": "2023-09-29",
+    "valor": 35000.0,
+    "favorecido": "Martina Milla Raffaelli Me",
+    "cnpj": "09.466.037/0001-84",
+    "descricao": "MR5 - Locação de equipamentos",
+    "fonte": "043 - 29-09-2023 - MR5 - Locação de equipamentos.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "100.201",
+    "data": "2023-10-02",
+    "valor": 1610.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "PATEO MOINHOS DE VENTO ADM",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 53,
+    "data": "2023-10-02",
+    "valor": 1610.0,
+    "favorecido": "Pateo Moinhos de Vento Adm e Part Lt",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Hospedagem Amir Labaki - Hospedagem sem alimentação",
+    "fonte": "053 - 02-10-2023 - Hospedagem Amir Labaki - Hospedagem sem alimentação.pdf"
+   },
+   "score_nome": 0.6998
+  },
+  {
+   "debito": {
+    "doc": "100.301",
+    "data": "2023-10-03",
+    "valor": 200.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Glademir Martins Machado",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 54,
+    "data": "2023-10-03",
+    "valor": 200.0,
+    "favorecido": "Glademir M Machado",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Motorista POA - verba de alimentação",
+    "fonte": "054 - 03-10-2023 - Motorista POA - verba de alimentação.pdf"
+   },
+   "score_nome": 0.95
+  },
+  {
+   "debito": {
+    "doc": "100.302",
+    "data": "2023-10-03",
+    "valor": 3020.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MATRON INFORMATICA",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 55,
+    "data": "2023-10-03",
+    "valor": 3020.0,
+    "favorecido": "Matron Informatica",
+    "cnpj": "10.372.701/0001-05",
+    "descricao": "HDS - Hds externos",
+    "fonte": "055 - 03-10-2023 - HDS - Hds externos.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "100.503",
+    "data": "2023-10-05",
+    "valor": 500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "AMIR LABAKI",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 57,
+    "data": "2023-10-05",
+    "valor": 500.0,
+    "favorecido": "Amir Labaki",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Amir Labaki - Verba de transporte",
+    "fonte": "057 - 05-10-2023 - Amir Labaki - Verba de transporte.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "100.601",
+    "data": "2023-10-06",
+    "valor": 10500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MEMORIA COLETIVA IMAGENS E",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 58,
+    "data": "2023-10-06",
+    "valor": 10500.0,
+    "favorecido": "Memoria Coletiva Imagens e Textos Lt",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Eloa Chouzal (parcela final) - Pesquisa",
+    "fonte": "058 - 06-10-2023 - Eloa Chouzal (parcela final) - Pesquisa.pdf"
+   },
+   "score_nome": 0.7269
+  },
+  {
+   "debito": {
+    "doc": "100.905",
+    "data": "2023-10-09",
+    "valor": 1800.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "FABIO BALTAR DUARTE",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 64,
+    "data": "2023-10-09",
+    "valor": 1800.0,
+    "favorecido": "Fabio Baltar Duarte",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Fabio Baltar - som direto",
+    "fonte": "064 - 09-10-2023 - Fabio Baltar - som direto.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "100.906",
+    "data": "2023-10-09",
+    "valor": 1800.01,
+    "historico": "Pix - Enviado",
+    "favorecido": "FABIO BALTAR DUARTE",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 65,
+    "data": "2023-10-09",
+    "valor": 1800.01,
+    "favorecido": "Fabio Baltar Duarte",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Fabio Baltar - equipamento de som",
+    "fonte": "065 - 09-10-2023 - Fabio Baltar - equipamento de som.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "100.904",
+    "data": "2023-10-09",
+    "valor": 4800.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "THIAGO AUGUSTO GOMAS CUNHA",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 63,
+    "data": "2023-10-09",
+    "valor": 4800.0,
+    "favorecido": "Thiago Augusto Gomas Cunha 397893948",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Thiago Cunha - Logger",
+    "fonte": "063 - 09-10-2023 - Thiago Cunha - Logger.pdf"
+   },
+   "score_nome": 0.8135
+  },
+  {
+   "debito": {
+    "doc": "100.903",
+    "data": "2023-10-09",
+    "valor": 7500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "LUIS FELIPE MONTE CIPULLO",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 62,
+    "data": "2023-10-09",
+    "valor": 7500.0,
+    "favorecido": "Luis Felipe Monte Cipullo 4425612981",
+    "cnpj": "22.592.616/0001-31",
+    "descricao": "Luis Cipullo - Assistente de Fotografia",
+    "fonte": "062 - 09-10-2023 - Luis Cipullo - Assistente de Fotografia.pdf"
+   },
+   "score_nome": 0.8069
+  },
+  {
+   "debito": {
+    "doc": "100.907",
+    "data": "2023-10-09",
+    "valor": 9502.77,
+    "historico": "Pix - Enviado",
+    "favorecido": "MANDALA TOURS",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 66,
+    "data": "2023-10-09",
+    "valor": 9502.77,
+    "favorecido": "Mandala Tours",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Mandala Tour - Hospedagem sem alimentação",
+    "fonte": "066 - 09-10-2023 - Mandala Tour - Hospedagem sem alimentação.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "100.902",
+    "data": "2023-10-09",
+    "valor": 13500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MOG PRODUTORA",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 61,
+    "data": "2023-10-09",
+    "valor": 13500.0,
+    "favorecido": "Mog Produtora",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Frico Guimarães - Diretor de fotografia",
+    "fonte": "061 - 09-10-2023 - Frico Guimarães - Diretor de fotografia.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "101.002",
+    "data": "2023-10-10",
+    "valor": 2300.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CONTA RECEITAS D F",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 71,
+    "data": "2023-10-10",
+    "valor": 2300.0,
+    "favorecido": "Faculdade de Arquitetura e Urbanismo",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "FAU - Locação de Espaço",
+    "fonte": "071 - 10-10-2023 - FAU - Locação de Espaço.pdf"
+   },
+   "score_nome": 0.3507
+  },
+  {
+   "debito": {
+    "doc": "101.102",
+    "data": "2023-10-11",
+    "valor": 400.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "AAMAC",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 73,
+    "data": "2023-10-11",
+    "valor": 400.0,
+    "favorecido": "Aamac",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "MAC RS - locação de espaço",
+    "fonte": "073 - 11-10-2023 - MAC RS - locação de espaço.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "101.103",
+    "data": "2023-10-11",
+    "valor": 500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Malnes Transporte e Produç",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 74,
+    "data": "2023-10-11",
+    "valor": 500.0,
+    "favorecido": "Malnes Transporte e Produção",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Motorista SP - transporte local",
+    "fonte": "074 - 11-10-2023 - Motorista SP - transporte local.pdf"
+   },
+   "score_nome": 0.987
+  },
+  {
+   "debito": {
+    "doc": "101.105",
+    "data": "2023-10-11",
+    "valor": 1000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "IDALINA SOUZA RIBEIRO DA S",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 76,
+    "data": "2023-10-11",
+    "valor": 1000.0,
+    "favorecido": "Idalina S R Silva",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Verba de produção Rio de Janeiro",
+    "fonte": "076 - 11-10-2023 - Verba de produção Rio de Janeiro.pdf"
+   },
+   "score_nome": 0.7316
+  },
+  {
+   "debito": {
+    "doc": "101.101",
+    "data": "2023-10-11",
+    "valor": 1500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "ANA BEATRIZ HERMANSON POMA",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 72,
+    "data": "2023-10-11",
+    "valor": 1500.0,
+    "favorecido": "Ana Beatriz Hermanson Pomar Servicos",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Beatriz Pomar - Assistente de produção",
+    "fonte": "072 - 10-10-2023 - Beatriz Pomar - Assistente de produção.pdf"
+   },
+   "score_nome": 0.8135
+  },
+  {
+   "debito": {
+    "doc": "101.104",
+    "data": "2023-10-11",
+    "valor": 4000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "VONDOC FILMES LTDA",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 75,
+    "data": "2023-10-11",
+    "valor": 4000.0,
+    "favorecido": "Vondoc Filmes Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Sofia Vontobel - Produtora Local POA",
+    "fonte": "075 - 11-10-2023 - Sofia Vontobel - Produtora Local POA.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "101.106",
+    "data": "2023-10-11",
+    "valor": 9672.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MANDALA TOURS",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 77,
+    "data": "2023-10-11",
+    "valor": 9672.0,
+    "favorecido": "Mandala Tours",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Hospedagem Equipe RJ - Hospedagem sem alimentação",
+    "fonte": "077 - 11-10-2023 - Hospedagem Equipe RJ - Hospedagem sem alimentação.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "101.308",
+    "data": "2023-10-13",
+    "valor": 300.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "RICARDO DIAS DOS SANTOS",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 85,
+    "data": "2023-10-13",
+    "valor": 300.0,
+    "favorecido": "Ricardo Dias Santos",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Motorista Rio - verba de alimentação",
+    "fonte": "085 - 13-10-2023 - Motorista Rio - verba de alimentação.pdf"
+   },
+   "score_nome": 0.8042
+  },
+  {
+   "debito": {
+    "doc": "101.305",
+    "data": "2023-10-13",
+    "valor": 1000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "André Lima Manfrim",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 82,
+    "data": "2023-10-13",
+    "valor": 1000.0,
+    "favorecido": "Andre Lima Manfrim",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Manfrim - verba de produção RJ",
+    "fonte": "082 - 13-10-2023 - André Manfrim - verba de produção RJ.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "101.309",
+    "data": "2023-10-13",
+    "valor": 2000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MAGA PROJETOS CULTURAIS",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 86,
+    "data": "2023-10-13",
+    "valor": 2000.0,
+    "favorecido": "Maga Projetos Culturais",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Ida Leal (primeira parcela) - Prod. local RJ",
+    "fonte": "086 - 13-10-2023 - Ida Leal (primeira parcela) - Prod. local RJ.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "101.602",
+    "data": "2023-10-16",
+    "valor": 1100.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "LUZ RIO LOCACAO DE EQUIPAM",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 88,
+    "data": "2023-10-16",
+    "valor": 1100.0,
+    "favorecido": "Luz Rio Locacao de Equipamentos Cine",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Equipamento de Luz - Rio de Janeiro",
+    "fonte": "088 - 16-10-2023 - Equipamento de Luz - Rio de Janeiro.pdf"
+   },
+   "score_nome": 0.8352
+  },
+  {
+   "debito": {
+    "doc": "101.701",
+    "data": "2023-10-17",
+    "valor": 4375.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CRISTHIANO RODRIGUES DE JE",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 89,
+    "data": "2023-10-17",
+    "valor": 4375.0,
+    "favorecido": "Cristhiano Rodrigues de Jesus 041338",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Van São Paulo - transporte local",
+    "fonte": "089 - 17-10-2023 - Van São Paulo - transporte local.pdf"
+   },
+   "score_nome": 0.6835
+  },
+  {
+   "debito": {
+    "doc": "101.702",
+    "data": "2023-10-17",
+    "valor": 4900.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CLAUDIA",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 90,
+    "data": "2023-10-17",
+    "valor": 4900.0,
+    "favorecido": "Claudia",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Van porto Alegre - transporte local",
+    "fonte": "090 - 17-10-2023 - Van porto Alegre - transporte local.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "101.801",
+    "data": "2023-10-18",
+    "valor": 550.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Fernando Miguel Efron",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 91,
+    "data": "2023-10-18",
+    "valor": 550.0,
+    "favorecido": "Fernando M Efron",
+    "cnpj": "09.279.669/0001-39",
+    "descricao": "Fernando Miguel - Locação de equipamento de som",
+    "fonte": "091 - 18-10-2023 - Fernando Miguel - Locação de equipamento de som.pdf"
+   },
+   "score_nome": 0.9527
+  },
+  {
+   "debito": {
+    "doc": "102.401",
+    "data": "2023-10-24",
+    "valor": 9427.38,
+    "historico": "Pix - Enviado",
+    "favorecido": "MONICA GUIMARAES P MORAES",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 92,
+    "data": "2023-10-24",
+    "valor": 9427.38,
+    "favorecido": "Monica G P Moraes",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Reembolso MG - Passagens Aéreas",
+    "fonte": "092 - 24-10-2023 - Reembolso MG - Passagens Aéreas.pdf"
+   },
+   "score_nome": 0.9333
+  },
+  {
+   "debito": {
+    "doc": "102.509",
+    "data": "2023-10-25",
+    "valor": 450.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CALEIDOSKOPICA PRODUCOES",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 101,
+    "data": "2023-10-25",
+    "valor": 450.0,
+    "favorecido": "Caleidoskopica Producoes",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Calendoscopia - Locação equip. som",
+    "fonte": "101 - 25-10-2023 - Calendoscopia - Locação equip. som.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "102.511",
+    "data": "2023-10-25",
+    "valor": 600.0,
+    "historico": "Pagamento de Boleto",
+    "favorecido": "",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 103,
+    "data": "2023-10-25",
+    "valor": 600.0,
+    "favorecido": ":",
+    "cnpj": "46.009.874/0001-00",
+    "descricao": "Equipamento LUZ SP",
+    "fonte": "103 - 25-10-2023 - Equipamento LUZ SP.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "102.508",
+    "data": "2023-10-25",
+    "valor": 816.42,
+    "historico": "Pix - Enviado",
+    "favorecido": "Sofia Vontobel Baccarini",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 100,
+    "data": "2023-10-25",
+    "valor": 816.42,
+    "favorecido": "Sofia V Baccarini",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Reembolso Sofia - Verba de Produção",
+    "fonte": "100 - 25-10-2023 - Reembolso Sofia - Verba de Produção.pdf"
+   },
+   "score_nome": 0.9402
+  },
+  {
+   "debito": {
+    "doc": "102.506",
+    "data": "2023-10-25",
+    "valor": 1800.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "THIAGO AUGUSTO GOMAS CUNHA",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 98,
+    "data": "2023-10-25",
+    "valor": 1800.0,
+    "favorecido": "Thiago Augusto Gomas Cunha 397893948",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Thiago Cunha - Equipamento de luz",
+    "fonte": "098 - 25-10-2023 - Thiago Cunha - Equipamento de luz.pdf"
+   },
+   "score_nome": 0.8135
+  },
+  {
+   "debito": {
+    "doc": "102.505",
+    "data": "2023-10-25",
+    "valor": 2000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MAGA PROJETOS CULTURAIS",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 97,
+    "data": "2023-10-25",
+    "valor": 2000.0,
+    "favorecido": "Maga Projetos Culturais",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Idalina - Produtora RJ",
+    "fonte": "097 - 25-10-2023 - Idalina - Produtora RJ.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "102.502",
+    "data": "2023-10-25",
+    "valor": 3600.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "ANNE SANTOS",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 94,
+    "data": "2023-10-25",
+    "valor": 3600.0,
+    "favorecido": "Anne Santos",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Anne Santos - Som Direto RJ",
+    "fonte": "094 - 25-10-2023 - Anne Santos - Som Direto RJ.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "102.510",
+    "data": "2023-10-25",
+    "valor": 4500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 102,
+    "data": "2023-10-25",
+    "valor": 4500.0,
+    "favorecido": "Filmes de Taipa Prod",
+    "cnpj": "28.105.588/0001-67",
+    "descricao": "Filmes de Taipa - Equipamento de Câmera",
+    "fonte": "102 - 25-10-2023 - Filmes de Taipa - Equipamento de Câmera.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "102.507",
+    "data": "2023-10-25",
+    "valor": 4800.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "THIAGO AUGUSTO GOMAS CUNHA",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 99,
+    "data": "2023-10-25",
+    "valor": 4800.0,
+    "favorecido": "Thiago Augusto Gomas Cunha 397893948",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Thiago Cunha - Logger",
+    "fonte": "099 - 25-10-2023 - Thiago Cunha - Logger.pdf"
+   },
+   "score_nome": 0.8135
+  },
+  {
+   "debito": {
+    "doc": "102.503",
+    "data": "2023-10-25",
+    "valor": 13500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MOG PRODUTORA",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 95,
+    "data": "2023-10-25",
+    "valor": 13500.0,
+    "favorecido": "Mog Produtora",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Frico Guimarães - Diretor de Fotografia",
+    "fonte": "095 - 25-10-2023 - Frico Guimarães - Diretor de Fotografia.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "102.501",
+    "data": "2023-10-25",
+    "valor": 20625.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "FOGO FILMES LTDA",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 93,
+    "data": "2023-10-25",
+    "valor": 20625.0,
+    "favorecido": "Fogo Filmes Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Finotti - Pacote de imagem",
+    "fonte": "093 - 25-10-2023 - André Finotti - Pacote de imagem.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "102.601",
+    "data": "2023-10-26",
+    "valor": 995.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "LOC ALL DE CINEMA E TELEVI",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 105,
+    "data": "2023-10-26",
+    "valor": 995.0,
+    "favorecido": "Loc All de Cinema e Televisao Limita",
+    "cnpj": "53.563.292.0006-41",
+    "descricao": "Locall - Locação de equipamentos",
+    "fonte": "105 - 26-10-2023 - Locall - Locação de equipamentos.pdf"
+   },
+   "score_nome": 0.8507
+  },
+  {
+   "debito": {
+    "doc": "550.101.000.061.344",
+    "data": "2023-10-26",
+    "valor": 6550.0,
+    "historico": "Transferência enviada",
+    "favorecido": "GRIFE RIO LOCADORA LTDA",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 104,
+    "data": "2023-10-26",
+    "valor": 6550.0,
+    "favorecido": "GRIFE RIO LOCADORA LTDA",
+    "cnpj": null,
+    "descricao": "Van Rio de Janeiro - Transporte local",
+    "fonte": "104 - 26-10-2023 - Van Rio de Janeiro - Transporte local.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "102.602",
+    "data": "2023-10-26",
+    "valor": 7500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "LUIS FELIPE MONTE CIPULLO",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 106,
+    "data": "2023-10-26",
+    "valor": 7500.0,
+    "favorecido": "Luis Felipe Monte Cipullo 4425612981",
+    "cnpj": "22.592.616/0001-31",
+    "descricao": "Luis Cipullo - Assistente de Fotografia",
+    "fonte": "106 - 26-10-2023 - Luis Cipullo - Assistente de Fotografia.pdf"
+   },
+   "score_nome": 0.8069
+  },
+  {
+   "debito": {
+    "doc": "102.603",
+    "data": "2023-10-26",
+    "valor": 11250.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "FILMES DE TAIPA PROD",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 34,
+    "data": "2023-10-26",
+    "valor": 11250.0,
+    "favorecido": "Filmes de Taipa Prod",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Manfrin - Coordenador de Produção",
+    "fonte": "034 - 26-09-2023 - André Manfrin - Coordenador de Produção.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "103.003",
+    "data": "2023-10-30",
+    "valor": 450.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "-",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 110,
+    "data": "2023-10-30",
+    "valor": 450.0,
+    "favorecido": "",
+    "cnpj": "33.242.286/0001-70",
+    "descricao": "Arthur Rodrigues - Locação de equipamento",
+    "fonte": "110 - 30-10-2023 - Arthur Rodrigues - Locação de equipamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "103.005",
+    "data": "2023-10-30",
+    "valor": 1500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MARTINA MILLA RAFFAELLI ME",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 112,
+    "data": "2023-10-30",
+    "valor": 1500.0,
+    "favorecido": "Martina Milla Raffaelli Me",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "MR5 - Equipamento de Câmera",
+    "fonte": "112 - 30-10-2023 - MR5 - Equipamento de Câmera.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "103.002",
+    "data": "2023-10-30",
+    "valor": 1559.33,
+    "historico": "Pix - Enviado",
+    "favorecido": "WINDSOR ADMINISTRACAO DE H",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 109,
+    "data": "2023-10-30",
+    "valor": 1559.33,
+    "favorecido": "Windsor Administracao de Hoteis e Se",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Hotel AL - Hospedagem",
+    "fonte": "109 - 30-10-2023 - Hotel AL - Hospedagem.pdf"
+   },
+   "score_nome": 0.7269
+  },
+  {
+   "debito": {
+    "doc": "103.001",
+    "data": "2023-10-30",
+    "valor": 2529.85,
+    "historico": "Pix - Enviado",
+    "favorecido": "WINDSOR ADMINISTRACAO DE H",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 108,
+    "data": "2023-10-30",
+    "valor": 2529.85,
+    "favorecido": "Windsor Administracao de Hoteis e Se",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Hotel Equipe - Hospedagem",
+    "fonte": "108 - 30-10-2023 - Hotel Equipe - Hospedagem.pdf"
+   },
+   "score_nome": 0.7269
+  },
+  {
+   "debito": {
+    "doc": "103.105",
+    "data": "2023-10-31",
+    "valor": 200.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "André Lima Manfrim",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 117,
+    "data": "2023-10-31",
+    "valor": 200.0,
+    "favorecido": "Andre Lima Manfrim",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Verba de produção RJ",
+    "fonte": "117 - 31-10-2023 - Verba de produção RJ.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "103.101",
+    "data": "2023-10-31",
+    "valor": 320.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "JEFFERSON MARCOS SILVA DE",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 113,
+    "data": "2023-10-31",
+    "valor": 320.0,
+    "favorecido": "Jefferson S Oliveira",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Alimentação motorista",
+    "fonte": "113 - 31-10-2023 - Alimentação motorista.pdf"
+   },
+   "score_nome": 0.5583
+  },
+  {
+   "debito": {
+    "doc": "110.101",
+    "data": "2023-11-01",
+    "valor": 316.23,
+    "historico": "Pix - Enviado",
+    "favorecido": "WINDSOR ADMINISTRACAO DE H",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 118,
+    "data": "2023-11-01",
+    "valor": 316.23,
+    "favorecido": "Windsor Administracao de Hoteis e Se",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Late Check out",
+    "fonte": "118 - 01-11-2023 - Late Check out.pdf"
+   },
+   "score_nome": 0.7269
+  },
+  {
+   "debito": {
+    "doc": "110.803",
+    "data": "2023-11-08",
+    "valor": 4750.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CRISTHIANO RODRIGUES DE JE",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 120,
+    "data": "2023-11-08",
+    "valor": 4750.0,
+    "favorecido": "Cristhiano Rodrigues de Jesus 041338",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "VAN São Paulo x Rio - transporte local",
+    "fonte": "120 - 08-11-2023 - VAN São Paulo x Rio - transporte local.pdf"
+   },
+   "score_nome": 0.6835
+  },
+  {
+   "debito": {
+    "doc": "111.404",
+    "data": "2023-11-14",
+    "valor": 400.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "FILMES DE TAIPA PROD",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 125,
+    "data": "2023-11-14",
+    "valor": 400.0,
+    "favorecido": "Filmes de Taipa Prod",
+    "cnpj": "28.105.588/0001-67",
+    "descricao": "Locação de equipamento de camera",
+    "fonte": "125 - 14-11-2023 - Locação de equipamento de camera.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "111.403",
+    "data": "2023-11-14",
+    "valor": 750.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "BIE CINEMA E TV LTDA ME",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 124,
+    "data": "2023-11-14",
+    "valor": 750.0,
+    "favorecido": "Bie Cinema e Tv Ltda Me",
+    "cnpj": "59.875.666/0001-36",
+    "descricao": "Equipamento de som SP",
+    "fonte": "124 - 14-11-2023 - Equipamento de som SP.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "111.401",
+    "data": "2023-11-14",
+    "valor": 27000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MOG PRODUTORA",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 121,
+    "data": "2023-11-14",
+    "valor": 27000.0,
+    "favorecido": "Mog Produtora",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Mônica Guimarães - Produtora Executiva",
+    "fonte": "121 - 14-11-2023 - Mônica Guimarães - Produtora Executiva.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "112.701",
+    "data": "2023-11-27",
+    "valor": 20625.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "FOGO FILMES LTDA",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 126,
+    "data": "2023-11-27",
+    "valor": 20625.0,
+    "favorecido": "Fogo Filmes Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Finotti - Edicão e Finalização",
+    "fonte": "126 - 27-11-2023 - André Finotti - Edicão e Finalização.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "121.101",
+    "data": "2023-12-11",
+    "valor": 2000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MEMORIA COLETIVA IMAGENS E",
+    "pagina": 1,
+    "fonte": "12. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 127,
+    "data": "2023-12-11",
+    "valor": 2000.0,
+    "favorecido": "Memoria Coletiva Imagens e Textos Lt",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Eloa Chouzal - Pesquisador",
+    "fonte": "127 - 11-12-2023 - Eloa Chouzal - Pesquisador.pdf"
+   },
+   "score_nome": 0.7269
+  },
+  {
+   "debito": {
+    "doc": "122.001",
+    "data": "2023-12-20",
+    "valor": 585.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "RAQUEL DE OLIVEIRA LAZARO",
+    "pagina": 1,
+    "fonte": "12. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 128,
+    "data": "2023-12-20",
+    "valor": 585.0,
+    "favorecido": "Raquel de Oliveira Lazaro 0483723061",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Raquel (diária extra) - Som direto",
+    "fonte": "128 - 20-12-2023 - Raquel (diária extra) - Som direto.pdf"
+   },
+   "score_nome": 0.8069
+  },
+  {
+   "debito": {
+    "doc": "122.002",
+    "data": "2023-12-20",
+    "valor": 20625.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "FOGO FILMES LTDA",
+    "pagina": 1,
+    "fonte": "12. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 129,
+    "data": "2023-12-20",
+    "valor": 20625.0,
+    "favorecido": "Fogo Filmes Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Finotti - Edição e Finalização",
+    "fonte": "129 - 20-12-2023 - André Finotti - Edição e Finalização.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "12.401",
+    "data": "2024-01-24",
+    "valor": 20625.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "FOGO FILMES LTDA",
+    "pagina": 1,
+    "fonte": "1. jan.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 130,
+    "data": "2024-01-24",
+    "valor": 20625.0,
+    "favorecido": "Fogo Filmes Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Finotti - Edição e Finalização",
+    "fonte": "130 - 24-01-2024 - André Finotti - Edição e Finalização.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "13.101",
+    "data": "2024-01-31",
+    "valor": 487.2,
+    "historico": "Pix - Enviado",
+    "favorecido": "IN SAMPA COURIER ENTREGAS",
+    "pagina": 1,
+    "fonte": "1. jan.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 131,
+    "data": "2024-01-31",
+    "valor": 487.2,
+    "favorecido": "In Sampa Courier Entregas Eireli",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "FP Courrier - Transporte Loca",
+    "fonte": "131 - 31-01-2024 - FP Courrier - Transporte Loca.pdf"
+   },
+   "score_nome": 0.827
+  },
+  {
+   "debito": {
+    "doc": "22.301",
+    "data": "2024-02-23",
+    "valor": 6000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "JUBA PRODUCOES",
+    "pagina": 1,
+    "fonte": "2. fev.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 132,
+    "data": "2024-02-23",
+    "valor": 6000.0,
+    "favorecido": "Juba Producoes",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Júlia Sousa - controller",
+    "fonte": "132 - 23-02-2024 - Júlia Sousa - controller.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "22.302",
+    "data": "2024-02-23",
+    "valor": 22500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "FOGO FILMES",
+    "pagina": 1,
+    "fonte": "2. fev.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 133,
+    "data": "2024-02-23",
+    "valor": 22500.0,
+    "favorecido": "Fogo Filmes",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Finotti - Edição e Finalização",
+    "fonte": "133 - 23-02-2024 - André Finotti - Edição e Finalização.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "50.701",
+    "data": "2024-05-07",
+    "valor": 4000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "JULIA BARBARA MELO DE SOUS",
+    "pagina": 1,
+    "fonte": "5. mai.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 134,
+    "data": "2024-05-07",
+    "valor": 4000.0,
+    "favorecido": "Julia Barbara Melo de Sousa 40926175",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Júlia Sousa - controller",
+    "fonte": "134 - 07-05-2024 - Júlia Sousa - controller.pdf"
+   },
+   "score_nome": 0.8352
+  },
+  {
+   "debito": {
+    "doc": "53.101",
+    "data": "2024-05-31",
+    "valor": 5000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "GANZAH",
+    "pagina": 1,
+    "fonte": "5. mai.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 135,
+    "data": "2024-05-31",
+    "valor": 5000.0,
+    "favorecido": "Ganzah",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Ganzah - Trilha Musical",
+    "fonte": "135 - 31-05-2024 - Ganzah - Trilha Musical.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "60.301",
+    "data": "2024-06-03",
+    "valor": 13500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "FOGO FILMES",
+    "pagina": 1,
+    "fonte": "6. jun.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 136,
+    "data": "2024-06-03",
+    "valor": 13500.0,
+    "favorecido": "Fogo Filmes",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Finotti - Edição e Finalização",
+    "fonte": "136 - 03-06-2024 - André Finotti - Edição e Finalização.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "70.301",
+    "data": "2024-07-03",
+    "valor": 5000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "GIOVANA AMANO",
+    "pagina": 1,
+    "fonte": "7. jul.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 137,
+    "data": "2024-07-03",
+    "valor": 5000.0,
+    "favorecido": "Giovana Amano",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Giovana Amano - Produtora de Licenciamento",
+    "fonte": "137 - 03-07-2024 - Giovana Amano - Produtora de Licenciamento.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "73.001",
+    "data": "2024-07-30",
+    "valor": 8000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "BRASIL IMAGEM",
+    "pagina": 1,
+    "fonte": "7. jul.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 138,
+    "data": "2024-07-30",
+    "valor": 8000.0,
+    "favorecido": "Brasil Imagem",
+    "cnpj": "18.148.355/0001-98",
+    "descricao": "Wagner Labs Anastacio ME _ Brasil Imagem - Licenciamento",
+    "fonte": "138 - 30-07-2024 - Wagner Labs Anastacio ME _ Brasil Imagem - Licenciamento.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "80.903",
+    "data": "2024-08-09",
+    "valor": 550.0,
+    "historico": "Pagto via Auto-Atend.BB",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "8. ago.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 142,
+    "data": "2024-08-09",
+    "valor": 550.0,
+    "favorecido": "",
+    "cnpj": "11400274/0001-94",
+    "descricao": "Biblioteca Nacional - Licenciamento",
+    "fonte": "142 - 09-08-2024 - Biblioteca Nacional - Licenciamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "550.525.000.034.632",
+    "data": "2024-08-09",
+    "valor": 2815.0,
+    "historico": "Transferência enviada",
+    "favorecido": "ANJO AZUL FILMES LTDA.",
+    "pagina": 1,
+    "fonte": "8. ago.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 139,
+    "data": "2024-08-09",
+    "valor": 2815.0,
+    "favorecido": "ANJO AZUL FILMES LTDA.",
+    "cnpj": null,
+    "descricao": "Sylvio Back - Licenciamento",
+    "fonte": "139 - 09-08-2024 - Sylvio Back - Licenciamento.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "80.901",
+    "data": "2024-08-09",
+    "valor": 2873.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "SOCIEDADE AMIGOS DA CINEMA",
+    "pagina": 1,
+    "fonte": "8. ago.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 140,
+    "data": "2024-08-09",
+    "valor": 2873.0,
+    "favorecido": "Sociedade Amigos da Cinemateca - Sac",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Cinemateca Brasileira - Licenciamento",
+    "fonte": "140 - 09-08-2024 - Cinemateca Brasileira - Licenciamento.pdf"
+   },
+   "score_nome": 0.8233
+  },
+  {
+   "debito": {
+    "doc": "80.902",
+    "data": "2024-08-09",
+    "valor": 4000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "F. Werneck Barcinski Ltda",
+    "pagina": 1,
+    "fonte": "8. ago.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 141,
+    "data": "2024-08-09",
+    "valor": 4000.0,
+    "favorecido": "F. Werneck Barcinski Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Fabiana - Produtora de Licenciamento",
+    "fonte": "141 - 09-08-2024 - Fabiana - Produtora de Licenciamento.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "81.601",
+    "data": "2024-08-16",
+    "valor": 130.0,
+    "historico": "Pagamento de Boleto",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "8. ago.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 143,
+    "data": "2024-08-16",
+    "valor": 130.0,
+    "favorecido": ":",
+    "cnpj": "33.641.663/0001-44",
+    "descricao": "CPDOC - Licenciamento",
+    "fonte": "143 - 16-08-2024 - CPDOC - Licenciamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "81.901",
+    "data": "2024-08-19",
+    "valor": 8627.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "SOCIEDADE AMIGOS DA CINEMA",
+    "pagina": 1,
+    "fonte": "8. ago.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 144,
+    "data": "2024-08-19",
+    "valor": 8627.0,
+    "favorecido": "Sociedade Amigos da Cinemateca - Sac",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Cinemateca Brasileira - Licenciamento",
+    "fonte": "144 - 19-08-2024 - Cinemateca Brasileira - Licenciamento.pdf"
+   },
+   "score_nome": 0.8233
+  },
+  {
+   "debito": {
+    "doc": "90.301",
+    "data": "2024-09-03",
+    "valor": 600.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CAMILA BRAUNE",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 145,
+    "data": "2024-09-03",
+    "valor": 600.0,
+    "favorecido": "Camila Braune",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Som_SP_adicional",
+    "fonte": "145 - 03-09-2024 - Som_SP_adicional.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "90.501",
+    "data": "2024-09-05",
+    "valor": 938.5,
+    "historico": "Pagamento de Boleto",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 146,
+    "data": "2024-09-05",
+    "valor": 938.5,
+    "favorecido": "GLOBO COMUNICACAO E PARTICIPACOES S.A. - CNPJ: 27.865.757/0001-02",
+    "cnpj": "27.865.757/0001-02",
+    "descricao": "Licenc_Globo",
+    "fonte": "146 - 05-09-2024 - Licenc_Globo.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "553.560.000.010.518",
+    "data": "2024-09-17",
+    "valor": 2250.0,
+    "historico": "Transferência enviada",
+    "favorecido": "LAPFILME P C LTDA",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 147,
+    "data": "2024-09-17",
+    "valor": 2250.0,
+    "favorecido": "LAPFILME P C LTDA",
+    "cnpj": null,
+    "descricao": "Lapfilme produções - Licenciamento",
+    "fonte": "147 - 17-09-2024 - Lapfilme produções - Licenciamento.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "91.701",
+    "data": "2024-09-17",
+    "valor": 2632.45,
+    "historico": "Pagamento de Boleto",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 148,
+    "data": "2024-09-17",
+    "valor": 2632.45,
+    "favorecido": "S.A. O ESTADO DE S.PAULO CNPJ 61.533.949/0001-41",
+    "cnpj": "011.400.274/0001-94",
+    "descricao": "Estadão - Licenciamento",
+    "fonte": "148 - 17-09-2024 - Estadão - Licenciamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "92.301",
+    "data": "2024-09-23",
+    "valor": 5500.0,
+    "historico": "Pagamento de Boleto",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 149,
+    "data": "2024-09-23",
+    "valor": 5500.0,
+    "favorecido": ":",
+    "cnpj": "08.561.701/0001-01",
+    "descricao": "JB - Licenciamento",
+    "fonte": "149 - 23-09-2024 - JB - Licenciamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "92.501",
+    "data": "2024-09-25",
+    "valor": 6726.23,
+    "historico": "Pix - Enviado",
+    "favorecido": "COTACAO D.T.V.M. S/A - SEF",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 150,
+    "data": "2024-09-25",
+    "valor": 6726.23,
+    "favorecido": "Cotacao D.t.v.m. S/a - Sefic",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "INA - Licenciamento",
+    "fonte": "150 - 25-09-2024 - INA - Licenciamento.pdf"
+   },
+   "score_nome": 0.9854
+  },
+  {
+   "debito": {
+    "doc": "93.001",
+    "data": "2024-09-30",
+    "valor": 700.0,
+    "historico": "Pagto via Auto-Atend.BB",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 151,
+    "data": "2024-09-30",
+    "valor": 700.0,
+    "favorecido": "do Contribuinte",
+    "cnpj": "11400274/0001-94",
+    "descricao": "Biblioteca Nacional - Licenciamento",
+    "fonte": "151 - 30-09-2024 - Biblioteca Nacional - Licenciamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "93.002",
+    "data": "2024-09-30",
+    "valor": 2400.0,
+    "historico": "Pagto via Auto-Atend.BB",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 152,
+    "data": "2024-09-30",
+    "valor": 2400.0,
+    "favorecido": "do Contribuinte",
+    "cnpj": "11400274/0001-94",
+    "descricao": "Biblioteca Nacional - Licenciamento",
+    "fonte": "152 - 30-09-2024 - Biblioteca Nacional - Licenciamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "101.002",
+    "data": "2024-10-10",
+    "valor": 372.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "SOCIEDADE AMIGOS DA CINEMA",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 154,
+    "data": "2024-10-10",
+    "valor": 372.0,
+    "favorecido": "Sociedade Amigos da Cinemateca - Sac",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Cinemateca Brasileira - Licenciamento",
+    "fonte": "154 - 10-10-2024 - Cinemateca Brasileira - Licenciamento.pdf"
+   },
+   "score_nome": 0.8233
+  },
+  {
+   "debito": {
+    "doc": "101.001",
+    "data": "2024-10-10",
+    "valor": 1836.22,
+    "historico": "Pix - Enviado",
+    "favorecido": "COTACAO D.T.V.M. S/A - SEF",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 153,
+    "data": "2024-10-10",
+    "valor": 1836.22,
+    "favorecido": "Cotacao D.t.v.m. S/a - Sefic",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Le Monde - Licenciamento",
+    "fonte": "153 - 10-10-2024 - Le Monde - Licenciamento.pdf"
+   },
+   "score_nome": 0.9854
+  },
+  {
+   "debito": {
+    "doc": "103.101",
+    "data": "2024-10-31",
+    "valor": 5000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "PORVIROSCOPIO PROJETOS C.",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 155,
+    "data": "2024-10-31",
+    "valor": 5000.0,
+    "favorecido": "Porviroscopio Projetos C. C. Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Iconografia - Licenciamento",
+    "fonte": "155 - 31-10-2024 - Iconografia - Licenciamento.pdf"
+   },
+   "score_nome": 0.6955
+  },
+  {
+   "debito": {
+    "doc": "103.102",
+    "data": "2024-10-31",
+    "valor": 5500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CALIBAN PRODUCOES CINEMATO",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 156,
+    "data": "2024-10-31",
+    "valor": 5500.0,
+    "favorecido": "Caliban Producoes Cinematograficas L",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Silvio Tendler - Licenciamento",
+    "fonte": "156 - 31-10-2024 - Silvio Tendler - Licenciamento.pdf"
+   },
+   "score_nome": 0.781
+  },
+  {
+   "debito": {
+    "doc": "110.101",
+    "data": "2024-11-01",
+    "valor": 140.0,
+    "historico": "Impostos",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 157,
+    "data": "2024-11-01",
+    "valor": 140.0,
+    "favorecido": "do Contribuinte",
+    "cnpj": null,
+    "descricao": "Biblioteca Nacional - Licenciamento",
+    "fonte": "157 - 01-11-2024 - Biblioteca Nacional - Licenciamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "110.401",
+    "data": "2024-11-04",
+    "valor": 400.0,
+    "historico": "Pagto via Auto-Atend.BB",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 158,
+    "data": "2024-11-04",
+    "valor": 400.0,
+    "favorecido": "do Contribuinte",
+    "cnpj": "11400274/0001-94",
+    "descricao": "Arquivo Nacional - Licenciamento",
+    "fonte": "158 - 04-11-2024 - Arquivo Nacional - Licenciamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "110.801",
+    "data": "2024-11-08",
+    "valor": 600.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "ECHO S COMUNICACAO SONORA",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 159,
+    "data": "2024-11-08",
+    "valor": 600.0,
+    "favorecido": "Echo S Comunicacao Sonora e Visual",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Echos Comunicação - Cópia Digital",
+    "fonte": "159 - 08-11-2024 - Echos Comunicação - Cópia Digital.pdf"
+   },
+   "score_nome": 0.7299
+  },
+  {
+   "debito": {
+    "doc": "110.802",
+    "data": "2024-11-08",
+    "valor": 1000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "ROBERTO FERRARETTO D AVILA",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 160,
+    "data": "2024-11-08",
+    "valor": 1000.0,
+    "favorecido": "Roberto F D Avila",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Roberto Davilla - Licenciamento",
+    "fonte": "160 - 08-11-2024 - Roberto Davilla - Licenciamento.pdf"
+   },
+   "score_nome": 0.9267
+  },
+  {
+   "debito": {
+    "doc": "111.201",
+    "data": "2024-11-12",
+    "valor": 12.0,
+    "historico": "Impostos",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 161,
+    "data": "2024-11-12",
+    "valor": 12.0,
+    "favorecido": "do Contribuinte",
+    "cnpj": null,
+    "descricao": "Biblioteca Nacional - Licenciamento",
+    "fonte": "161 - 12-11-2024 - Biblioteca Nacional - Licenciamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "111.401",
+    "data": "2024-11-14",
+    "valor": 200.0,
+    "historico": "Pagto via Auto-Atend.BB",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 162,
+    "data": "2024-11-14",
+    "valor": 200.0,
+    "favorecido": "do Contribuinte",
+    "cnpj": "11400274/0001-94",
+    "descricao": "Arquivo Nacional - Licenciamento",
+    "fonte": "162 - 14-11-2024 - Arquivo Nacional - Licenciamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "112.801",
+    "data": "2024-11-28",
+    "valor": 230.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MARACH SERVICOS AUDIOVISUA",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 163,
+    "data": "2024-11-28",
+    "valor": 230.0,
+    "favorecido": "Marach Servicos Audiovisuais Eireli",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Procimar - Cópias Digitais",
+    "fonte": "163 - 28-11-2024 - Procimar - Cópias Digitais.pdf"
+   },
+   "score_nome": 0.7859
+  },
+  {
+   "debito": {
+    "doc": "120.502",
+    "data": "2024-12-05",
+    "valor": 1500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "GEISA DA SILVA DE JESUS",
+    "pagina": 1,
+    "fonte": "12. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 165,
+    "data": "2024-12-05",
+    "valor": 1500.0,
+    "favorecido": "Geisa Silva Jesus",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Geisa da Silva Jesus - Licenciamento",
+    "fonte": "165 - 05-12-2024 - Geisa da Silva Jesus - Licenciamento.pdf"
+   },
+   "score_nome": 0.6875
+  },
+  {
+   "debito": {
+    "doc": "120.501",
+    "data": "2024-12-05",
+    "valor": 6400.0,
+    "historico": "Pagamento de Boleto",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "12. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 164,
+    "data": "2024-12-05",
+    "valor": 6400.0,
+    "favorecido": ":",
+    "cnpj": "02.903.707/0001-33",
+    "descricao": "Correios Brasiliense - Licenciamento",
+    "fonte": "164 - 05-12-2024 - Correios Brasiliense - Licenciamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "121.001",
+    "data": "2024-12-10",
+    "valor": 100.0,
+    "historico": "Pagamento de Boleto",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "12. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 166,
+    "data": "2024-12-10",
+    "valor": 100.0,
+    "favorecido": ":",
+    "cnpj": "33.641.663/0001-44",
+    "descricao": "FGV - Licenciamento",
+    "fonte": "166 - 10-12-2024 - FGV - Licenciamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "121.702",
+    "data": "2024-12-17",
+    "valor": 2000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "SOM LIVRE",
+    "pagina": 1,
+    "fonte": "12. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 168,
+    "data": "2024-12-17",
+    "valor": 2000.0,
+    "favorecido": "Som Livre",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Som Livre - Licenciamento",
+    "fonte": "168 - 17-12-2024 - Som Livre - Licenciamento.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "121.701",
+    "data": "2024-12-17",
+    "valor": 3000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "EDITORA E IMPORTADORA MUSI",
+    "pagina": 1,
+    "fonte": "12. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 167,
+    "data": "2024-12-17",
+    "valor": 3000.0,
+    "favorecido": "Editora e Importadora Musical Fermat",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Fermata - Licenciamento",
+    "fonte": "167 - 17-12-2024 - Fermata - Licenciamento.pdf"
+   },
+   "score_nome": 0.8135
+  },
+  {
+   "debito": {
+    "doc": "121.703",
+    "data": "2024-12-17",
+    "valor": 3500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CARLOS LYRA EDICOES MUSICA",
+    "pagina": 1,
+    "fonte": "12. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 169,
+    "data": "2024-12-17",
+    "valor": 3500.0,
+    "favorecido": "Carlos Lyra Edicoes Musicais",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Carlos Lyra Edições Musicais - Licenciamento",
+    "fonte": "169 - 17-12-2024 - Carlos Lyra Edições Musicais - Licenciamento.pdf"
+   },
+   "score_nome": 0.987
+  },
+  {
+   "debito": {
+    "doc": "121.704",
+    "data": "2024-12-17",
+    "valor": 8393.3,
+    "historico": "Pix - Enviado",
+    "favorecido": "COTACAO D.T.V.M. S/A - SEF",
+    "pagina": 1,
+    "fonte": "12. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 170,
+    "data": "2024-12-17",
+    "valor": 8393.3,
+    "favorecido": "Cotacao D.t.v.m. S/a - Sefic",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "NYT - Licenciamento",
+    "fonte": "170 - 17-12-2024 - NYT - Licenciamento.pdf"
+   },
+   "score_nome": 0.9854
+  },
+  {
+   "debito": {
+    "doc": "122.601",
+    "data": "2024-12-26",
+    "valor": 5000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "GIOVANA AMANO",
+    "pagina": 1,
+    "fonte": "12. dez.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 171,
+    "data": "2024-12-26",
+    "valor": 5000.0,
+    "favorecido": "Giovana Amano",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Giovana Amano - Produtora de Licenciamento",
+    "fonte": "171 - 26-12-2024 - Giovana Amano - Produtora de Licenciamento.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "11.601",
+    "data": "2025-01-16",
+    "valor": 50.0,
+    "historico": "Pagto via Auto-Atend.BB",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "1. jan.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 172,
+    "data": "2025-01-16",
+    "valor": 50.0,
+    "favorecido": "",
+    "cnpj": "11400274/0001-94",
+    "descricao": "Arquivo Nacional - Licenciamento",
+    "fonte": "172 - 16-01-2025 - Arquivo Nacional - Licenciamento.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "22.701",
+    "data": "2025-02-27",
+    "valor": 7000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "GANZAH",
+    "pagina": 1,
+    "fonte": "2. fev.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 174,
+    "data": "2025-02-27",
+    "valor": 7000.0,
+    "favorecido": "Ganzah",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Marcos Azambuja - Ganzah - Trilha Sonora",
+    "fonte": "174 - 27-02-2025 - Marcos Azambuja - Ganzah - Trilha Sonora.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "32.501",
+    "data": "2025-03-25",
+    "valor": 626.3,
+    "historico": "Pagamento de Boleto",
+    "favorecido": "",
+    "pagina": 1,
+    "fonte": "3. mar.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 175,
+    "data": "2025-03-25",
+    "valor": 626.3,
+    "favorecido": ":",
+    "cnpj": "04.884.574/0001-20",
+    "descricao": "ANCINE - Boleto",
+    "fonte": "175 - 25-03-2025 - ANCINE - Boleto.pdf"
+   },
+   "score_nome": null
+  },
+  {
+   "debito": {
+    "doc": "43.002",
+    "data": "2025-04-30",
+    "valor": 1200.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "PLANIFILMES LTDA",
+    "pagina": 1,
+    "fonte": "4. abr.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 177,
+    "data": "2025-04-30",
+    "valor": 1200.0,
+    "favorecido": "Planifilmes Ltda",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Planifilmes Ltda (emissão CPB - Lia Pini)",
+    "fonte": "177 - 30-04-2025 - Planifilmes Ltda (emissão CPB - Lia Pini).pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "43.001",
+    "data": "2025-04-30",
+    "valor": 3000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "GIOVANA AMANO",
+    "pagina": 1,
+    "fonte": "4. abr.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 176,
+    "data": "2025-04-30",
+    "valor": 3000.0,
+    "favorecido": "Giovana Amano",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Giovana Amano - Produtora de Licenciamento",
+    "fonte": "176 - 30-04-2025 - Giovana Amano - Produtora de Licenciamento.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "50.701",
+    "data": "2025-05-07",
+    "valor": 18093.63,
+    "historico": "Pix - Enviado",
+    "favorecido": "FOGO FILMES",
+    "pagina": 1,
+    "fonte": "5. maio.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 178,
+    "data": "2025-05-07",
+    "valor": 18093.63,
+    "favorecido": "Fogo Filmes",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Fogo Filmes - Edição e Finalização (André Finotti)",
+    "fonte": "178 - 07-05-2025 - Fogo Filmes - Edição e Finalização (André Finotti).pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "111.001",
+    "data": "2022-11-10",
+    "valor": 1200.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Felipe Guimarães Rosa",
+    "pagina": 1,
+    "fonte": "2. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 5,
+    "data": "2022-11-10",
+    "valor": 1200.0,
+    "favorecido": "Felipe G Rosa",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Frico Guimarães - Diretor de Fotografia",
+    "fonte": "005 - 10-11-2022 - Frico Guimarães - Diretor de Fotografia.pdf"
+   },
+   "score_nome": 0.9176
+  },
+  {
+   "debito": {
+    "doc": "111.002",
+    "data": "2022-11-10",
+    "valor": 1200.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "LUIS FELIPE LABAKI",
+    "pagina": 1,
+    "fonte": "2. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 6,
+    "data": "2022-11-10",
+    "valor": 1200.0,
+    "favorecido": "Luis Felipe Labaki",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Luis Felipe Labaki - Som Direto",
+    "fonte": "006 - 10-11-2022 - Luis Felipe Labaki - Som Direto.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "70.302",
+    "data": "2023-07-03",
+    "valor": 25000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MOG PRODUTORA",
+    "pagina": 1,
+    "fonte": "7. jul.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 17,
+    "data": "2023-07-03",
+    "valor": 25000.0,
+    "favorecido": "Mog Produtora",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "MoG Produtora - Produtora Executiva",
+    "fonte": "017 - 03-07-2023 - MoG Produtora - Produtora Executiva.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "70.301",
+    "data": "2023-07-03",
+    "valor": 25000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CIRCUNSTANCIA CINEMATOGRAF",
+    "pagina": 1,
+    "fonte": "7. jul.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 16,
+    "data": "2023-07-03",
+    "valor": 25000.0,
+    "favorecido": "Circunstancia Cinematografica e Prod",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Circunstância_diretor",
+    "fonte": "016 - 03-07-2023 - Circunstância_diretor.pdf"
+   },
+   "score_nome": 0.6185
+  },
+  {
+   "debito": {
+    "doc": "92.802",
+    "data": "2023-09-28",
+    "valor": 1000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Sofia Vontobel Baccarini",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 37,
+    "data": "2023-09-28",
+    "valor": 1000.0,
+    "favorecido": "Sofia V Baccarini",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Sofia Vontobel - Verba de Produção",
+    "fonte": "037 - 28-09-2023 - Sofia Vontobel - Verba de Produção.pdf"
+   },
+   "score_nome": 0.9402
+  },
+  {
+   "debito": {
+    "doc": "92.803",
+    "data": "2023-09-28",
+    "valor": 1000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "André Lima Manfrim",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 38,
+    "data": "2023-09-28",
+    "valor": 1000.0,
+    "favorecido": "Andre Lima Manfrim",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Manfrin - Verba de Produção",
+    "fonte": "038 - 28-09-2023 - André Manfrin - Verba de Produção.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.908",
+    "data": "2023-09-29",
+    "valor": 560.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Sofia Vontobel Baccarini",
+    "pagina": 2,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 48,
+    "data": "2023-09-29",
+    "valor": 560.0,
+    "favorecido": "Sofia V Baccarini",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Sofia Vontobel - verba de alimentação",
+    "fonte": "048 - 29-09-2023 - Sofia Vontobel - verba de alimentação.pdf"
+   },
+   "score_nome": 0.9402
+  },
+  {
+   "debito": {
+    "doc": "92.909",
+    "data": "2023-09-29",
+    "valor": 560.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Fábio Baltar Duarte",
+    "pagina": 2,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 49,
+    "data": "2023-09-29",
+    "valor": 560.0,
+    "favorecido": "Fabio Baltar Duarte",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Fabio Baltar - verba de alimentação",
+    "fonte": "049 - 29-09-2023 - Fabio Baltar - verba de alimentação.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "92.905",
+    "data": "2023-09-29",
+    "valor": 1050.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "LUIS FELIPE MONTE CIPULLO",
+    "pagina": 2,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 45,
+    "data": "2023-09-29",
+    "valor": 1050.0,
+    "favorecido": "Luis F Monte Cipullo",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Luis Cipullo - verba de alimentação",
+    "fonte": "045 - 29-09-2023 - Luis Cipullo - verba de alimentação.pdf"
+   },
+   "score_nome": 0.9611
+  },
+  {
+   "debito": {
+    "doc": "92.906",
+    "data": "2023-09-29",
+    "valor": 1050.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Felipe Guimarães Rosa",
+    "pagina": 2,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 46,
+    "data": "2023-09-29",
+    "valor": 1050.0,
+    "favorecido": "Felipe G Rosa",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Frico Guimarães - verba de alimentação",
+    "fonte": "046 - 29-09-2023 - Frico Guimarães - verba de alimentação.pdf"
+   },
+   "score_nome": 0.9176
+  },
+  {
+   "debito": {
+    "doc": "92.907",
+    "data": "2023-09-29",
+    "valor": 1050.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Thiago Augusto Gomas Cunha",
+    "pagina": 2,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 47,
+    "data": "2023-09-29",
+    "valor": 1050.0,
+    "favorecido": "Thiago A Gomas Cunha",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Thiago Cunha - verba de alimentação",
+    "fonte": "047 - 29-09-2023 - Thiago Cunha - verba de alimentação.pdf"
+   },
+   "score_nome": 0.9543
+  },
+  {
+   "debito": {
+    "doc": "92.910",
+    "data": "2023-09-29",
+    "valor": 1050.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Andre Lima Monfrini",
+    "pagina": 2,
+    "fonte": "9. set.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 50,
+    "data": "2023-09-29",
+    "valor": 1050.0,
+    "favorecido": "Andre Lima Monfrini",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Manfrin - verba de alimentação",
+    "fonte": "050 - 29-09-2023 - André Manfrin - verba de alimentação.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "100.502",
+    "data": "2023-10-05",
+    "valor": 700.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "EDSON DE CAMARGO TRANSPORT",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 56,
+    "data": "2023-10-05",
+    "valor": 700.0,
+    "favorecido": "Edson de Camargo Transportes",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Motorista SP - transporte local",
+    "fonte": "056 - 05-10-2023 - Motorista SP - transporte local.pdf"
+   },
+   "score_nome": 0.987
+  },
+  {
+   "debito": {
+    "doc": "100.908",
+    "data": "2023-10-09",
+    "valor": 240.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "LUIS FELIPE MONTE CIPULLO",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 67,
+    "data": "2023-10-09",
+    "valor": 240.0,
+    "favorecido": "Luis F Monte Cipullo",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Luis Cipullo - verba de alimentação",
+    "fonte": "067 - 09-10-2023 - Luis Cipullo - verba de alimentação.pdf"
+   },
+   "score_nome": 0.9611
+  },
+  {
+   "debito": {
+    "doc": "100.909",
+    "data": "2023-10-09",
+    "valor": 240.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Andre Lima Monfrini",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 68,
+    "data": "2023-10-09",
+    "valor": 240.0,
+    "favorecido": "Andre Lima Monfrini",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Manfrin - verba de alimentação",
+    "fonte": "068 - 09-10-2023 - André Manfrin - verba de alimentação.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "100.910",
+    "data": "2023-10-09",
+    "valor": 240.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Felipe Guimarães Rosa",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 69,
+    "data": "2023-10-09",
+    "valor": 240.0,
+    "favorecido": "Felipe G Rosa",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Frico Guimarães - verba de alimentação",
+    "fonte": "069 - 09-10-2023 - Frico Guimarães - verba de alimentação.pdf"
+   },
+   "score_nome": 0.9176
+  },
+  {
+   "debito": {
+    "doc": "100.911",
+    "data": "2023-10-09",
+    "valor": 240.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Thiago Augusto Gomas Cunha",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 70,
+    "data": "2023-10-09",
+    "valor": 240.0,
+    "favorecido": "Thiago A Gomas Cunha",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Thiago Cunha - verba de alimentação",
+    "fonte": "070 - 09-10-2023 - Thiago Cunha - verba de alimentação.pdf"
+   },
+   "score_nome": 0.9543
+  },
+  {
+   "debito": {
+    "doc": "101.306",
+    "data": "2023-10-13",
+    "valor": 480.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "IDALINA SOUZA RIBEIRO DA S",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 83,
+    "data": "2023-10-13",
+    "valor": 480.0,
+    "favorecido": "Idalina S R Silva",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Ida Leal - verba de alimentação",
+    "fonte": "083 - 13-10-2023 - Ida Leal - verba de alimentação.pdf"
+   },
+   "score_nome": 0.7316
+  },
+  {
+   "debito": {
+    "doc": "101.307",
+    "data": "2023-10-13",
+    "valor": 480.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "ANNE CAROLINA MELO DOS SAN",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 84,
+    "data": "2023-10-13",
+    "valor": 480.0,
+    "favorecido": "Anne C Melo Santos",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Anne Santos - verba de alimentação",
+    "fonte": "084 - 13-10-2023 - Anne Santos - verba de alimentação.pdf"
+   },
+   "score_nome": 0.7586
+  },
+  {
+   "debito": {
+    "doc": "101.301",
+    "data": "2023-10-13",
+    "valor": 1200.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Andre Lima Monfrini",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 78,
+    "data": "2023-10-13",
+    "valor": 1200.0,
+    "favorecido": "Andre Lima Monfrini",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Manfrim - verba de alimentação",
+    "fonte": "078 - 13-10-2023 - André Manfrim - verba de alimentação.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "101.302",
+    "data": "2023-10-13",
+    "valor": 1200.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Felipe Guimarães Rosa",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 79,
+    "data": "2023-10-13",
+    "valor": 1200.0,
+    "favorecido": "Felipe G Rosa",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Frico Guimarães - verba de alimentação",
+    "fonte": "079 - 13-10-2023 - Frico Guimarães - verba de alimentação.pdf"
+   },
+   "score_nome": 0.9176
+  },
+  {
+   "debito": {
+    "doc": "101.303",
+    "data": "2023-10-13",
+    "valor": 1200.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "LUIS FELIPE MONTE CIPULLO",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 80,
+    "data": "2023-10-13",
+    "valor": 1200.0,
+    "favorecido": "Luis F Monte Cipullo",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Luis Cipullo - verba de alimentação",
+    "fonte": "080 - 13-10-2023 - Luis Cipullo - verba de alimentação.pdf"
+   },
+   "score_nome": 0.9611
+  },
+  {
+   "debito": {
+    "doc": "101.304",
+    "data": "2023-10-13",
+    "valor": 1200.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Thiago Augusto Gomas Cunha",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 81,
+    "data": "2023-10-13",
+    "valor": 1200.0,
+    "favorecido": "Thiago A Gomas Cunha",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Thiago Cunha - verba de alimentação",
+    "fonte": "081 - 13-10-2023 - Thiago Cunha - verba de alimentação.pdf"
+   },
+   "score_nome": 0.9543
+  },
+  {
+   "debito": {
+    "doc": "103.102",
+    "data": "2023-10-31",
+    "valor": 1020.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Felipe Guimarães Rosa",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 114,
+    "data": "2023-10-31",
+    "valor": 1020.0,
+    "favorecido": "Felipe G Rosa",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Frico Guimarães - Ajuda de custo + Alimentação",
+    "fonte": "114 - 31-10-2023 - Frico Guimarães - Ajuda de custo + Alimentação.pdf"
+   },
+   "score_nome": 0.9176
+  },
+  {
+   "debito": {
+    "doc": "103.103",
+    "data": "2023-10-31",
+    "valor": 1020.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "LUIS FELIPE MONTE CIPULLO",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 115,
+    "data": "2023-10-31",
+    "valor": 1020.0,
+    "favorecido": "Luis F Monte Cipullo",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Luis Cipullo - Ajuda de custo + Alimentação",
+    "fonte": "115 - 31-10-2023 - Luis Cipullo - Ajuda de custo + Alimentação.pdf"
+   },
+   "score_nome": 0.9611
+  },
+  {
+   "debito": {
+    "doc": "103.104",
+    "data": "2023-10-31",
+    "valor": 1020.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Andre Lima Monfrini",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 116,
+    "data": "2023-10-31",
+    "valor": 1020.0,
+    "favorecido": "Andre Lima Monfrini",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Manfrin - Ajuda de custo + Alimentação",
+    "fonte": "116 - 31-10-2023 - André Manfrin - Ajuda de custo + Alimentação.pdf"
+   },
+   "score_nome": 1.0
+  },
+  {
+   "debito": {
+    "doc": "110.802",
+    "data": "2023-11-08",
+    "valor": 300.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "BERNARDO TAVARES E SILVA C",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 119,
+    "data": "2023-11-08",
+    "valor": 300.0,
+    "favorecido": "Bernardo T S Costa",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Bernardo Tavares - assistente de pesquisa",
+    "fonte": "119 - 08-11-2023 - Bernardo Tavares - assistente de pesquisa.pdf"
+   },
+   "score_nome": 0.7427
+  }
+ ],
+ "ambiguos_extrato": [
+  {
+   "debito": {
+    "doc": "92.005",
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "candidatos_comprovantes": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "debito": {
+    "doc": "92.006",
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "candidatos_comprovantes": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "debito": {
+    "doc": "92.007",
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "candidatos_comprovantes": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "debito": {
+    "doc": "92.008",
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "candidatos_comprovantes": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "debito": {
+    "doc": "92.001",
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "candidatos_comprovantes": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "debito": {
+    "doc": "92.002",
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "candidatos_comprovantes": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "debito": {
+    "doc": "92.003",
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "candidatos_comprovantes": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "debito": {
+    "doc": "92.004",
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "historico": "Pix - Enviado",
+    "favorecido": "GOL Linhas Aéreas",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "candidatos_comprovantes": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "debito": {
+    "doc": "100.901",
+    "data": "2023-10-09",
+    "valor": 945.49,
+    "historico": "Pix - Enviado",
+    "favorecido": "AMIR LABAKI",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "candidatos_comprovantes": [
+    "AMIR LABAKI",
+    "AMIR LABAKI"
+   ]
+  },
+  {
+   "debito": {
+    "doc": "101.601",
+    "data": "2023-10-16",
+    "valor": 3000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "CAMILA LICARIAO DE CARVALH",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "candidatos_comprovantes": [
+    "CAMILA LICARIAO DE CARVALHO BRAUNE 4",
+    "CAMILA LICARIAO DE CARVALHO BRAUNE 4"
+   ]
+  },
+  {
+   "debito": {
+    "doc": "102.504",
+    "data": "2023-10-25",
+    "valor": 10000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "MOG PRODUTORA",
+    "pagina": 2,
+    "fonte": "10. out.pdf"
+   },
+   "candidatos_comprovantes": [
+    "MOG PRODUTORA",
+    "MOG PRODUTORA"
+   ]
+  },
+  {
+   "debito": {
+    "doc": "111.402",
+    "data": "2023-11-14",
+    "valor": 3724.74,
+    "historico": "Pix - Enviado",
+    "favorecido": "MONICA GUIMARAES P MORAES",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "candidatos_comprovantes": [
+    "MONICA G P MORAES",
+    "MONICA G P MORAES"
+   ]
+  },
+  {
+   "debito": {
+    "doc": "20.302",
+    "data": "2025-02-03",
+    "valor": 975.04,
+    "historico": "Pix - Enviado",
+    "favorecido": "BANCO RENDIMENTO S/A",
+    "pagina": 1,
+    "fonte": "2. fev.pdf"
+   },
+   "candidatos_comprovantes": [
+    "BANCO RENDIMENTO S A"
+   ]
+  },
+  {
+   "debito": {
+    "doc": "20.303",
+    "data": "2025-02-03",
+    "valor": 975.04,
+    "historico": "Pix - Enviado",
+    "favorecido": "BANCO RENDIMENTO S/A",
+    "pagina": 1,
+    "fonte": "2. fev.pdf"
+   },
+   "candidatos_comprovantes": [
+    "BANCO RENDIMENTO S A"
+   ]
+  }
+ ],
+ "ambiguos_comprovante": [
+  {
+   "comprovante": {
+    "numero_arquivo": 29,
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Manfrim RJ - Passagem Aérea",
+    "fonte": "029 - 20-09-2023 - André Manfrim RJ - Passagem Aérea.pdf"
+   },
+   "candidatos_extrato": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 30,
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Luis Cipullo RJ - Passagem Aérea",
+    "fonte": "030 - 20-09-2023 - Luis Cipullo RJ - Passagem Aérea.pdf"
+   },
+   "candidatos_extrato": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 31,
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Frico Guimarães RJ - Passagem Aérea",
+    "fonte": "031 - 20-09-2023 - Frico Guimarães RJ - Passagem Aérea.pdf"
+   },
+   "candidatos_extrato": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 32,
+    "data": "2023-09-20",
+    "valor": 1524.64,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Thiago Cunha RJ - Passagem Aérea",
+    "fonte": "032 - 20-09-2023 - Thiago Cunha RJ - Passagem Aérea.pdf"
+   },
+   "candidatos_extrato": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 25,
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "André Manfrim - Passagem Aérea",
+    "fonte": "025 - 20-09-2023 - André Manfrim - Passagem Aérea.pdf"
+   },
+   "candidatos_extrato": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 26,
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Luis Cipullo - Passagem Aérea",
+    "fonte": "026 - 20-09-2023 - Luis Cipullo - Passagem Aérea.pdf"
+   },
+   "candidatos_extrato": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 27,
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Thiago Cunha - Passagem Aérea",
+    "fonte": "027 - 20-09-2023 - Thiago Cunha - Passagem Aérea.pdf"
+   },
+   "candidatos_extrato": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 28,
+    "data": "2023-09-20",
+    "valor": 2870.87,
+    "favorecido": "Gol Linhas Aéreas",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Frico Guimarães - Passagem Aérea",
+    "fonte": "028 - 20-09-2023 - Frico Guimarães - Passagem Aérea.pdf"
+   },
+   "candidatos_extrato": [
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS",
+    "GOL LINHAS AEREAS"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 59,
+    "data": "2023-10-09",
+    "valor": 945.49,
+    "favorecido": "Amir Labaki",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Amir Labaki - Verba Transporte e Alimentação",
+    "fonte": "059 - 09-10-2023 - Amir Labaki - Verba Transporte e Alimentação.pdf"
+   },
+   "candidatos_extrato": [
+    "AMIR LABAKI"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 60,
+    "data": "2023-10-09",
+    "valor": 945.49,
+    "favorecido": "Amir Labaki",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Amir Labaki - Verba Transporte e Alimentação",
+    "fonte": "060 - 09-10-2023 - Amir Labaki - Verba Transporte e Alimentação.pdf"
+   },
+   "candidatos_extrato": [
+    "AMIR LABAKI"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 35,
+    "data": "2023-10-16",
+    "valor": 3000.0,
+    "favorecido": "Camila Licariao de Carvalho Braune 4",
+    "cnpj": "36.584.511/0001-",
+    "descricao": "Camila Braune - Tecnica de som SP",
+    "fonte": "035 - 26-09-2023 - Camila Braune - Tecnica de som SP.pdf"
+   },
+   "candidatos_extrato": [
+    "CAMILA LICARIAO DE CARVALH"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 87,
+    "data": "2023-10-16",
+    "valor": 3000.0,
+    "favorecido": "Camila Licariao de Carvalho Braune 4",
+    "cnpj": "36.584.511/0001-",
+    "descricao": "Camila Braune - Tecnica de som SP",
+    "fonte": "087 - 16-10-2023 - Camila Braune - Tecnica de som SP.pdf"
+   },
+   "candidatos_extrato": [
+    "CAMILA LICARIAO DE CARVALH"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 33,
+    "data": "2023-10-25",
+    "valor": 10000.0,
+    "favorecido": "Mog Produtora",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Mônica Guimarães - Produtora Executiva",
+    "fonte": "033 - 26-09-2023 - Mônica Guimarães - Produtora Executiva.pdf"
+   },
+   "candidatos_extrato": [
+    "MOG PRODUTORA"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 96,
+    "data": "2023-10-25",
+    "valor": 10000.0,
+    "favorecido": "Mog Produtora",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Mônica Guimarães - Produtora Executiva",
+    "fonte": "096 - 25-10-2023 - Mônica Guimarães - Produtora Executiva.pdf"
+   },
+   "candidatos_extrato": [
+    "MOG PRODUTORA"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 122,
+    "data": "2023-11-14",
+    "valor": 3724.74,
+    "favorecido": "Monica G P Moraes",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Reembolso MG (refeição e transporte)",
+    "fonte": "122 - 14-11-2023 - Reembolso MG (refeição e transporte).pdf"
+   },
+   "candidatos_extrato": [
+    "MONICA GUIMARAES P MORAES"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 123,
+    "data": "2023-11-14",
+    "valor": 3724.74,
+    "favorecido": "Monica G P Moraes",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Reembolso MG (refeição e transporte)",
+    "fonte": "123 - 14-11-2023 - Reembolso MG (refeição e transporte).pdf"
+   },
+   "candidatos_extrato": [
+    "MONICA GUIMARAES P MORAES"
+   ]
+  },
+  {
+   "comprovante": {
+    "numero_arquivo": 173,
+    "data": "2025-02-03",
+    "valor": 975.04,
+    "favorecido": "Banco Rendimento S/a",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "La Nacion - Licenciamento",
+    "fonte": "173 - 03-02-2025 - La Nacion - Licenciamento.pdf"
+   },
+   "candidatos_extrato": [
+    "BANCO RENDIMENTO S A",
+    "BANCO RENDIMENTO S A"
+   ]
+  }
+ ],
+ "divergentes_valor": [
+  {
+   "debito": {
+    "doc": "103.004",
+    "data": "2023-10-30",
+    "valor": 211.5,
+    "historico": "Pix - Enviado",
+    "favorecido": "BRILHO",
+    "pagina": 3,
+    "fonte": "10. out.pdf"
+   },
+   "comprovante": {
+    "numero_arquivo": 111,
+    "data": "2023-10-30",
+    "valor": 0.0,
+    "favorecido": "Brilho",
+    "cnpj": "11.400.274/0001-94",
+    "descricao": "Brilho - Equipamento Luz (diária extra)",
+    "fonte": "111 - 30-10-2023 - Brilho - Equipamento Luz (diária extra).pdf"
+   },
+   "motivo": "data bate (2023-10-30) mas valor diverge: extrato R$211.50 vs comprovante R$0.00"
+  }
+ ],
+ "orfaos_extrato": [
+  {
+   "debito": {
+    "doc": "100.501",
+    "data": "2023-10-05",
+    "valor": 700.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "EDSON DE CAMARGO",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "observacao": "comprovante do mesmo valor na data já vinculado a outro débito"
+  },
+  {
+   "debito": {
+    "doc": "101.001",
+    "data": "2023-10-10",
+    "valor": 500.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "Andre Lima Monfrini",
+    "pagina": 1,
+    "fonte": "10. out.pdf"
+   },
+   "observacao": "data/valor não bate"
+  },
+  {
+   "debito": {
+    "doc": "110.801",
+    "data": "2023-11-08",
+    "valor": 300.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "BERNARDO TAVARES ROSA",
+    "pagina": 1,
+    "fonte": "11. nov.pdf"
+   },
+   "observacao": "comprovante do mesmo valor na data já vinculado a outro débito"
+  },
+  {
+   "debito": {
+    "doc": "92.601",
+    "data": "2023-09-26",
+    "valor": 10000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "LUIS FELIPE LABAKI",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "observacao": "data/valor não bate"
+  },
+  {
+   "debito": {
+    "doc": "92.603",
+    "data": "2023-09-26",
+    "valor": 3000.0,
+    "historico": "Pix - Enviado",
+    "favorecido": "ANA BEATRIZ HERMANSON POMA",
+    "pagina": 1,
+    "fonte": "9. set.pdf"
+   },
+   "observacao": "data/valor não bate"
+  },
+  {
+   "debito": {
+    "doc": "20.301",
+    "data": "2025-02-03",
+    "valor": 975.04,
+    "historico": "Pix - Enviado",
+    "favorecido": "CIRCUNSTANC 1961 FSAMPJFN",
+    "pagina": 1,
+    "fonte": "2. fev.pdf"
+   },
+   "observacao": "comprovante do mesmo valor na data já vinculado a outro débito"
+  }
+ ],
+ "orfaos_comprovante": []
+}
