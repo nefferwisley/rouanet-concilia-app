@@ -11,7 +11,7 @@ NUNCA inventar campo: se não achar no documento → `null` + anotar em "observa
 | 004 | Planilha corrigida (xlsx) | opencode/north-mini-code-free | motor/gerar_planilha.py, saida/planilha/, motor/_parsed/planilha_linhas.json | ✅ (185 linhas; 178 arquivos finais) | xlsx reabre, N linhas = cruzamento |
 | 005 | Pasta final espelhada | opencode/north-mini-code-free | motor/gerar_pasta.py, saida/arquivos_finais/ | ✅ (178/178 copiados; 1 PENDENTES; faltando 0) | 0 faltantes no tally |
 | 006 | Relatório de validação | opencode/nemotron-3-ultra-free | motor/gerar_resumo.py, saida/relatorios/resumo_validacao.md | ✅ (batimento OK R$884.523,93; taxa acerto 93.5%) | soma débitos == soma planilha |
-| 007 | Integrar no painel online | opencode/big-pickle | backend/routes/conciliacao.py, services/conciliacao_service.py, frontend ConciliacaoPage.tsx | ⏸️ | fluxo testado no browser |
+| 007 | Integrar no painel online | opencode/big-pickle | backend/routes/conciliacao.py, services/conciliacao_service.py, frontend ConciliacaoPage.tsx | ✅ (fluxo validado no browser) | fluxo testado no browser |
 
 Interface:
 - 001/002 → motor/_parsed/*.json   |   003 → cruzamento.json + stats.json
