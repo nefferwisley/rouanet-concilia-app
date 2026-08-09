@@ -19,8 +19,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenState] = useState<string | null>(() => localStorage.getItem("rc_token"));
 
   function setToken(t: string | null) {
-    setTokenState(t);
-    if (t) localStorage.setItem("rc_token", t);
+    // Colar um JWT longo de uma UI de chat/navegador às vezes injeta espaço
+    // não separável (U+00A0), zero-width space ou quebra de linha do meio da
+    // seleção — qualquer caractere fora de ISO-8859-1 aí quebra o fetch()
+    // nativo com "String contains non ISO-8859-1 code point" (header inválido).
+    // Sanitiza pra sobrar só o que um JWT (base64url + pontos) realmente tem.
+    const limpo = t ? t.replace(/[^A-Za-z0-9\-_.]/g, "") : t;
+    setTokenState(limpo);
+    if (limpo) localStorage.setItem("rc_token", limpo);
     else localStorage.removeItem("rc_token");
   }
 
