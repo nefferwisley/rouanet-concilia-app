@@ -17,8 +17,11 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/projetos", tags=["auditoria"])
 
 WHERE_STATUS = {
+    # 'CONCILIADA'/'OK' não existem no enum status_conciliacao (valores reais
+    # em db/migrations/0001_schema.sql) -- esse filtro quebrava com erro de
+    # enum inválido assim que alguém clicava em "OK / Conciliadas".
     "pendente": "t.status = 'PENDENTE'",
-    "ok": "t.status in ('CONCILIADA', 'OK')",
+    "ok": "t.status = 'CONCILIADO_OK'",
     "com_docs": "t.tem_nf and t.tem_comprovante",
     "sem_docs": "not (t.tem_nf and t.tem_comprovante)",
 }
@@ -70,13 +73,29 @@ async def auditoria_projeto(
     total_filtrado = await conn.fetchval(f"select count(*) from transacoes t {where}", projeto_id)
     rows = await conn.fetch(
         f"""
+        with saldo_acumulado as (
+            -- soma corrida SEMPRE sobre todas as transações do projeto (não
+            -- sobre o filtro atual) -- "saldo restante" só faz sentido como
+            -- sequência única do orçamento, não recalculado por filtro
+            select id, sum(valor_bruto) over (
+                order by data_pagamento nulls last, created_at
+                rows between unbounded preceding and current row
+            ) as debitado_acumulado
+            from transacoes
+            where projeto_id = $1
+        )
         select t.id, t.fornecedor, t.cnpj_fornecedor, t.data_pagamento, t.valor_bruto,
                t.tem_nf, t.tem_comprovante, t.status, t.score_conciliacao,
-               dt.arquivo_ref as documento, dt.confianca_ocr
+               r.codigo as rubrica_codigo, r.descricao as rubrica_descricao,
+               dt.arquivo_ref as documento, dt.confianca_ocr,
+               sa.debitado_acumulado
         from transacoes t
+        left join despesas d on d.transacao_id = t.id
+        left join rubricas r on r.id = d.rubrica_id
+        left join saldo_acumulado sa on sa.id = t.id
         left join lateral (
-            select arquivo_ref, confianca_ocr from documentos_transacao d
-            where d.transacao_id = t.id order by created_at desc limit 1
+            select arquivo_ref, confianca_ocr from documentos_transacao doc
+            where doc.transacao_id = t.id order by created_at desc limit 1
         ) dt on true
         {where}
         order by t.data_pagamento nulls last, t.created_at
@@ -109,8 +128,14 @@ async def auditoria_projeto(
             "tem_comprovante": r["tem_comprovante"],
             "status": r["status"],
             "score_conciliacao": r["score_conciliacao"],
+            "rubrica_codigo": r["rubrica_codigo"],
+            "rubrica_descricao": r["rubrica_descricao"],
             "documento": r["documento"],
             "confianca_ocr": r["confianca_ocr"],
+            "saldo_restante": (
+                float(orcado) - float(r["debitado_acumulado"])
+                if r["debitado_acumulado"] is not None else None
+            ),
         }
         for r in rows
     ]

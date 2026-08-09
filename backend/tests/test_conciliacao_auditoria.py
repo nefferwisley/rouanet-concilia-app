@@ -97,7 +97,7 @@ def test_iniciar_importacao_requires_auth():
     "filtro, esperado",
     [
         ("pendente", "t.status = 'PENDENTE'"),
-        ("ok", "t.status in ('CONCILIADA', 'OK')"),
+        ("ok", "t.status = 'CONCILIADO_OK'"),
         ("com_docs", "t.tem_nf and t.tem_comprovante"),
         ("sem_docs", "not (t.tem_nf and t.tem_comprovante)"),
         (None, "true"),

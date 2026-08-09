@@ -22,9 +22,12 @@ interface TransacaoAuditoria {
   tem_nf: boolean;
   tem_comprovante: boolean;
   status: string;
+  rubrica_codigo?: string | null;
+  rubrica_descricao?: string | null;
   documento?: string;
   confianca_ocr?: number;
   score_conciliacao?: number;
+  saldo_restante?: number | null;
 }
 
 interface AuditoriaResponse {
@@ -154,22 +157,38 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                <th className="py-2 pr-2 font-medium">#</th>
                 <th className="py-2 pr-2 font-medium">Data</th>
                 <th className="py-2 pr-2 font-medium">Fornecedor</th>
-                <th className="py-2 pr-2 font-medium">Valor</th>
+                <th className="py-2 pr-2 font-medium">Rubrica</th>
+                <th className="py-2 pr-2 font-medium text-right">Valor</th>
+                <th className="py-2 pr-2 font-medium text-right">Saldo restante</th>
                 <th className="py-2 pr-2 font-medium">Documento</th>
                 <th className="py-2 pr-2 font-medium">Docs</th>
                 <th className="py-2 font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
-              {transacoes.map((t) => (
+              {transacoes.map((t, i) => (
                 <tr key={t.id} className="border-t border-slate-100 dark:border-slate-800">
+                  <td className="py-2 pr-2 whitespace-nowrap font-mono text-xs text-slate-400">
+                    {(page - 1) * limit + i + 1}
+                  </td>
                   <td className="py-2 pr-2 whitespace-nowrap">
                     {t.data_pagamento ? new Date(t.data_pagamento + "T00:00:00").toLocaleDateString("pt-BR") : "-"}
                   </td>
                   <td className="py-2 pr-2">{t.fornecedor || "-"}</td>
+                  <td className="py-2 pr-2 whitespace-nowrap">
+                    {t.rubrica_codigo ? (
+                      <span title={t.rubrica_descricao ?? undefined}>{t.rubrica_codigo}</span>
+                    ) : (
+                      <span className="text-amber-600 text-xs">sem rubrica</span>
+                    )}
+                  </td>
                   <td className="py-2 pr-2 text-right font-semibold whitespace-nowrap">{brl(t.valor_bruto)}</td>
+                  <td className="py-2 pr-2 text-right whitespace-nowrap text-slate-500">
+                    {t.saldo_restante != null ? brl(t.saldo_restante) : "-"}
+                  </td>
                   <td className="py-2 pr-2">
                     {t.documento ? (
                       <span className="text-slate-600 dark:text-slate-300" title={`Confiança OCR: ${t.confianca_ocr ?? "-"}`}>
@@ -190,8 +209,10 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
                   </td>
                   <td className="py-2">
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      t.status === "CONCILIADA" || t.status === "OK"
+                      t.status === "CONCILIADO_OK"
                         ? "bg-green-100 text-green-700"
+                        : t.status?.startsWith("ALERTA")
+                        ? "bg-red-100 text-red-700"
                         : "bg-amber-100 text-amber-700"
                     }`}>
                       {t.status}
