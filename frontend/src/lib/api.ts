@@ -57,6 +57,29 @@ export function apiClient(token: string | null) {
     postForm: <T,>(path: string, form: FormData) =>
       fetch(`${API_URL}${path}`, { method: "POST", headers: headers(token), body: form }).then((r) => tratar<T>(r)),
 
+    download: (path: string, filename: string) =>
+      fetch(`${API_URL}${path}`, { headers: headers(token) }).then(async (r) => {
+        if (!r.ok) {
+          let detail: unknown = r.statusText;
+          try {
+            const body = await r.json();
+            detail = body.detail ?? detail;
+          } catch {
+            /* corpo não era JSON */
+          }
+          throw new ApiError(r.status, formatarDetail(detail, r.statusText));
+        }
+        const blob = await r.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }),
+
     patch: <T,>(path: string, data: unknown) =>
       fetch(`${API_URL}${path}`, {
         method: "PATCH",

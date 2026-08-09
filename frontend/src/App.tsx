@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 
 import { Header } from "./components/Header";
+import { ConciliacaoPage } from "./pages/ConciliacaoPage";
 import { Dashboard } from "./pages/Dashboard";
 import { ImportacaoDetalhes } from "./pages/ImportacaoDetalhes";
 import { ProjetoDetalhes } from "./pages/ProjetoDetalhes";
@@ -12,6 +13,7 @@ export function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/conciliacao" element={<ConciliacaoPage />} />
         <Route path="/projeto/:id" element={<ProjetoDetalhes />} />
         <Route path="/importacao/:id" element={<ImportacaoDetalhes />} />
         <Route path="/relatorio/:id" element={<RelatorioPage />} />
