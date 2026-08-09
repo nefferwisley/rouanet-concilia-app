@@ -457,6 +457,24 @@ def cruzamento_em_memoria(comprovantes: list[dict], movimentos: list[dict]) -> d
     return cruzador.resultado()
 
 
+def _achar_duplicata(c: dict, conciliados: list[dict]) -> dict | None:
+    """Procura, entre os já CONCILIADOS, um comprovante com data+valor+favorecido
+    (normalizado) idênticos a `c` — sinal forte de que `c` é o mesmo documento
+    enviado duas vezes (mesmo pagamento, arquivo duplicado), não um segundo
+    pagamento real disputando o mesmo débito."""
+    chave_c = (c["data"], round(float(c["valor"]), 2) if c.get("valor") is not None else None,
+               normalizar(_fav(c)))
+    if not chave_c[2]:
+        return None
+    for item in conciliados:
+        cc = item["comprovante"]
+        chave_cc = (cc["data"], round(float(cc["valor"]), 2) if cc.get("valor") is not None else None,
+                    normalizar(_fav(cc)))
+        if chave_cc == chave_c:
+            return cc
+    return None
+
+
 def _para_linhas(resultado: dict) -> list[dict]:
     """Converte o resultado em-memória (classes) pro formato em lista da task 003
     (mesmo schema de motor/gerar_cruzamento.py)."""
@@ -511,6 +529,15 @@ def _para_linhas(resultado: dict) -> list[dict]:
         })
     for item in resultado["orfaos_comprovante"]:
         c = item["comprovante"]
+        duplicata = _achar_duplicata(c, resultado["conciliados"])
+        if duplicata is not None:
+            observacao = (
+                f"provável duplicata do comprovante nº {duplicata.get('numero_arquivo')} "
+                f"(mesma data/valor/favorecido, já conciliado) — confira se é o mesmo documento "
+                f"enviado duas vezes antes de tratar como pagamento à parte"
+            )
+        else:
+            observacao = item.get("observacao") or "comprovante sem débito correspondente"
         linha = _base_comp(c)
         linha.update({
             "data_pagamento": c["data"],
@@ -519,7 +546,7 @@ def _para_linhas(resultado: dict) -> list[dict]:
             "rubrica_salic": None,
             "status": "SEM-EXTRATO",
             "extrato_ref": None,
-            "observacao": item.get("observacao") or "comprovante sem débito correspondente",
+            "observacao": observacao,
         })
         linhas.append(linha)
     for item in resultado["divergentes_valor"]:
@@ -555,6 +582,15 @@ def _para_linhas(resultado: dict) -> list[dict]:
         })
     for item in resultado["ambiguos_comprovante"]:
         c = item["comprovante"]
+        duplicata = _achar_duplicata(c, resultado["conciliados"])
+        if duplicata is not None:
+            observacao = (
+                f"provável duplicata do comprovante nº {duplicata.get('numero_arquivo')} "
+                f"(mesma data/valor/favorecido, já conciliado) — confira se é o mesmo documento "
+                f"enviado duas vezes antes de tratar como pagamento à parte"
+            )
+        else:
+            observacao = "comprovante disputado por débitos: " + ", ".join(item.get("candidatos_extrato", []))
         linha = _base_comp(c)
         linha.update({
             "data_pagamento": c["data"],
@@ -563,7 +599,7 @@ def _para_linhas(resultado: dict) -> list[dict]:
             "rubrica_salic": None,
             "status": "AMBIGUO",
             "extrato_ref": None,
-            "observacao": "comprovante disputado por débitos: " + ", ".join(item.get("candidatos_extrato", [])),
+            "observacao": observacao,
         })
         linhas.append(linha)
 

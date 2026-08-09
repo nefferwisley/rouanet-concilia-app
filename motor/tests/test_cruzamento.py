@@ -12,7 +12,7 @@ para 2 débitos.
 from datetime import date
 from decimal import Decimal
 
-from motor.cruzamento import cruzamento_em_memoria
+from motor.cruzamento import _para_linhas, cruzamento_em_memoria
 
 
 def deb(data, valor, nome, doc="100.001"):
@@ -157,6 +157,48 @@ def test_aceita_formato_json_strings_e_floats():
     )
     assert nativo["stats"]["conciliados"] == 1
     assert json_path["stats"]["conciliados"] == 1
+
+
+def test_orfao_comprovante_identico_ao_conciliado_marca_provavel_duplicata():
+    """Caso real do 1961 (Amir Labaki R$945,49): dois comprovantes com data/valor/
+    favorecido idênticos, um único débito no extrato. Regra 6 (fungíveis) casa
+    1 e sobra o outro como SEM-EXTRATO (órfão comprovante) — que antes só dizia
+    'comprovante sem débito correspondente', sem indicar que o comprovante
+    conciliado ao lado é quase certamente o mesmo documento enviado duas vezes."""
+    r = cruzamento_em_memoria(
+        [
+            comp(date(2023, 10, 9), Decimal("945.49"), "AMIR LABAKI", num=59),
+            comp(date(2023, 10, 9), Decimal("945.49"), "AMIR LABAKI", num=60),
+        ],
+        [deb(date(2023, 10, 9), Decimal("945.49"), "AMIR LABAKI")],
+    )
+    assert r["stats"]["conciliados"] == 1
+    assert r["stats"]["orfaos_comprovante"] == 1
+    assert r["stats"]["ambiguos"] == 0
+
+    linhas = _para_linhas(r)
+    orfao = next(l for l in linhas if l["status"] == "SEM-EXTRATO")
+    assert orfao["numero_arquivo"] == 60
+    assert "provável duplicata do comprovante nº 59" in orfao["observacao"]
+    assert "já conciliado" in orfao["observacao"]
+
+
+def test_ambiguo_comprovante_sem_gemeo_conciliado_mantem_texto_generico():
+    """Quando o comprovante disputado NÃO tem gêmeo idêntico entre os
+    conciliados (é uma disputa de verdade entre nomes diferentes), o texto
+    genérico de disputa continua valendo — só o caso de duplicata literal
+    ganha a mensagem específica."""
+    r = cruzamento_em_memoria(
+        [comp(date(2023, 10, 25), Decimal("500.00"), None, num=1)],
+        [
+            deb(date(2023, 10, 25), Decimal("500.00"), "A"),
+            deb(date(2023, 10, 25), Decimal("500.00"), "B"),
+        ],
+    )
+    linhas = _para_linhas(r)
+    ambiguo_comp = next(l for l in linhas if l["status"] == "AMBIGUO" and l["numero_arquivo"] == 1)
+    assert "provável duplicata" not in ambiguo_comp["observacao"]
+    assert "disputado por débitos" in ambiguo_comp["observacao"]
 
 
 def test_nao_muta_as_entradas():
