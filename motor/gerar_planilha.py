@@ -7,11 +7,17 @@ Entrada:
 
 Saídas:
     saida/planilha/planilha_corrigida.xlsx
-    motor/_parsed/planilha_linhas.json   (referência p/ a task 005, MESMA ordem)
+    motor/_parsed/planilha_linhas.json   (referência p/ a task 005)
 
 Uma linha = um pagamento (conciliados + órfãos + divergentes + ambíguos).
-O cruzamento não traz rubrica SALIC -> todas as linhas ficam "(a classificar)"
-(nunca inventar; contagem reportada ao board).
+O cruzamento não traz rubrica SALIC -> coluna fica "(a classificar)" (nunca
+inventar; contagem reportada ao board).
+
+planilha_linhas.json só lista as linhas QUE TÊM comprovante (arquivo final),
+na mesma ordem das linhas da planilha — é o conjunto que a task 005 copia.
+Linhas SEM-COMPROVANTE ficam com a coluna "Arquivo Final" vazia.
+Comprovante com valor ilegível (<= 0) -> arquivo final = nome original em
+"saida/arquivos_finais/PENDENTES/" (regra da task 005).
 
 Colunas (ordem fixa): Nº, Data pagamento, Favorecido, CNPJ/CPF, Rubrica SALIC,
 Valor, Status, Arquivo Final, Observação.
@@ -34,6 +40,7 @@ XLSX = PASTA_PLANILHA / "planilha_corrigida.xlsx"
 LINHAS_JSON = PARSED / "planilha_linhas.json"
 
 RUBRICA = "(a classificar)"
+PENDENTES = "PENDENTES"
 
 # classe (task 003) -> status (vocabulário da planilha)
 CLASSE_PARA_STATUS = {
@@ -127,6 +134,9 @@ def _linhas_brutas(cruz) -> list[dict]:
                     "valor": _valor_comprovante(c) if _valor_comprovante(c) is not None else _valor_debito(d),
                     "status": status,
                     "obs": "",
+                    "numero_arquivo": c.get("numero_arquivo"),
+                    "fonte_comprovante": c.get("fonte"),
+                    "valor_comprovante": _valor_comprovante(c),
                 })
             elif classe == "ambiguos_extrato":
                 d = item["debito"]
@@ -137,6 +147,9 @@ def _linhas_brutas(cruz) -> list[dict]:
                     "valor": _valor_debito(d),
                     "status": status,
                     "obs": "débito disputado por comprovantes: " + _resumo_unicos(item.get("candidatos_comprovantes", [])),
+                    "numero_arquivo": None,
+                    "fonte_comprovante": None,
+                    "valor_comprovante": None,
                 })
             elif classe == "ambiguos_comprovante":
                 c = item["comprovante"]
@@ -147,6 +160,9 @@ def _linhas_brutas(cruz) -> list[dict]:
                     "valor": _valor_comprovante(c) if _valor_comprovante(c) is not None else 0.0,
                     "status": status,
                     "obs": "comprovante disputado por débitos: " + _resumo_unicos(item.get("candidatos_extrato", [])),
+                    "numero_arquivo": c.get("numero_arquivo"),
+                    "fonte_comprovante": c.get("fonte"),
+                    "valor_comprovante": _valor_comprovante(c),
                 })
             elif classe == "divergentes_valor":
                 d, c = item["debito"], item["comprovante"]
@@ -157,6 +173,9 @@ def _linhas_brutas(cruz) -> list[dict]:
                     "valor": _valor_debito(d),
                     "status": status,
                     "obs": item.get("motivo", ""),
+                    "numero_arquivo": c.get("numero_arquivo"),
+                    "fonte_comprovante": c.get("fonte"),
+                    "valor_comprovante": _valor_comprovante(c),
                 })
             elif classe == "orfaos_extrato":
                 d = item["debito"]
@@ -167,6 +186,9 @@ def _linhas_brutas(cruz) -> list[dict]:
                     "valor": _valor_debito(d),
                     "status": status,
                     "obs": item.get("observacao", ""),
+                    "numero_arquivo": None,
+                    "fonte_comprovante": None,
+                    "valor_comprovante": None,
                 })
             else:  # orfaos_comprovante
                 c = item["comprovante"]
@@ -177,6 +199,9 @@ def _linhas_brutas(cruz) -> list[dict]:
                     "valor": _valor_comprovante(c) if _valor_comprovante(c) is not None else 0.0,
                     "status": status,
                     "obs": item.get("observacao", ""),
+                    "numero_arquivo": c.get("numero_arquivo"),
+                    "fonte_comprovante": c.get("fonte"),
+                    "valor_comprovante": _valor_comprovante(c),
                 })
     return linhas
 
@@ -184,6 +209,15 @@ def _linhas_brutas(cruz) -> list[dict]:
 def _arquivo_final(num, data, valor, favorecido):
     slug_fav = _slug(_sem_sufixo_truncado(favorecido)) or "sem_favorecido"
     return f"{num:04d}_{RUBRICA}_{_data_ddmm(data)}_{_valor_br(valor)}_{slug_fav}.pdf"
+
+
+def _destino_linha(ln):
+    """Subpasta + arquivo final de cada linha (None se a linha não tem comprovante)."""
+    if ln["numero_arquivo"] is None:
+        return None, None
+    if ln["valor_comprovante"] is None or ln["valor_comprovante"] <= 0:
+        return PENDENTES, ln["fonte_comprovante"]
+    return RUBRICA, _arquivo_final(ln["num"], ln["data"], ln["valor"], ln["favorecido"])
 
 
 def _gerar_xlsx(linhas):
@@ -197,24 +231,25 @@ def _gerar_xlsx(linhas):
         ws.cell(row=1, column=col).fill = PatternFill("solid", fgColor="DDEBF7")
         ws.cell(row=1, column=col).alignment = Alignment(vertical="center")
 
-    for n, ln in enumerate(linhas, start=1):
+    for ln in linhas:
+        arq = ln["arquivo_final"]
         ws.append([
-            n,
+            ln["num"],
             ln["data"],
             ln["favorecido"],
             ln["cnpj"] or "",
             RUBRICA,
             ln["valor"],
             ln["status"],
-            ln["arquivo_final"],
+            (f"{ln['subpasta']}\\{arq}" if arq else ""),
             ln["obs"],
         ])
-        ws.cell(row=n + 1, column=6).number_format = "#,##0.00"
+        ws.cell(row=ws.max_row, column=6).number_format = "#,##0.00"
 
     ws.freeze_panes = "A2"
     ws.auto_filter.ref = ws.dimensions
 
-    larguras = [6, 13, 42, 20, 17, 13, 16, 58, 60]
+    larguras = [6, 13, 42, 20, 17, 13, 16, 62, 60]
     for i, w in enumerate(larguras, start=1):
         ws.column_dimensions[get_column_letter(i)].width = w
 
@@ -229,30 +264,36 @@ def main():
     usados = Counter()
     linhas = []
     for n, ln in enumerate(brutas, start=1):
-        nome = _arquivo_final(n, ln["data"], ln["valor"], ln["favorecido"])
-        usados[nome] += 1
-        if usados[nome] > 1:
-            nome = f"{nome[:-4]}_{usados[nome]}.pdf"
-        linhas.append({**ln, "arquivo_final": nome})
+        ln = {**ln, "num": n}
+        subpasta, arq = _destino_linha(ln)
+        if arq:
+            usados[arq] += 1
+            if usados[arq] > 1:
+                arq = f"{arq[:-4]}_{usados[arq]}.pdf"
+        linhas.append({**ln, "subpasta": subpasta, "arquivo_final": arq})
 
     _gerar_xlsx(linhas)
 
     ref = [
         {
             "arquivo_final": ln["arquivo_final"],
-            "subpasta": RUBRICA,
+            "subpasta": ln["subpasta"],
             "data": ln["data"],
             "valor": ln["valor"],
+            "numero_arquivo": ln["numero_arquivo"],
         }
         for ln in linhas
+        if ln["arquivo_final"]
     ]
-    (LINHAS_JSON).write_text(json.dumps(ref, ensure_ascii=False, indent=1), encoding="utf-8")
+    LINHAS_JSON.write_text(json.dumps(ref, ensure_ascii=False, indent=1), encoding="utf-8")
 
     return {
         "arquivo": str(XLSX),
         "linhas": len(linhas),
+        "com_arquivo_final": len(ref),
         "por_status": dict(Counter(ln["status"] for ln in linhas)),
         "rubrica": RUBRICA,
+        "pendentes": sum(1 for ln in linhas if ln["subpasta"] == PENDENTES),
     }
 
 
