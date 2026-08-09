@@ -9,11 +9,15 @@ calculado ao vivo a partir do banco, pra qualquer projeto.
 Não grava nada — é uma visão computada sobre transacoes/despesas/rubricas/
 documentos_transacao que já existem.
 """
+import io
 import logging
 import re
 import unicodedata
+import zipfile
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 
 from backend.database import get_conn
 
@@ -50,7 +54,19 @@ async def organizacao_documental(projeto_id: str, dep=Depends(get_conn)):
     if not projeto:
         raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
 
-    rows = await conn.fetch(
+    rows = await _buscar_itens_organizacao(conn, projeto_id)
+    itens = _montar_itens(rows)
+
+    sem_rubrica = sum(1 for it in itens if it["sem_rubrica"])
+    return {
+        "total": len(itens),
+        "sem_rubrica": sem_rubrica,
+        "itens": itens,
+    }
+
+
+async def _buscar_itens_organizacao(conn, projeto_id: str):
+    return await conn.fetch(
         """
         select t.id, t.fornecedor, t.data_pagamento, t.valor_bruto, t.tem_nf, t.tem_comprovante,
                r.codigo as rubrica_codigo, r.descricao as rubrica_descricao,
@@ -71,6 +87,8 @@ async def organizacao_documental(projeto_id: str, dep=Depends(get_conn)):
         projeto_id,
     )
 
+
+def _montar_itens(rows) -> list[dict]:
     itens = []
     for i, r in enumerate(rows, start=1):
         itens.append({
@@ -89,13 +107,55 @@ async def organizacao_documental(projeto_id: str, dep=Depends(get_conn)):
             ),
             "sem_rubrica": r["rubrica_codigo"] is None,
         })
+    return itens
 
-    sem_rubrica = sum(1 for it in itens if it["sem_rubrica"])
-    return {
-        "total": len(itens),
-        "sem_rubrica": sem_rubrica,
-        "itens": itens,
-    }
+
+@router.get("/{projeto_id}/organizacao/download")
+async def baixar_pasta_organizada(projeto_id: str, dep=Depends(get_conn)):
+    """Gera um .zip com os documentos já anexados (documentos_transacao),
+    renomeados conforme nome_padronizado e agrupados por rubrica — o
+    resultado esperado real da Etapa 4 ("documentação organizada pra
+    conferência e prestação de contas"), sem mover nada no disco de
+    produção. Itens sem documento anexado entram listados num
+    FALTANTES.txt em vez de silenciosamente sumir do pacote."""
+    conn, _ = dep
+
+    projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
+    if not projeto:
+        raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
+
+    rows = await _buscar_itens_organizacao(conn, projeto_id)
+    itens = _montar_itens(rows)
+
+    buffer = io.BytesIO()
+    faltantes = []
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+        for it in itens:
+            pasta = it["rubrica_codigo"] or "sem_rubrica"
+            if not it["documento_atual"]:
+                faltantes.append(f"{it['nome_padronizado']} — {it['fornecedor'] or 'sem fornecedor'}")
+                continue
+            origem = Path(it["documento_atual"])
+            if not origem.is_file():
+                faltantes.append(f"{it['nome_padronizado']} — arquivo não está mais em disco ({origem.name})")
+                continue
+            sufixo = origem.suffix or ".pdf"
+            nome_no_zip = f"{pasta}/{Path(it['nome_padronizado']).stem}{sufixo}"
+            zf.write(origem, nome_no_zip)
+
+        if faltantes:
+            zf.writestr(
+                "FALTANTES.txt",
+                "Lançamentos sem documento anexado (não entraram na pasta):\n\n"
+                + "\n".join(faltantes),
+            )
+
+    buffer.seek(0)
+    return StreamingResponse(
+        buffer,
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="organizacao_{projeto_id}.zip"'},
+    )
 
 
 @router.get("/{projeto_id}/checklist-final")

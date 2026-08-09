@@ -3,9 +3,9 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { OrganizacaoDocumental } from './OrganizacaoDocumental';
-import { mockGet } from '../test/setup';
+import { mockGet, mockDownload } from '../test/setup';
 
 const mockOrganizacao = {
   total: 2,
@@ -45,6 +45,7 @@ const mockOrganizacao = {
 describe('OrganizacaoDocumental', () => {
   beforeEach(() => {
     mockGet.mockClear();
+    mockDownload.mockClear();
     mockGet.mockResolvedValue(mockOrganizacao);
   });
 
@@ -71,6 +72,20 @@ describe('OrganizacaoDocumental', () => {
 
     await waitFor(() => {
       expect(screen.getByText('sem rubrica')).toBeInTheDocument();
+    });
+  });
+
+  it('botão de download chama /organizacao/download', async () => {
+    render(<OrganizacaoDocumental projetoId="projeto-123" />);
+
+    await waitFor(() => screen.getByText(/Baixar pasta organizada/i));
+    fireEvent.click(screen.getByText(/Baixar pasta organizada/i));
+
+    await waitFor(() => {
+      expect(mockDownload).toHaveBeenCalledWith(
+        '/api/v1/projetos/projeto-123/organizacao/download',
+        'organizacao_projeto-123.zip'
+      );
     });
   });
 

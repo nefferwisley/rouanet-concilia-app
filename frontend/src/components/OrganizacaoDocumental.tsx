@@ -30,10 +30,11 @@ const brl = (v: number | null | undefined) =>
  *  (a mesma sequência usada na pasta final de prestação de contas) e
  *  mostra o nome de arquivo padronizado que cada documento deveria ter. */
 export function OrganizacaoDocumental({ projetoId }: { projetoId: string }) {
-  const { get } = useAPI();
+  const { get, download } = useAPI();
   const [dados, setDados] = useState<OrganizacaoResponse | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+  const [baixando, setBaixando] = useState(false);
 
   const carregar = async () => {
     try {
@@ -51,6 +52,20 @@ export function OrganizacaoDocumental({ projetoId }: { projetoId: string }) {
     carregar();
   }, [projetoId]);
 
+  const baixarPastaOrganizada = async () => {
+    setBaixando(true);
+    try {
+      await download(
+        `/api/v1/projetos/${projetoId}/organizacao/download`,
+        `organizacao_${projetoId}.zip`
+      );
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Falha ao baixar a pasta organizada.");
+    } finally {
+      setBaixando(false);
+    }
+  };
+
   if (carregando) return <div className="text-sm text-slate-500">Carregando organização documental...</div>;
   if (erro) return <div className="text-sm text-red-600">{erro}</div>;
   if (!dados) return null;
@@ -66,9 +81,14 @@ export function OrganizacaoDocumental({ projetoId }: { projetoId: string }) {
               {dados.sem_rubrica > 0 ? ` ${dados.sem_rubrica} sem rubrica atribuída.` : " todos com rubrica."}
             </p>
           </div>
-          <button className="btn-secondary text-xs" onClick={carregar}>
-            🔄 Atualizar
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="btn-secondary text-xs" onClick={carregar}>
+              🔄 Atualizar
+            </button>
+            <button className="btn-primary text-xs" disabled={baixando} onClick={baixarPastaOrganizada}>
+              {baixando ? "Gerando…" : "📦 Baixar pasta organizada (.zip)"}
+            </button>
+          </div>
         </div>
       </div>
 

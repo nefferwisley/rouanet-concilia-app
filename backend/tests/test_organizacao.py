@@ -16,6 +16,11 @@ def test_organizacao_documental_requires_auth():
     assert response.status_code == 401
 
 
+def test_baixar_pasta_organizada_requires_auth():
+    response = client.get("/api/v1/projetos/fake-uuid/organizacao/download")
+    assert response.status_code == 401
+
+
 def test_slugificar_remove_acentos_e_pontuacao():
     assert slugificar("José da Silva & Cia.") == "jose_da_silva_cia"
 
