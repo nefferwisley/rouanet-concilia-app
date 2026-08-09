@@ -6,7 +6,19 @@ from fastapi.responses import JSONResponse
 
 from backend.config import settings
 from backend.database import close_pool, get_pool
-from backend.routes import auditoria, conciliacao, documentos, importacoes, organizacao, projetos, relatorios, revisao, salic, websocket
+from backend.routes import (
+    auditoria,
+    conciliacao,
+    documentos,
+    importacoes,
+    organizacao,
+    projetos,
+    regularizacao,
+    relatorios,
+    revisao,
+    salic,
+    websocket,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 log = logging.getLogger("rouanet-api")
@@ -30,6 +42,7 @@ app.include_router(auditoria.router)
 app.include_router(revisao.router)
 app.include_router(salic.router)
 app.include_router(organizacao.router)
+app.include_router(regularizacao.router)
 
 
 @app.on_event("startup")

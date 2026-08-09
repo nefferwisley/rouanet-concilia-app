@@ -96,3 +96,70 @@ async def organizacao_documental(projeto_id: str, dep=Depends(get_conn)):
         "sem_rubrica": sem_rubrica,
         "itens": itens,
     }
+
+
+@router.get("/{projeto_id}/checklist-final")
+async def checklist_final(projeto_id: str, dep=Depends(get_conn)):
+    """Etapa 6 — organização final: agrega o que falta pra considerar a
+    prestação de contas pronta. Uma transação está 'resolvida' se tem os
+    dois documentos (NF + comprovante) OU se a regularização dela (Etapa 5)
+    já voltou assinada. Não grava nada, só computa sobre as tabelas
+    existentes (transacoes, campos_revisao, regularizacoes)."""
+    conn, _ = dep
+
+    projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
+    if not projeto:
+        raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
+
+    total = await conn.fetchval("select count(*) from transacoes where projeto_id = $1", projeto_id)
+
+    pendentes = await conn.fetch(
+        """
+        select t.id, t.fornecedor, t.data_pagamento, t.valor_bruto, r.status as regularizacao_status
+        from transacoes t
+        left join regularizacoes r on r.transacao_id = t.id
+        where t.projeto_id = $1
+          and not (t.tem_nf and t.tem_comprovante)
+          and coalesce(r.status, 'PENDENTE_GERACAO') <> 'ASSINADO'
+        order by t.data_pagamento nulls last
+        """,
+        projeto_id,
+    )
+
+    revisoes_pendentes = await conn.fetchval(
+        """
+        select count(*) from campos_revisao r
+        join transacoes t on t.id = r.transacao_id
+        where t.projeto_id = $1 and r.status_revisao = 'PENDENTE'
+        """,
+        projeto_id,
+    )
+
+    regularizacoes_por_status = await conn.fetch(
+        """
+        select r.status, count(*)::int as total
+        from regularizacoes r join transacoes t on t.id = r.transacao_id
+        where t.projeto_id = $1 group by r.status
+        """,
+        projeto_id,
+    )
+
+    pendentes_lista = [
+        {
+            "transacao_id": str(p["id"]),
+            "fornecedor": p["fornecedor"],
+            "data_pagamento": p["data_pagamento"].isoformat() if p["data_pagamento"] else None,
+            "valor_bruto": float(p["valor_bruto"]) if p["valor_bruto"] is not None else None,
+            "regularizacao_status": p["regularizacao_status"],
+        }
+        for p in pendentes
+    ]
+
+    return {
+        "total_transacoes": total,
+        "documentacao_pendente": len(pendentes_lista),
+        "revisoes_pendentes": revisoes_pendentes,
+        "regularizacoes_por_status": {r["status"]: r["total"] for r in regularizacoes_por_status},
+        "pendencias": pendentes_lista,
+        "pronto_para_prestacao": len(pendentes_lista) == 0 and revisoes_pendentes == 0,
+    }
