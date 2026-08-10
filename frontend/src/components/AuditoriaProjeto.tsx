@@ -208,12 +208,12 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
                     <span title="Comprovante anexado">{t.tem_comprovante ? "🏦" : "⬜"}</span>
                   </td>
                   <td className="py-2">
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                    <span className={`pill ${
                       t.status === "CONCILIADO_OK"
-                        ? "bg-green-100 text-green-700"
+                        ? "pill-sucesso"
                         : t.status?.startsWith("ALERTA")
-                        ? "bg-red-100 text-red-700"
-                        : "bg-amber-100 text-amber-700"
+                        ? "pill-erro"
+                        : "pill-alerta"
                     }`}>
                       {t.status}
                     </span>

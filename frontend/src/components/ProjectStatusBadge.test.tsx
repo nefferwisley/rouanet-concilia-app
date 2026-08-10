@@ -37,9 +37,9 @@ describe('ProjectStatusBadge', () => {
     expect(screen.getByText('❌')).toBeInTheDocument();
   });
 
-  it('aplica classes Tailwind corretas para cada status', () => {
+  it('aplica classes de pílula corretas para cada status', () => {
     const { container } = render(<ProjectStatusBadge status="sucesso" />);
     const badge = container.querySelector('span');
-    expect(badge).toHaveClass('bg-green-100', 'text-green-700');
+    expect(badge).toHaveClass('pill', 'pill-sucesso');
   });
 });

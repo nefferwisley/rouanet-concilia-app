@@ -88,7 +88,7 @@ describe('AuditoriaProjeto', () => {
 
     await waitFor(() => {
       const badge = screen.getByText('CONCILIADO_OK');
-      expect(badge.className).toContain('bg-green-100');
+      expect(badge.className).toContain('pill-sucesso');
     });
   });
 });

@@ -3,17 +3,33 @@
 @tailwind utilities;
 
 .btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white rounded px-3 py-1.5 text-sm font-medium disabled:opacity-50;
+  @apply bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-1.5 text-sm font-medium disabled:opacity-50;
 }
 .btn-secondary {
-  @apply bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 rounded px-3 py-1.5 text-sm font-medium;
+  @apply bg-slate-200 dark:bg-white/[0.04] text-slate-700 dark:text-slate-50 hover:bg-slate-300 dark:hover:bg-white/10 rounded-lg px-3 py-1.5 text-sm font-medium;
 }
 .btn-danger {
-  @apply bg-red-600 hover:bg-red-700 text-white rounded px-3 py-1.5 text-sm font-medium;
+  @apply bg-red-600 hover:bg-red-700 text-white rounded-lg px-3 py-1.5 text-sm font-medium;
 }
 .input {
-  @apply w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded px-3 py-1.5 text-sm;
+  @apply w-full border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900/70 dark:text-slate-50 rounded-lg px-3 py-1.5 text-sm;
 }
 .card {
-  @apply bg-white dark:bg-slate-800 rounded-lg p-4 shadow;
+  @apply bg-white dark:bg-navy-800 border border-transparent dark:border-navy-700 rounded-2xl p-4 shadow dark:shadow-[0_15px_35px_-15px_rgba(0,0,0,0.6)];
+}
+
+.pill {
+  @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium;
+}
+.pill-sucesso {
+  @apply bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400;
+}
+.pill-alerta {
+  @apply bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400;
+}
+.pill-erro {
+  @apply bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400;
+}
+.pill-neutro {
+  @apply bg-slate-100 text-slate-700 dark:bg-white/[0.06] dark:text-slate-300;
 }

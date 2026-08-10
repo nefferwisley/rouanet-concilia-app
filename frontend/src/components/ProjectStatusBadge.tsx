@@ -9,31 +9,31 @@ interface ProjectStatusBadgeProps {
   status: 'iniciando' | 'em_progresso' | 'sucesso' | 'concluido' | 'erro';
 }
 
-const statusConfig: Record<string, { emoji: string; label: string; color: string }> = {
+const statusConfig: Record<string, { emoji: string; label: string; pill: string }> = {
   iniciando: {
     emoji: '⏳',
     label: 'Iniciando',
-    color: 'bg-gray-100 text-gray-700',
+    pill: 'pill-neutro',
   },
   em_progresso: {
     emoji: '⚙️',
     label: 'Em Progresso',
-    color: 'bg-blue-100 text-blue-700',
+    pill: 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300',
   },
   sucesso: {
     emoji: '✅',
     label: 'Sucesso',
-    color: 'bg-green-100 text-green-700',
+    pill: 'pill-sucesso',
   },
   concluido: {
     emoji: '🎉',
     label: 'Concluído',
-    color: 'bg-green-100 text-green-700',
+    pill: 'pill-sucesso',
   },
   erro: {
     emoji: '❌',
     label: 'Erro',
-    color: 'bg-red-100 text-red-700',
+    pill: 'pill-erro',
   },
 };
 
@@ -41,7 +41,7 @@ export const ProjectStatusBadge: React.FC<ProjectStatusBadgeProps> = ({ status }
   const config = statusConfig[status] || statusConfig.erro;
 
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded ${config.color}`}>
+    <span className={`pill ${config.pill}`}>
       <span>{config.emoji}</span>
       <span>{config.label}</span>
     </span>

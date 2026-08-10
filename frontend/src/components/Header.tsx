@@ -10,9 +10,9 @@ export function Header() {
   const [rascunho, setRascunho] = useState(token ?? "");
 
   return (
-    <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+    <nav className="bg-white dark:bg-navy-800 border-b border-slate-200 dark:border-navy-700">
       <div className="flex justify-between items-center px-6 py-4 max-w-6xl mx-auto">
-        <h1 className="text-xl font-bold">RouanetConcilia</h1>
+        <h1 className="text-xl font-bold tracking-tight">RouanetConcilia</h1>
         <div className="flex items-center gap-3">
           {editando ? (
             <div className="flex items-center gap-2">
