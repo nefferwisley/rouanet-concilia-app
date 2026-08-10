@@ -34,6 +34,7 @@ services:
       SUPABASE_JWT_SECRET: "dev-secret-key-min-32-chars-long-!!!"
       GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
       CORS_ORIGINS: "http://localhost:5173,http://localhost:3000"
+      UPLOAD_DIR: /app/uploads
       PYTHONUNBUFFERED: 1
     ports:
       - "8000:8000"
@@ -43,6 +44,7 @@ services:
     volumes:
       - ./backend:/app/backend
       - ./motor:/app/motor
+      - uploads:/app/uploads
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     networks:
       - rouanet_network
@@ -74,6 +76,7 @@ services:
 
 volumes:
   postgres_data:
+  uploads:
 
 networks:
   rouanet_network:
