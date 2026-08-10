@@ -123,7 +123,7 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
       <div className="card">
         <div className="flex justify-between items-center flex-wrap gap-2">
           <div>
-            <h3 className="font-bold">🏦 Conciliação Extrato × Lançamentos</h3>
+            <h3 className="section-title">🏦 Conciliação Extrato × Lançamentos</h3>
             <p className="text-xs text-slate-500 mt-0.5">
               {pendentesCount} movimento(s) pendente(s) de conciliação no extrato bancário.
             </p>

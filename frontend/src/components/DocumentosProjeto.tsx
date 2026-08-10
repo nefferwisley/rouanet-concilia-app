@@ -51,7 +51,7 @@ export function DocumentosProjeto({ projetoId }: { projetoId: string }) {
   return (
     <div className="card">
       <div className="flex justify-between items-center mb-2">
-        <h3 className="font-semibold text-sm">Documentos-fonte ({documentos.length})</h3>
+        <h3 className="section-title text-sm">📁 Documentos-fonte ({documentos.length})</h3>
         {temLinkPendente && (
           <button className="btn-secondary text-xs" onClick={sincronizar} disabled={sincronizando}>
             {sincronizando ? "Sincronizando..." : "🔄 Sincronizar Drive"}

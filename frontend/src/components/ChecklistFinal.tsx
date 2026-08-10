@@ -70,7 +70,7 @@ export function ChecklistFinal({ projetoId }: { projetoId: string }) {
       <div className={`card border-l-4 ${dados.pronto_para_prestacao ? "border-l-green-500" : "border-l-amber-500"}`}>
         <div className="flex justify-between items-center flex-wrap gap-2">
           <div>
-            <h3 className="font-bold">
+            <h3 className="section-title">
               {dados.pronto_para_prestacao ? "✅ Pronto pra prestação de contas" : "⏳ Organização Final — Etapa 6"}
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">

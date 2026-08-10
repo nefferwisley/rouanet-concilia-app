@@ -81,7 +81,7 @@ export function RevisaoManual({ projetoId }: { projetoId: string }) {
     <div className="space-y-4">
       <div className="card">
         <div className="flex justify-between items-center">
-          <h3 className="font-bold">📝 Revisão Manual ({pendentes.length} pendentes)</h3>
+          <h3 className="section-title">📝 Revisão Manual ({pendentes.length} pendentes)</h3>
           <button className="btn-secondary text-xs" onClick={carregar}>
             🔄 Atualizar
           </button>

@@ -75,7 +75,7 @@ export function OrganizacaoDocumental({ projetoId }: { projetoId: string }) {
       <div className="card">
         <div className="flex justify-between items-center flex-wrap gap-2">
           <div>
-            <h3 className="font-bold">🗂 Organização Documental</h3>
+            <h3 className="section-title">🗂 Organização Documental</h3>
             <p className="text-xs text-slate-500 mt-0.5">
               {dados.total} lançamento(s), ordenados por rubrica e data —
               {dados.sem_rubrica > 0 ? ` ${dados.sem_rubrica} sem rubrica atribuída.` : " todos com rubrica."}

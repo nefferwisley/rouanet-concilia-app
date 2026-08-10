@@ -84,7 +84,7 @@ export function Regularizacao({ projetoId }: { projetoId: string }) {
       <div className="card">
         <div className="flex justify-between items-center">
           <div>
-            <h3 className="font-bold">📝 Regularização Documental</h3>
+            <h3 className="section-title">📝 Regularização Documental</h3>
             <p className="text-xs text-slate-500 mt-0.5">
               Lançamentos sem comprovante original que estão em processo de regularização
               (recibo a assinar).

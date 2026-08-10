@@ -89,7 +89,7 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
       {/* Demonstrativo */}
       <div className="card space-y-3">
         <div className="flex justify-between items-center">
-          <h3 className="font-bold">📊 Demonstrativo de Saldos</h3>
+          <h3 className="section-title">📊 Demonstrativo de Saldos</h3>
           <button className="btn-secondary text-xs" onClick={() => download(`/api/v1/projetos/${projetoId}/auditoria?format=csv`, `auditoria_${projetoId}.csv`)}>
             ⬇ Exportar CSV
           </button>
@@ -146,7 +146,7 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
       {/* Tabela de lançamentos */}
       <div className="card">
         <div className="flex justify-between items-center mb-3 gap-2 flex-wrap">
-          <h3 className="font-bold">🧾 Lançamentos ({total})</h3>
+          <h3 className="section-title">🧾 Lançamentos ({total})</h3>
           <select className="input w-56" value={filtro} onChange={(e) => { setFiltro(e.target.value); setPage(1); }}>
             {FILTROS.map((f) => (
               <option key={f.valor} value={f.valor}>{f.rotulo}</option>

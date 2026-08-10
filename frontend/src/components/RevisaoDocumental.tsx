@@ -122,7 +122,7 @@ export function RevisaoDocumental({ projetoId }: { projetoId: string }) {
     <div className="space-y-4">
       <div className="card">
         <div className="flex justify-between items-center flex-wrap gap-2">
-          <h3 className="font-bold">🖨 Revisão Documental</h3>
+          <h3 className="section-title">🖨 Revisão Documental</h3>
           <label className="text-xs text-slate-500 flex items-center gap-1">
             Chave Gemini (opcional; sem ela o doc é anexado sem OCR)
             <input

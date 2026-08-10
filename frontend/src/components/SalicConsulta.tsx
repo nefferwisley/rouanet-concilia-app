@@ -46,7 +46,7 @@ export function SalicConsulta({ pronacInicial }: { pronacInicial?: string }) {
     <div className="card space-y-3">
       <div className="flex justify-between items-center flex-wrap gap-2">
         <div>
-          <h3 className="font-bold">🏛 Consulta Pública SALIC (MinC)</h3>
+          <h3 className="section-title">🏛 Consulta Pública SALIC (MinC)</h3>
           <p className="text-xs text-slate-500 mt-0.5">
             Dados oficiais obtidos diretamente da API aberta do Ministério da Cultura.
           </p>

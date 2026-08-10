@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { ImportarModal } from "./ImportarModal";
 import { AuditoriaProjeto } from "../components/AuditoriaProjeto";
@@ -58,21 +58,38 @@ export function ProjetoDetalhes() {
     );
   }
 
-  if (carregando || !projeto) return <div className="max-w-3xl mx-auto p-6">Carregando...</div>;
+  if (carregando || !projeto) {
+    return (
+      <div className="max-w-6xl mx-auto p-6 space-y-4 animate-pulse">
+        <div className="h-20 card" />
+        <div className="h-32 card" />
+        <div className="h-48 card" />
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-4">
+    <div className="max-w-6xl mx-auto p-6 space-y-4">
+      <Link
+        to="/"
+        className="text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1"
+      >
+        ← Projetos
+      </Link>
+
       <div className="card">
-        <div className="flex justify-between items-start">
+        <div className="flex flex-wrap justify-between items-start gap-4">
           <div>
-            <h2 className="text-lg font-bold">{projeto.nome}</h2>
-            <p className="text-sm text-slate-500">{projeto.pronac}</p>
-            {projeto.proponente && <p className="text-sm text-slate-600">Proponente: {projeto.proponente}</p>}
-            {projeto.banco && <p className="text-sm text-slate-600">Banco: {projeto.banco}</p>}
+            <p className="eyebrow">{projeto.pronac}</p>
+            <h1 className="text-xl font-bold tracking-tight mt-0.5">{projeto.nome}</h1>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-slate-500 dark:text-slate-400">
+              {projeto.proponente && <span>👤 {projeto.proponente}</span>}
+              {projeto.banco && <span>🏦 {projeto.banco}</span>}
+            </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 shrink-0">
             <button
-              className="px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+              className="px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors"
               onClick={() => setMostrarEditar(true)}
             >
               ✏️ Editar

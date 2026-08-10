@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
@@ -10,10 +11,15 @@ export function Header() {
   const [rascunho, setRascunho] = useState(token ?? "");
 
   return (
-    <nav className="bg-white dark:bg-navy-800 border-b border-slate-200 dark:border-navy-700">
-      <div className="flex justify-between items-center px-6 py-4 max-w-6xl mx-auto">
-        <h1 className="text-xl font-bold tracking-tight">RouanetConcilia</h1>
-        <div className="flex items-center gap-3">
+    <nav className="sticky top-0 z-40 bg-white/90 dark:bg-navy-800/90 backdrop-blur border-b border-slate-200 dark:border-navy-700">
+      <div className="flex justify-between items-center px-6 py-3.5 max-w-6xl mx-auto">
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <span className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center text-sm font-bold shadow-sm group-hover:shadow-md transition-shadow">
+            RC
+          </span>
+          <span className="text-lg font-bold tracking-tight">RouanetConcilia</span>
+        </Link>
+        <div className="flex items-center gap-2">
           {editando ? (
             <div className="flex items-center gap-2">
               <input
@@ -34,10 +40,14 @@ export function Header() {
             </div>
           ) : (
             <button className="btn-secondary" onClick={() => setEditando(true)}>
-              {token ? "Token: ••••••" : "Definir token"}
+              {token ? "🔑 Conectado" : "Definir token"}
             </button>
           )}
-          <button className="btn-secondary" onClick={toggle} title="Alternar tema">
+          <button
+            className="h-8 w-8 flex items-center justify-center rounded-lg bg-slate-200 dark:bg-white/[0.04] hover:bg-slate-300 dark:hover:bg-white/10 transition-colors"
+            onClick={toggle}
+            title="Alternar tema"
+          >
             {dark ? "🌙" : "☀️"}
           </button>
         </div>
