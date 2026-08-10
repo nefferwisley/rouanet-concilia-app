@@ -283,6 +283,50 @@ async def sincronizar_drive(projeto_id: str, dep=Depends(get_conn)):
     }
 
 
+@router.post("/projeto/{projeto_id}/vincular-automatico")
+async def vincular_automatico(projeto_id: str, dep=Depends(get_conn)):
+    """
+    Cruza por nome de arquivo os documentos já baixados do Drive
+    (documentos_projeto, com caminho real em disco) contra os lançamentos
+    importados (documentos_transacao, cujo arquivo_ref vem do config de
+    importação e é só o NOME do comprovante -- nunca um caminho real, porque
+    a importação em si não sabe onde os arquivos foram baixados).
+
+    Sem isso, um lançamento importado com o nome certo do comprovante
+    (ex: "143 - 16-08-2024 - CPDOC - Licenciamento.pdf") continua
+    aparentando "sem documento" pro usuário, mesmo o arquivo já estando
+    salvo em disco -- só porque as duas tabelas nunca foram cruzadas.
+    """
+    conn, _ = dep
+    projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
+    if not projeto:
+        raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
+
+    linkados = await conn.fetch(
+        """
+        with reais as (
+            select id, arquivo_ref,
+                   regexp_replace(nome_arquivo, '^.*[/\\\\]', '') as nome_base
+            from documentos_projeto
+            where projeto_id = $1 and origem = 'google_drive' and nome_arquivo is not null
+        )
+        update documentos_transacao d
+        set arquivo_ref = r.arquivo_ref
+        from reais r, transacoes t
+        where d.transacao_id = t.id
+          and t.projeto_id = $1
+          and d.arquivo_ref = r.nome_base
+        returning d.id, r.nome_base
+        """,
+        projeto_id,
+    )
+
+    return {
+        "vinculados": len(linkados),
+        "arquivos": [row["nome_base"] for row in linkados],
+    }
+
+
 @router.get("/projeto/{projeto_id}")
 async def listar_documentos_projeto(projeto_id: str, dep=Depends(get_conn)):
     conn, _ = dep

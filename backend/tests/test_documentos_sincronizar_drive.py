@@ -15,6 +15,11 @@ def test_sincronizar_drive_requires_auth():
     assert response.status_code == 401
 
 
+def test_vincular_automatico_requires_auth():
+    response = client.post("/api/v1/documentos/projeto/fake-uuid/vincular-automatico")
+    assert response.status_code == 401
+
+
 def test_extrair_folder_id_reconhece_mesma_pasta_independente_de_variacao_na_url():
     """Base pra detecção de 'mesma pasta': o ID extraído tem que ser igual
     mesmo com querystring/barra final diferentes entre duas colagens do
