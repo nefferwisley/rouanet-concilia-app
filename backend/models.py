@@ -20,6 +20,7 @@ class ProjetoOut(BaseModel):
     nome: str
     proponente: Optional[str] = None
     banco: Optional[str] = None
+    valor_captado: Optional[float] = None
     criado_em: datetime
 
 
@@ -50,6 +51,7 @@ class ProjetoUpdate(BaseModel):
     proponente: Optional[str] = Field(None, max_length=255)
     controller: Optional[str] = Field(None, max_length=255)
     banco: Optional[str] = Field(None, max_length=255)
+    valor_captado: Optional[float] = Field(None, ge=0)
 
     @field_validator('nome')
     @classmethod

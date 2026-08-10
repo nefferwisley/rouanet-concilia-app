@@ -191,6 +191,8 @@ async def update_projeto(
             update_fields['controller'] = update_data.controller
         if update_data.banco is not None:
             update_fields['banco'] = update_data.banco
+        if update_data.valor_captado is not None:
+            update_fields['valor_captado'] = update_data.valor_captado
 
         if not update_fields:
             raise HTTPException(
@@ -216,6 +218,7 @@ async def update_projeto(
             nome=projeto["nome"],
             proponente=projeto["proponente"],
             banco=projeto["banco"],
+            valor_captado=float(projeto["valor_captado"]) if projeto["valor_captado"] is not None else None,
             criado_em=projeto["created_at"]
         )
 

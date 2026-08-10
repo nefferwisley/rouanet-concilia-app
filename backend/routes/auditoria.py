@@ -42,7 +42,7 @@ async def auditoria_projeto(
 ):
     conn, _ = dep
 
-    projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
+    projeto = await conn.fetchrow("select id, valor_captado from projetos where id = $1", projeto_id)
     if not projeto:
         raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
 
@@ -50,10 +50,19 @@ async def auditoria_projeto(
     where = "where t.projeto_id = $1" + (f" and {filtro}" if filtro else "")
 
     # ---- resumo financeiro (SEM filtro — totais do projeto) ----
-    orcado = await conn.fetchval(
-        "select coalesce(sum(valor_orcado), 0)::float from rubricas where projeto_id = $1",
-        projeto_id,
-    )
+    # `valor_captado` é o total efetivamente recebido (conferido manualmente
+    # contra extrato/planilha oficial) -- preferido sobre a soma de
+    # `rubricas.valor_orcado` porque essa soma só reflete as rubricas que já
+    # foram materializadas por algum lançamento importado, e pode ficar bem
+    # menor que o valor real captado se o orçamento por rubrica no config
+    # de importação estiver incompleto.
+    if projeto["valor_captado"] is not None:
+        orcado = float(projeto["valor_captado"])
+    else:
+        orcado = await conn.fetchval(
+            "select coalesce(sum(valor_orcado), 0)::float from rubricas where projeto_id = $1",
+            projeto_id,
+        )
     total = await conn.fetchval(
         "select count(*) from transacoes where projeto_id = $1", projeto_id
     )
