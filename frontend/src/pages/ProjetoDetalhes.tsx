@@ -19,19 +19,46 @@ export function ProjetoDetalhes() {
   const { id } = useParams<{ id: string }>();
   const api = useAPI();
   const [projeto, setProjeto] = useState<Projeto | null>(null);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
   const [mostrarImportar, setMostrarImportar] = useState(false);
   const [mostrarEditar, setMostrarEditar] = useState(false);
 
   const recarregarProjeto = () => {
     if (!id) return;
-    api.get<Projeto>(`/api/v1/projetos/${id}`).then(setProjeto).catch(() => setProjeto(null));
+    setCarregando(true);
+    setErro(null);
+    api
+      .get<Projeto>(`/api/v1/projetos/${id}`)
+      .then((p) => {
+        setProjeto(p);
+        setCarregando(false);
+      })
+      .catch((e) => {
+        // Antes, um erro aqui (token expirado, backend fora, 404) deixava a
+        // tela presa em "Carregando..." pra sempre -- igual ao estado inicial,
+        // sem diferença visível nenhuma. Agora mostra o motivo de verdade.
+        setErro(e instanceof Error ? e.message : "Erro ao carregar projeto.");
+        setCarregando(false);
+      });
   };
 
   useEffect(() => {
     recarregarProjeto();
   }, [api, id]);
 
-  if (!projeto) return <div className="max-w-3xl mx-auto p-6">Carregando...</div>;
+  if (erro) {
+    return (
+      <div className="max-w-3xl mx-auto p-6 space-y-3">
+        <p className="text-sm text-red-600">{erro}</p>
+        <button className="btn-secondary" onClick={recarregarProjeto}>
+          🔄 Tentar novamente
+        </button>
+      </div>
+    );
+  }
+
+  if (carregando || !projeto) return <div className="max-w-3xl mx-auto p-6">Carregando...</div>;
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-4">
