@@ -190,11 +190,17 @@ async def sincronizar_drive(projeto_id: str, dep=Depends(get_conn)):
     """
     conn, user_id = dep
 
+    # nome_arquivo is null é verdade tanto pro link (a pasta em si) quanto,
+    # antes deste fix, indistinguível de um link já processado -- sem o
+    # filtro de status aqui, um projeto com 2+ pastas linkadas ficava preso
+    # sincronizando pra sempre só a mais recente (a de status 'pendente' mais
+    # antiga nunca era escolhida por "order by created_at desc").
     link_row = await conn.fetchrow(
         """
         select id, arquivo_ref from documentos_projeto
-        where projeto_id = $1 and origem = 'google_drive' and nome_arquivo is null
-        order by created_at desc limit 1
+        where projeto_id = $1 and origem = 'google_drive'
+          and nome_arquivo is null and status = 'pendente'
+        order by created_at asc limit 1
         """,
         projeto_id,
     )
