@@ -11,6 +11,8 @@ interface DocumentoProjeto {
   criado_em: string;
 }
 
+const LIMITE_INICIAL = 12;
+
 export function DocumentosProjeto({ projetoId }: { projetoId: string }) {
   const api = useAPI();
   const [documentos, setDocumentos] = useState<DocumentoProjeto[]>([]);
@@ -18,6 +20,7 @@ export function DocumentosProjeto({ projetoId }: { projetoId: string }) {
   const [vinculando, setVinculando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [mensagemVinculo, setMensagemVinculo] = useState<string | null>(null);
+  const [expandido, setExpandido] = useState(false);
 
   const carregar = () => {
     api
@@ -71,6 +74,14 @@ export function DocumentosProjeto({ projetoId }: { projetoId: string }) {
 
   if (documentos.length === 0) return null;
 
+  // Links de pasta (2-3 linhas normalmente) sempre visíveis; arquivos reais
+  // baixados (pode ser centenas) ficam colapsados por padrão -- listar todos
+  // de uma vez deixava a página com ~5MB de DOM e 16k px de altura.
+  const links = documentos.filter((d) => d.origem === "google_drive" && !d.nome_arquivo);
+  const arquivos = documentos.filter((d) => !(d.origem === "google_drive" && !d.nome_arquivo));
+  const arquivosExibidos = expandido ? arquivos : arquivos.slice(0, LIMITE_INICIAL);
+  const processados = arquivos.filter((d) => d.status === "processado").length;
+
   return (
     <div className="card">
       <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
@@ -88,17 +99,41 @@ export function DocumentosProjeto({ projetoId }: { projetoId: string }) {
       </div>
       {erro && <p className="text-xs text-red-600 mb-2">{erro}</p>}
       {mensagemVinculo && <p className="text-xs text-slate-500 mb-2">{mensagemVinculo}</p>}
-      <ul className="text-sm space-y-1">
-        {documentos.map((d) => (
-          <li key={d.id} className="flex justify-between text-slate-600">
-            <span>
-              {d.origem === "google_drive" ? "📁 " : "📄 "}
-              {d.nome_arquivo ?? d.drive_link ?? "—"}
-            </span>
-            <span className="text-xs text-slate-400">{d.status}</span>
-          </li>
-        ))}
-      </ul>
+
+      {links.length > 0 && (
+        <ul className="text-sm space-y-1 mb-2">
+          {links.map((d) => (
+            <li key={d.id} className="flex justify-between text-slate-600 dark:text-slate-300">
+              <span>📁 {d.drive_link ?? "—"}</span>
+              <span className="text-xs text-slate-400">{d.status}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {arquivos.length > 0 && (
+        <>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+            {arquivos.length} arquivo(s) sincronizado(s) — {processados} processado(s)
+          </p>
+          <ul className="text-sm space-y-1">
+            {arquivosExibidos.map((d) => (
+              <li key={d.id} className="flex justify-between text-slate-600 dark:text-slate-300">
+                <span className="truncate">📄 {d.nome_arquivo}</span>
+                <span className="text-xs text-slate-400 shrink-0 ml-2">{d.status}</span>
+              </li>
+            ))}
+          </ul>
+          {arquivos.length > LIMITE_INICIAL && (
+            <button
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2"
+              onClick={() => setExpandido((v) => !v)}
+            >
+              {expandido ? "▲ Mostrar menos" : `▼ Mostrar todos (${arquivos.length})`}
+            </button>
+          )}
+        </>
+      )}
     </div>
   );
 }

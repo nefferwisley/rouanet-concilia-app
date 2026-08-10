@@ -153,13 +153,13 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
       <div className="card p-0 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-slate-500 border-b border-slate-200 dark:border-slate-700">
-              <th className="py-2 px-3 font-medium">Data</th>
-              <th className="py-2 px-3 font-medium">Histórico / Extrato</th>
-              <th className="py-2 px-3 font-medium text-right">Valor</th>
-              <th className="py-2 px-3 font-medium">Status</th>
-              <th className="py-2 px-3 font-medium">Lançamento do Projeto</th>
-              <th className="py-2 px-3 font-medium text-right">Ação</th>
+            <tr className="table-head">
+              <th>Data</th>
+              <th>Histórico / Extrato</th>
+              <th className="text-right">Valor</th>
+              <th>Status</th>
+              <th>Lançamento do Projeto</th>
+              <th className="text-right">Ação</th>
             </tr>
           </thead>
           <tbody>

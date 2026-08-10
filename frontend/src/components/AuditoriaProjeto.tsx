@@ -105,27 +105,27 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
           </button>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-          <div className="p-3 rounded bg-slate-50 dark:bg-slate-900">
-            <div className="text-slate-500 text-xs">Orçamento SALIC</div>
-            <div className="text-lg font-bold">{brl(resumo.orcado)}</div>
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-navy-900/60 border border-transparent dark:border-navy-700">
+            <div className="eyebrow">Orçamento SALIC</div>
+            <div className="stat-value mt-0.5">{brl(resumo.orcado)}</div>
           </div>
-          <div className="p-3 rounded bg-slate-50 dark:bg-slate-900">
-            <div className="text-slate-500 text-xs">Débitos efetivados ({resumo.total})</div>
-            <div className="text-lg font-bold">{brl(resumo.debitado)}</div>
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-navy-900/60 border border-transparent dark:border-navy-700">
+            <div className="eyebrow">Débitos efetivados ({resumo.total})</div>
+            <div className="stat-value mt-0.5">{brl(resumo.debitado)}</div>
           </div>
-          <div className="p-3 rounded bg-slate-50 dark:bg-slate-900">
-            <div className="text-slate-500 text-xs">Saldo</div>
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-navy-900/60 border border-transparent dark:border-navy-700">
+            <div className="eyebrow">Saldo</div>
             <div
-              className={`text-lg font-bold ${resumo.saldo >= 0 ? "text-emerald-600" : "text-red-600"}`}
+              className={`stat-value mt-0.5 ${resumo.saldo >= 0 ? "!text-emerald-600 dark:!text-emerald-400" : "!text-red-600 dark:!text-red-400"}`}
             >
               {brl(resumo.saldo)}
             </div>
           </div>
-          <div className="p-3 rounded bg-slate-50 dark:bg-slate-900">
-            <div className="text-slate-500 text-xs">Docs anexados</div>
-            <div className="text-lg font-bold">
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-navy-900/60 border border-transparent dark:border-navy-700">
+            <div className="eyebrow">Docs anexados</div>
+            <div className="stat-value mt-0.5">
               {resumo.com_docs}/{resumo.total}
-              <span className="text-xs text-slate-500 font-normal"> sem docs: {resumo.sem_docs}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-normal"> sem docs: {resumo.sem_docs}</span>
             </div>
           </div>
         </div>
@@ -175,14 +175,14 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-slate-500 border-b border-slate-200 dark:border-slate-700">
-                <th className="py-2 pr-2 font-medium">#</th>
-                <th className="py-2 pr-2 font-medium">Data</th>
-                <th className="py-2 pr-2 font-medium">Razão Social / Prestador</th>
-                <th className="py-2 pr-2 font-medium">Rubrica SALIC &amp; Documento</th>
-                <th className="py-2 pr-2 font-medium text-right">Valor &amp; Saldo Restante</th>
-                <th className="py-2 pr-2 font-medium">Status Revisão</th>
-                <th className="py-2 font-medium">Checklist de Anexos</th>
+              <tr className="table-head">
+                <th>#</th>
+                <th>Data</th>
+                <th>Razão Social / Prestador</th>
+                <th>Rubrica SALIC &amp; Documento</th>
+                <th className="text-right">Valor &amp; Saldo Restante</th>
+                <th>Status Revisão</th>
+                <th>Checklist de Anexos</th>
               </tr>
             </thead>
             <tbody>
