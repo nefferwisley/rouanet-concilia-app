@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { ImportarModal } from "./ImportarModal";
 import { AuditoriaProjeto } from "../components/AuditoriaProjeto";
 import { ConfrontoSalic } from "../components/ConfrontoSalic";
+import { DemonstrativoSaldos } from "../components/DemonstrativoSaldos";
 import { EditProjectModal } from "../components/EditProjectModal";
 import { DeleteProjectButton } from "../components/DeleteProjectButton";
 import { DocumentosProjeto } from "../components/DocumentosProjeto";
@@ -139,6 +140,8 @@ export function ProjetoDetalhes() {
           </button>
         </div>
       </div>
+
+      <DemonstrativoSaldos projetoId={projeto.id} />
 
       <ConfrontoSalic projetoId={projeto.id} />
 
