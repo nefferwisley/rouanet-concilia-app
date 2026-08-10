@@ -61,7 +61,7 @@ class ProjetoUpdate(BaseModel):
         return v
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             'example': {
                 'nome': 'Projeto Atualizado',
                 'proponente': 'Novo Proponente',

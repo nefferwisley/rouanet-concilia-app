@@ -10,6 +10,14 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 import sys
 
+# Console Windows usa cp1252 por padrão — emojis quebram com UnicodeEncodeError.
+# Força UTF-8 na saída sempre que possível para prints com acentos/emojis.
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except AttributeError:
+    pass
+
 DB_URL = os.getenv('DATABASE_URL', 'postgresql://rouanet:rouanet_dev_password@localhost:5432/rouanet_concilia')
 
 def get_connection():
@@ -47,18 +55,50 @@ def seed_db():
             print(f"  ✓ Projeto {i+1}: {nome}")
 
         # 2. Criar 5 membros (usuários)
-        user_id = '840b3bf2-9520-423b-95cd-0c2557eef1db'  # Fixed user ID para testes
+        # Resolve o user_id UMA vez (as importações também usam ele em
+        # criado_por). Prioriza os ID fixos de teste se existirem no
+        # auth.users; senão, pega qualquer usuário existente.
+        user_ids = [
+            '840b3bf2-9520-423b-95cd-0c2557eef1db',  # teste@rouanet.local
+            '11111111-2222-4333-8444-555555555555',
+        ]
+        user_id = None
+        for candidato in user_ids:
+            cur.execute("select 1 from auth.users where id = %s", (candidato,))
+            if cur.fetchone():
+                user_id = candidato
+                break
+        if user_id is None:
+            cur.execute("select id from auth.users limit 1")
+            row_user = cur.fetchone()
+            if row_user:
+                user_id = row_user[0]
+        if user_id is None:
+            raise RuntimeError(
+                "auth.users está vazio — crie um usuário de teste antes "
+                "(ex: via Supabase Auth ou INSERT manual) ou o seed não "
+                "consegue criar membros nem importações (FK)."
+            )
+
         print("\n👥 Criando membros...")
         for projeto_id in projetos:
             try:
+                cur.execute("SAVEPOINT seed_membro")
                 cur.execute("""
                     INSERT INTO membros_projeto (id, projeto_id, user_id, papel, created_at)
                     VALUES (%s, %s, %s, %s, NOW())
                 """, (str(uuid4()), projeto_id, user_id, 'admin'))
-            except psycopg2.IntegrityError:
-                cur.execute("ROLLBACK")
-                conn.rollback()
-                print(f"  ⚠️  Membro já existe para projeto {projeto_id}")
+                cur.execute("RELEASE SAVEPOINT seed_membro")
+            except psycopg2.IntegrityError as e:
+                # SAVEPOINT em vez de ROLLBACK: isola a falha SEM desfazer os
+                # projetos/transações já inseridos nesta transação.
+                cur.execute("ROLLBACK TO SAVEPOINT seed_membro")
+                if e.pgcode == '23503':
+                    print(f"  ⚠️  user_id {user_id} não existe em auth.users (FK) — verifique o seed de usuários.")
+                elif e.pgcode == '23505':
+                    print(f"  ⚠️  Membro duplicado para projeto {projeto_id} (unique constraint).")
+                else:
+                    print(f"  ⚠️  Erro inesperado ao criar membro: {e.pgcode}")
 
         # 3. Criar 20 transações
         print("\n💳 Criando transações...")

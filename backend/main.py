@@ -1,4 +1,5 @@
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,7 +24,16 @@ from backend.routes import (
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 log = logging.getLogger("rouanet-api")
 
-app = FastAPI(title="RouanetConcilia API", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await get_pool()
+    log.info("Pool de conexões pronto.")
+    yield
+    await close_pool()
+
+
+app = FastAPI(title="RouanetConcilia API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,6 +41,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 app.include_router(projetos.router)
 app.include_router(importacoes.router)
@@ -43,17 +54,6 @@ app.include_router(revisao.router)
 app.include_router(salic.router)
 app.include_router(organizacao.router)
 app.include_router(regularizacao.router)
-
-
-@app.on_event("startup")
-async def startup():
-    await get_pool()
-    log.info("Pool de conexões pronto.")
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await close_pool()
 
 
 @app.exception_handler(HTTPException)
