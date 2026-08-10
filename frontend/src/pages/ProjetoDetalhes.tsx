@@ -15,6 +15,15 @@ import { ChecklistFinal } from "../components/ChecklistFinal";
 import { useAPI } from "../hooks/useAPI";
 import { Projeto } from "../types";
 
+const ABAS = [
+  { chave: "geral", rotulo: "Visão Geral", emoji: "📊" },
+  { chave: "conciliacao", rotulo: "Conciliação", emoji: "🏦" },
+  { chave: "documentacao", rotulo: "Documentação", emoji: "🖨" },
+  { chave: "entrega", rotulo: "Entrega Final", emoji: "🗂" },
+] as const;
+
+type Aba = (typeof ABAS)[number]["chave"];
+
 export function ProjetoDetalhes() {
   const { id } = useParams<{ id: string }>();
   const api = useAPI();
@@ -23,6 +32,7 @@ export function ProjetoDetalhes() {
   const [erro, setErro] = useState<string | null>(null);
   const [mostrarImportar, setMostrarImportar] = useState(false);
   const [mostrarEditar, setMostrarEditar] = useState(false);
+  const [aba, setAba] = useState<Aba>("geral");
 
   const recarregarProjeto = () => {
     if (!id) return;
@@ -105,21 +115,41 @@ export function ProjetoDetalhes() {
         </button>
       </div>
 
-      <DocumentosProjeto projetoId={projeto.id} />
+      <div className="flex gap-1 p-1 rounded-xl bg-slate-100 dark:bg-navy-900/70 overflow-x-auto">
+        {ABAS.map((a) => (
+          <button
+            key={a.chave}
+            onClick={() => setAba(a.chave)}
+            className={`flex-1 min-w-fit px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+              aba === a.chave
+                ? "bg-white dark:bg-navy-700 text-blue-600 dark:text-blue-400 shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+            }`}
+          >
+            {a.emoji} {a.rotulo}
+          </button>
+        ))}
+      </div>
 
-      <AuditoriaProjeto projetoId={projeto.id} />
+      <div className={aba === "geral" ? "space-y-4" : "hidden"}>
+        <DocumentosProjeto projetoId={projeto.id} />
+        <AuditoriaProjeto projetoId={projeto.id} />
+      </div>
 
-      <ConciliacaoManual projetoId={projeto.id} />
+      <div className={aba === "conciliacao" ? "space-y-4" : "hidden"}>
+        <ConciliacaoManual projetoId={projeto.id} />
+      </div>
 
-      <RevisaoDocumental projetoId={projeto.id} />
+      <div className={aba === "documentacao" ? "space-y-4" : "hidden"}>
+        <RevisaoDocumental projetoId={projeto.id} />
+        <RevisaoManual projetoId={projeto.id} />
+      </div>
 
-      <RevisaoManual projetoId={projeto.id} />
-
-      <OrganizacaoDocumental projetoId={projeto.id} />
-
-      <Regularizacao projetoId={projeto.id} />
-
-      <ChecklistFinal projetoId={projeto.id} />
+      <div className={aba === "entrega" ? "space-y-4" : "hidden"}>
+        <OrganizacaoDocumental projetoId={projeto.id} />
+        <Regularizacao projetoId={projeto.id} />
+        <ChecklistFinal projetoId={projeto.id} />
+      </div>
 
       {mostrarImportar && (
         <ImportarModal projetos={[projeto]} onClose={() => setMostrarImportar(false)} />
