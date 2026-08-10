@@ -4,6 +4,7 @@ export interface Projeto {
   nome: string;
   proponente?: string;
   banco?: string;
+  controller?: string | null;
   valor_captado?: number | null;
   transacoes_count?: number;
   criado_em: string;

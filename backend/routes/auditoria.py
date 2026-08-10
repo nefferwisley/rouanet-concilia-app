@@ -37,6 +37,7 @@ async def auditoria_projeto(
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     status: str | None = Query(None, description="pendente|ok|com_docs|sem_docs"),
+    busca: str | None = Query(None, description="filtra por fornecedor/razão social"),
     format: str = Query("json", pattern="^(json|csv)$"),
     dep=Depends(get_conn),
 ):
@@ -48,6 +49,10 @@ async def auditoria_projeto(
 
     filtro = _filtro_status(status)
     where = "where t.projeto_id = $1" + (f" and {filtro}" if filtro else "")
+    params: list = [projeto_id]
+    if busca:
+        params.append(f"%{busca}%")
+        where += f" and t.fornecedor ilike ${len(params)}"
 
     # ---- resumo financeiro (SEM filtro — totais do projeto) ----
     # `valor_captado` é o total efetivamente recebido (conferido manualmente
@@ -79,7 +84,9 @@ async def auditoria_projeto(
     )
 
     # ---- transações (com filtro se pedido) paginadas ----
-    total_filtrado = await conn.fetchval(f"select count(*) from transacoes t {where}", projeto_id)
+    total_filtrado = await conn.fetchval(f"select count(*) from transacoes t {where}", *params)
+    limit_idx = len(params) + 1
+    offset_idx = len(params) + 2
     rows = await conn.fetch(
         f"""
         with saldo_acumulado as (
@@ -96,21 +103,21 @@ async def auditoria_projeto(
         select t.id, t.fornecedor, t.cnpj_fornecedor, t.data_pagamento, t.valor_bruto,
                t.tem_nf, t.tem_comprovante, t.status, t.score_conciliacao,
                r.codigo as rubrica_codigo, r.descricao as rubrica_descricao,
-               dt.arquivo_ref as documento, dt.confianca_ocr,
+               dt.id as documento_id, dt.arquivo_ref as documento, dt.confianca_ocr,
                sa.debitado_acumulado
         from transacoes t
         left join despesas d on d.transacao_id = t.id
         left join rubricas r on r.id = d.rubrica_id
         left join saldo_acumulado sa on sa.id = t.id
         left join lateral (
-            select arquivo_ref, confianca_ocr from documentos_transacao doc
+            select id, arquivo_ref, confianca_ocr from documentos_transacao doc
             where doc.transacao_id = t.id order by created_at desc limit 1
         ) dt on true
         {where}
         order by t.data_pagamento nulls last, t.created_at
-        limit $2 offset $3
+        limit ${limit_idx} offset ${offset_idx}
         """,
-        projeto_id, limit, (page - 1) * limit,
+        *params, limit, (page - 1) * limit,
     )
 
     resumo = {
@@ -139,6 +146,7 @@ async def auditoria_projeto(
             "score_conciliacao": r["score_conciliacao"],
             "rubrica_codigo": r["rubrica_codigo"],
             "rubrica_descricao": r["rubrica_descricao"],
+            "documento_id": str(r["documento_id"]) if r["documento_id"] else None,
             "documento": r["documento"],
             "confianca_ocr": r["confianca_ocr"],
             "saldo_restante": (

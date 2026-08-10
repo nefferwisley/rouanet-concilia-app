@@ -17,6 +17,7 @@ interface ResumoAuditoria {
 interface TransacaoAuditoria {
   id: string;
   fornecedor?: string;
+  cnpj_fornecedor?: string | null;
   data_pagamento?: string;
   valor_bruto?: number;
   tem_nf: boolean;
@@ -24,6 +25,7 @@ interface TransacaoAuditoria {
   status: string;
   rubrica_codigo?: string | null;
   rubrica_descricao?: string | null;
+  documento_id?: string | null;
   documento?: string;
   confianca_ocr?: number;
   score_conciliacao?: number;
@@ -54,15 +56,18 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [filtro, setFiltro] = useState("");
+  const [busca, setBusca] = useState("");
+  const [buscaDebounced, setBuscaDebounced] = useState("");
   const [erro, setErro] = useState<string | null>(null);
 
   const limit = 20;
 
-  const carregar = async (pagina: number, filtroAtual: string) => {
+  const carregar = async (pagina: number, filtroAtual: string, buscaAtual: string) => {
     try {
       const q = filtroAtual ? `&status=${encodeURIComponent(filtroAtual)}` : "";
+      const b = buscaAtual ? `&busca=${encodeURIComponent(buscaAtual)}` : "";
       const data = await get<AuditoriaResponse>(
-        `/api/v1/projetos/${projetoId}/auditoria?page=${pagina}&limit=${limit}${q}`
+        `/api/v1/projetos/${projetoId}/auditoria?page=${pagina}&limit=${limit}${q}${b}`
       );
       setResumo(data.resumo);
       setTransacoes(data.transacoes);
@@ -75,8 +80,13 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
   };
 
   useEffect(() => {
-    carregar(1, filtro);
-  }, [projetoId, filtro]);
+    const t = setTimeout(() => setBuscaDebounced(busca), 300);
+    return () => clearTimeout(t);
+  }, [busca]);
+
+  useEffect(() => {
+    carregar(1, filtro, buscaDebounced);
+  }, [projetoId, filtro, buscaDebounced]);
 
   if (erro) return <div className="text-sm text-red-600">{erro}</div>;
   if (!resumo) return <div className="text-sm text-slate-500">Carregando auditoria...</div>;
@@ -147,11 +157,20 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
       <div className="card">
         <div className="flex justify-between items-center mb-3 gap-2 flex-wrap">
           <h3 className="section-title">🧾 Lançamentos ({total})</h3>
-          <select className="input w-56" value={filtro} onChange={(e) => { setFiltro(e.target.value); setPage(1); }}>
-            {FILTROS.map((f) => (
-              <option key={f.valor} value={f.valor}>{f.rotulo}</option>
-            ))}
-          </select>
+          <div className="flex gap-2 flex-wrap">
+            <input
+              type="text"
+              className="input w-56"
+              placeholder="🔎 Buscar prestador, razão social..."
+              value={busca}
+              onChange={(e) => { setBusca(e.target.value); setPage(1); }}
+            />
+            <select className="input w-56" value={filtro} onChange={(e) => { setFiltro(e.target.value); setPage(1); }}>
+              {FILTROS.map((f) => (
+                <option key={f.valor} value={f.valor}>{f.rotulo}</option>
+              ))}
+            </select>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -159,55 +178,68 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
               <tr className="text-left text-slate-500 border-b border-slate-200 dark:border-slate-700">
                 <th className="py-2 pr-2 font-medium">#</th>
                 <th className="py-2 pr-2 font-medium">Data</th>
-                <th className="py-2 pr-2 font-medium">Fornecedor</th>
-                <th className="py-2 pr-2 font-medium">Rubrica</th>
-                <th className="py-2 pr-2 font-medium text-right">Valor</th>
-                <th className="py-2 pr-2 font-medium text-right">Saldo restante</th>
-                <th className="py-2 pr-2 font-medium">Documento</th>
-                <th className="py-2 pr-2 font-medium">Docs</th>
-                <th className="py-2 font-medium">Status</th>
+                <th className="py-2 pr-2 font-medium">Razão Social / Prestador</th>
+                <th className="py-2 pr-2 font-medium">Rubrica SALIC &amp; Documento</th>
+                <th className="py-2 pr-2 font-medium text-right">Valor &amp; Saldo Restante</th>
+                <th className="py-2 pr-2 font-medium">Status Revisão</th>
+                <th className="py-2 font-medium">Checklist de Anexos</th>
               </tr>
             </thead>
             <tbody>
-              {transacoes.map((t, i) => (
-                <tr key={t.id} className="border-t border-slate-100 dark:border-slate-800">
+              {transacoes.map((t, i) => {
+                const anexos = (t.tem_nf ? 1 : 0) + (t.tem_comprovante ? 1 : 0);
+                const completo = anexos === 2;
+                return (
+                <tr key={t.id} className="border-t border-slate-100 dark:border-slate-800 align-top">
                   <td className="py-2 pr-2 whitespace-nowrap font-mono text-xs text-slate-400">
-                    {(page - 1) * limit + i + 1}
+                    #{(page - 1) * limit + i + 1}
                   </td>
                   <td className="py-2 pr-2 whitespace-nowrap">
                     {t.data_pagamento ? new Date(t.data_pagamento + "T00:00:00").toLocaleDateString("pt-BR") : "-"}
                   </td>
-                  <td className="py-2 pr-2">{t.fornecedor || "-"}</td>
-                  <td className="py-2 pr-2 whitespace-nowrap">
+                  <td className="py-2 pr-2 max-w-[14rem]">
+                    <div className="font-medium truncate" title={t.fornecedor}>{t.fornecedor || "-"}</div>
+                    {t.cnpj_fornecedor && (
+                      <div className="text-xs text-slate-400">👤 {t.cnpj_fornecedor}</div>
+                    )}
+                  </td>
+                  <td className="py-2 pr-2 max-w-[16rem]">
                     {t.rubrica_codigo ? (
-                      <span title={t.rubrica_descricao ?? undefined}>{t.rubrica_codigo}</span>
+                      <div className="font-medium text-xs" title={t.rubrica_descricao ?? undefined}>
+                        Rubrica {t.rubrica_codigo}{t.rubrica_descricao ? ` — ${t.rubrica_descricao}` : ""}
+                      </div>
                     ) : (
-                      <span className="text-amber-600 text-xs">sem rubrica</span>
+                      <div className="text-amber-600 dark:text-amber-400 text-xs font-medium">sem rubrica</div>
                     )}
-                  </td>
-                  <td className="py-2 pr-2 text-right font-semibold whitespace-nowrap">{brl(t.valor_bruto)}</td>
-                  <td className="py-2 pr-2 text-right whitespace-nowrap text-slate-500">
-                    {t.saldo_restante != null ? brl(t.saldo_restante) : "-"}
-                  </td>
-                  <td className="py-2 pr-2">
                     {t.documento ? (
-                      <span className="text-slate-600 dark:text-slate-300" title={`Confiança OCR: ${t.confianca_ocr ?? "-"}`}>
-                        📄 {t.documento.length > 38 ? t.documento.slice(0, 35) + "…" : t.documento}
-                        {t.confianca_ocr != null && (
-                          <span className="ml-1 text-xs text-slate-400">
-                            {Math.round(t.confianca_ocr * 100)}%
-                          </span>
-                        )}
-                      </span>
+                      t.documento_id ? (
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            download(`/api/v1/documentos/${t.documento_id}/arquivo`, t.documento!.split(/[\\/]/).pop() ?? "documento.pdf");
+                          }}
+                          className="text-blue-600 dark:text-blue-400 hover:underline text-xs flex items-center gap-1 mt-0.5"
+                          title="Abrir PDF"
+                        >
+                          📎 {t.documento.length > 34 ? t.documento.slice(0, 31) + "…" : t.documento}
+                        </a>
+                      ) : (
+                        <span className="text-slate-500 text-xs flex items-center gap-1 mt-0.5">
+                          📎 {t.documento.length > 34 ? t.documento.slice(0, 31) + "…" : t.documento}
+                        </span>
+                      )
                     ) : (
-                      <span className="text-slate-400">—</span>
+                      <span className="text-slate-400 text-xs">sem documento</span>
                     )}
+                  </td>
+                  <td className="py-2 pr-2 text-right whitespace-nowrap">
+                    <div className="font-semibold text-red-600 dark:text-red-400">- {brl(t.valor_bruto)}</div>
+                    <div className="text-xs text-blue-600 dark:text-blue-400">
+                      Saldo: {t.saldo_restante != null ? brl(t.saldo_restante) : "-"}
+                    </div>
                   </td>
                   <td className="py-2 pr-2 whitespace-nowrap">
-                    <span title="NF-e anexada">{t.tem_nf ? "🧾" : "⬜"}</span>{" "}
-                    <span title="Comprovante anexado">{t.tem_comprovante ? "🏦" : "⬜"}</span>
-                  </td>
-                  <td className="py-2">
                     <span className={`pill ${
                       t.status === "CONCILIADO_OK"
                         ? "pill-sucesso"
@@ -218,8 +250,14 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
                       {t.status}
                     </span>
                   </td>
+                  <td className="py-2">
+                    <span className={`pill ${completo ? "pill-sucesso" : "pill-alerta"}`}>
+                      {completo ? "✓" : "⚠"} {completo ? "Completo" : "Incompleto"} ({anexos}/2 docs)
+                    </span>
+                  </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -230,10 +268,10 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
             Página {page} de {totalPaginas}
           </span>
           <div className="flex gap-2">
-            <button className="btn-secondary" disabled={page <= 1} onClick={() => carregar(page - 1, filtro)}>
+            <button className="btn-secondary" disabled={page <= 1} onClick={() => carregar(page - 1, filtro, buscaDebounced)}>
               ← Anterior
             </button>
-            <button className="btn-secondary" disabled={page >= totalPaginas} onClick={() => carregar(page + 1, filtro)}>
+            <button className="btn-secondary" disabled={page >= totalPaginas} onClick={() => carregar(page + 1, filtro, buscaDebounced)}>
               Próxima →
             </button>
           </div>

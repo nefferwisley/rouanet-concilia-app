@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { ImportarModal } from "./ImportarModal";
 import { AuditoriaProjeto } from "../components/AuditoriaProjeto";
+import { ConfrontoSalic } from "../components/ConfrontoSalic";
 import { EditProjectModal } from "../components/EditProjectModal";
 import { DeleteProjectButton } from "../components/DeleteProjectButton";
 import { DocumentosProjeto } from "../components/DocumentosProjeto";
@@ -95,6 +96,7 @@ export function ProjetoDetalhes() {
             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-slate-500 dark:text-slate-400">
               {projeto.proponente && <span>👤 {projeto.proponente}</span>}
               {projeto.banco && <span>🏦 {projeto.banco}</span>}
+              {projeto.controller && <span>🧑‍💼 Controller: {projeto.controller}</span>}
             </div>
           </div>
           <div className="flex gap-2 shrink-0">
@@ -110,10 +112,35 @@ export function ProjetoDetalhes() {
             />
           </div>
         </div>
-        <button className="btn-primary mt-4" onClick={() => setMostrarImportar(true)}>
-          + Nova Importação
-        </button>
+        <div className="flex flex-wrap gap-2 mt-4">
+          <button className="btn-primary" onClick={() => setMostrarImportar(true)}>
+            + Nova Importação
+          </button>
+          <button
+            className="btn-secondary opacity-50 cursor-not-allowed"
+            disabled
+            title="Em breve — requer integração com API oficial do MinC/SALIC, ainda não disponível publicamente"
+          >
+            🌐 Transmitir via API SALIC
+          </button>
+          <button
+            className="btn-secondary opacity-50 cursor-not-allowed"
+            disabled
+            title="Em breve — exportação no layout oficial de lote SALIC/MinC"
+          >
+            📄 Exportar XML Lote SALIC/MinC
+          </button>
+          <button
+            className="btn-secondary opacity-50 cursor-not-allowed"
+            disabled
+            title="Em breve — geração do pacote de prestação de contas no formato MinC"
+          >
+            📤 Exportar Prestação SALIC (MinC)
+          </button>
+        </div>
       </div>
+
+      <ConfrontoSalic projetoId={projeto.id} />
 
       <div className="flex gap-1 p-1 rounded-xl bg-slate-100 dark:bg-navy-900/70 overflow-x-auto">
         {ABAS.map((a) => (

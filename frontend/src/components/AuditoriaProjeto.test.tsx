@@ -60,8 +60,8 @@ describe('AuditoriaProjeto', () => {
     render(<AuditoriaProjeto projetoId="projeto-123" />);
 
     await waitFor(() => {
-      expect(screen.getByText('1')).toBeInTheDocument();
-      expect(screen.getByText('2')).toBeInTheDocument();
+      expect(screen.getByText('#1')).toBeInTheDocument();
+      expect(screen.getByText('#2')).toBeInTheDocument();
     });
   });
 
@@ -69,7 +69,7 @@ describe('AuditoriaProjeto', () => {
     render(<AuditoriaProjeto projetoId="projeto-123" />);
 
     await waitFor(() => {
-      expect(screen.getByText('1.5.1')).toBeInTheDocument();
+      expect(screen.getByText(/Rubrica 1\.5\.1/)).toBeInTheDocument();
       expect(screen.getByText('sem rubrica')).toBeInTheDocument();
     });
   });

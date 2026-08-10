@@ -68,6 +68,11 @@ def test_consultar_projeto_salic_requires_auth():
     assert response.status_code == 401
 
 
+def test_confronto_salic_requires_auth():
+    response = client.get("/api/v1/salic/confronto/fake-uuid")
+    assert response.status_code == 401
+
+
 def test_achatar_projeto_normaliza_campos_hal():
     """_achatar_projeto (função pura) remove _links do HAL e mapeia os campos
     que a UI (SalicConsulta.tsx) espera."""
