@@ -16,8 +16,8 @@ import { useAPI } from "../hooks/useAPI";
 import { Projeto } from "../types";
 
 const ABAS = [
-  { chave: "geral", rotulo: "Visão Geral", emoji: "📊" },
   { chave: "conciliacao", rotulo: "Conciliação", emoji: "🏦" },
+  { chave: "geral", rotulo: "Visão Geral", emoji: "📊" },
   { chave: "documentacao", rotulo: "Documentação", emoji: "🖨" },
   { chave: "entrega", rotulo: "Entrega Final", emoji: "🗂" },
 ] as const;
@@ -32,7 +32,7 @@ export function ProjetoDetalhes() {
   const [erro, setErro] = useState<string | null>(null);
   const [mostrarImportar, setMostrarImportar] = useState(false);
   const [mostrarEditar, setMostrarEditar] = useState(false);
-  const [aba, setAba] = useState<Aba>("geral");
+  const [aba, setAba] = useState<Aba>("conciliacao");
 
   const recarregarProjeto = () => {
     if (!id) return;
