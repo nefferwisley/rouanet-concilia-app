@@ -187,9 +187,11 @@ async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
 
     movimentos = await conn.fetch(
         """
-        select m.id, m.data, m.historico, m.documento, m.valor, m.status_conciliacao
+        select m.id, m.data, m.historico, m.documento, m.valor, m.status_conciliacao,
+               ce.transacao_id
         from extrato_movimentos m
         join contas_captadoras c on c.id = m.conta_id
+        left join conciliacao_extrato ce on ce.movimento_id = m.id
         where c.projeto_id = $1
         order by m.status_conciliacao = 'PENDENTE' desc, m.data desc
         """,
@@ -213,6 +215,7 @@ async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
                 "documento": m["documento"],
                 "valor": float(m["valor"]),
                 "status_conciliacao": m["status_conciliacao"],
+                "transacao_id": str(m["transacao_id"]) if m["transacao_id"] else None,
             }
             for m in movimentos
         ],

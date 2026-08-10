@@ -9,6 +9,7 @@ interface MovimentoExtrato {
   documento?: string;
   valor: number;
   status_conciliacao: string;
+  transacao_id?: string | null;
 }
 
 interface TransacaoCandidata {
@@ -162,7 +163,10 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
             </tr>
           </thead>
           <tbody>
-            {movimentosExibidos.map((m) => (
+            {movimentosExibidos.map((m) => {
+              const valorSelecionado = selecoes[m.id] ?? m.transacao_id ?? "";
+              const alterouSelecao = valorSelecionado !== (m.transacao_id ?? "");
+              return (
               <tr key={m.id} className="border-t border-slate-100 dark:border-slate-800 align-top">
                 <td className="py-2 px-3 whitespace-nowrap">
                   {new Date(m.data + "T00:00:00").toLocaleDateString("pt-BR")}
@@ -190,7 +194,7 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
                 <td className="py-2 px-3">
                   <select
                     className="input text-xs w-full max-w-xs"
-                    value={selecoes[m.id] ?? ""}
+                    value={valorSelecionado}
                     onChange={(e) => setSelecoes({ ...selecoes, [m.id]: e.target.value })}
                   >
                     <option value="">-- Selecione o lançamento --</option>
@@ -200,12 +204,17 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
                       </option>
                     ))}
                   </select>
+                  {m.transacao_id && (
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {alterouSelecao ? "Vínculo atual acima — clique Vincular pra trocar." : "✓ já vinculado a este lançamento"}
+                    </p>
+                  )}
                 </td>
                 <td className="py-2 px-3 text-right whitespace-nowrap">
                   <div className="flex items-center justify-end gap-1">
                     <button
-                      className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"
-                      disabled={salvando === m.id || !selecoes[m.id]}
+                      className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded disabled:opacity-40 disabled:cursor-not-allowed"
+                      disabled={salvando === m.id || !valorSelecionado || !alterouSelecao}
                       onClick={() => conciliar(m.id, false)}
                     >
                       {salvando === m.id ? "…" : "🔗 Vincular"}
@@ -232,7 +241,8 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
                   </div>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
