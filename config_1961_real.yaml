@@ -1,0 +1,98 @@
+# ========================================
+# config_1961_real.yaml — SaaS RouanetConcilia
+# Projeto 1961 / PRONAC 20-7453
+# Circunstância Cinematográfica
+#
+# Fonte: motor/_parsed/cruzamento.json — dado real, gerado por extração
+# determinística de PDF (PyMuPDF) cruzada com o extrato bancário real.
+# Substitui config_1961.yaml + lançamentos_1961.json, que apontava pra um
+# JSON de demonstração do protótipo (172 das 184 linhas sem nenhuma
+# correspondência real em comprovante/extrato -- ver commit que reverteu
+# essa importação).
+# ========================================
+
+projeto:
+  pronac: "20-7453"
+  campos:
+    pronac: "pronac"
+    nome: "nome"
+    proponente: "proponente"
+    controller: "controller"
+    banco: "banco"
+    resumo_pendencias: "resumo_pendencias"
+
+banco_captador:
+  banco_nome: "Banco do Brasil"
+  agencia: "3210-9"
+  conta: "14.209-1"
+  saldo_inicial: 0.00
+
+mapeamento_lancamentos:
+  # cruzamento.json é uma lista flat -- empacotada em {"lancamentos": [...]}
+  # antes do upload (ver script de reimportação).
+  projeto_path: null
+  lancamentos_field: "lancamentos"
+  tipo_documento_default: null
+
+  campos_obrigatorios:
+    prestador: "favorecido"                  # nome do favorecido (extraído do comprovante/extrato)
+    data_pagamento: "data_pagamento"          # já ISO 8601 (YYYY-MM-DD)
+    valor_liquido: "valor"
+    descricao: "favorecido"                   # cruzamento.json não tem descrição de serviço separada
+
+  campos_opcionais:
+    razao_social: null
+    cnpj_cpf: "cnpj_cpf"
+    documento_ref: "comprovante_pdf"          # nome real do PDF do comprovante
+    confianca_ocr: null                       # extração determinística, sem score de OCR
+    valor_nota_fiscal: null
+    # rubrica_salic fica OPCIONAL (não em campos_obrigatorios) porque
+    # cruzamento.json sempre traz esse campo vazio -- colocá-lo em
+    # campos_obrigatorios faz o loop de validação rejeitar TODA linha antes
+    # mesmo de chegar na regra de negócio (rubrica_obrigatoria: false
+    # abaixo), que é quem de fato decide bloquear ou só alertar.
+    rubrica_salic: "rubrica_salic"
+
+regras_validacao:
+  valor_minimo: 0.01
+  valor_maximo: 9999999.99
+  data_inicio_projeto: "2022-01-01"
+  data_fim_projeto: "2025-12-31"              # cruzamento.json tem lançamentos até 2025-05
+  rubrica_obrigatoria: false                  # cruzamento.json não classifica rubrica -- fica
+                                               # como alerta (REVISAO_PENDENTE), nunca bloqueia
+                                               # nem inventa uma rubrica pra fechar o número
+  validar_cnpj_cpf: true
+  confianca_minima: 0.85
+
+rubricas_salic:
+  referencia_arquivo: null
+  rubricas:
+    "1.1.1": 30000.00
+    "1.2.1": 5000.00
+    "1.3.1": 5000.00
+    "1.4.1": 20000.00
+    "1.5.1": 11000.00
+    "1.6.1": 4900.00
+    "1.7.0": 19500.00
+    "1.8.0": 8000.00
+    "2.1.1": 20000.00
+    "3.1.2": 15000.00
+    "3.5.1": 1200.00
+    "3.5.2": 12000.00
+    "3.6.1": 1200.00
+    "3.6.2": 800.00
+    "3.6.3": 25000.00
+    "3.7.1": 8000.00
+    "3.8.1": 45000.00
+    "4.1.0": 18000.00
+    "4.1.2": 12000.00
+    "4.2.0": 22000.00
+    "4.3.0": 28000.00
+    "5.1.0": 4644.00
+    "5.1.2": 16000.00
+    "5.2.0": 9000.00
+
+importacao:
+  modo: "commit"
+  verbose: true
+  parar_no_primeiro_erro: false
