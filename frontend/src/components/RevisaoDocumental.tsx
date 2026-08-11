@@ -181,9 +181,13 @@ export function RevisaoDocumental({ projetoId }: { projetoId: string }) {
                           <span key={d.id} className="flex items-center gap-1 flex-wrap">
                             <a
                               href="#"
-                              onClick={(e) => {
+                              onClick={async (e) => {
                                 e.preventDefault();
-                                download(`/api/v1/documentos/${d.id}/arquivo`, d.arquivo_ref.split(/[\\/]/).pop() ?? "doc");
+                                try {
+                                  await download(`/api/v1/documentos/${d.id}/arquivo`, d.arquivo_ref.split(/[\\/]/).pop() ?? "doc");
+                                } catch (err: any) {
+                                  alert(err?.message || "O arquivo ainda não está salvo no servidor. Sincronize a pasta do Drive.");
+                                }
                               }}
                               className="text-blue-600 hover:underline"
                             >

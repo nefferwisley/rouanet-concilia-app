@@ -161,7 +161,7 @@ async def baixar_documento_transacao(documento_id: str, dep=Depends(get_conn)):
     conn, _ = dep
     row = await conn.fetchrow(
         """
-        select d.arquivo_ref from documentos_transacao d
+        select d.arquivo_ref, t.projeto_id from documentos_transacao d
         join transacoes t on t.id = d.transacao_id
         where d.id = $1
         """,
@@ -169,14 +169,47 @@ async def baixar_documento_transacao(documento_id: str, dep=Depends(get_conn)):
     )
     if not row:
         raise HTTPException(404, "Documento não encontrado (ou sem permissão via RLS).")
-    caminho = Path(row["arquivo_ref"])
+
+    arquivo_ref = row["arquivo_ref"]
+    caminho = Path(arquivo_ref)
+
     if not caminho.is_file():
-        raise HTTPException(404, "Arquivo não está mais em disco.")
+        nome_base = Path(arquivo_ref).name
+        projeto_id = str(row["projeto_id"])
+
+        # 1. Busca em documentos_projeto (onde o Google Drive salvou o arquivo com caminho real no servidor)
+        doc_proj = await conn.fetchrow(
+            """
+            select arquivo_ref from documentos_projeto
+            where projeto_id = $1 and (nome_arquivo = $2 or nome_arquivo = $3)
+              and arquivo_ref is not null
+            limit 1
+            """,
+            projeto_id, arquivo_ref, nome_base,
+        )
+        if doc_proj and doc_proj["arquivo_ref"] and Path(doc_proj["arquivo_ref"]).is_file():
+            caminho = Path(doc_proj["arquivo_ref"])
+        else:
+            # 2. Busca na pasta de uploads do projeto
+            possivel = UPLOAD_DIR / projeto_id / nome_base
+            if possivel.is_file():
+                caminho = possivel
+            else:
+                # 3. Busca recursiva por nome do arquivo em UPLOAD_DIR
+                if UPLOAD_DIR.exists():
+                    for f in UPLOAD_DIR.glob(f"**/{nome_base}"):
+                        if f.is_file():
+                            caminho = f
+                            break
+
+    if not caminho.is_file():
+        raise HTTPException(404, f"Arquivo '{Path(arquivo_ref).name}' não foi encontrado no disco do servidor.")
+
     media = {
         ".pdf": "application/pdf", ".xml": "application/xml",
         ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
     }.get(caminho.suffix.lower(), "application/octet-stream")
-    return FileResponse(caminho, media_type=media, headers={"Content-Disposition": f'attachment; filename="{caminho.name}"'})
+    return FileResponse(caminho, media_type=media, headers={"Content-Disposition": f'inline; filename="{caminho.name}"'})
 
 
 # ---------- P2: revisão manual (campos_revisao) ----------
