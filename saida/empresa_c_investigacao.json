@@ -1,0 +1,12 @@
+{
+  "encontrados": [
+    {
+      "id": 3,
+      "data": "2023-02-10",
+      "favorecido": "EMPRESA C",
+      "valor": 500.0
+    }
+  ],
+  "total_encontrados": 1,
+  "status": "ENCONTRADO"
+}

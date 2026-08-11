@@ -3,11 +3,18 @@
 # em /health/db (que roda "select 1" de verdade — /health sozinho não
 # conta, não toca o banco).
 #
+# IMPORTANTE: o plano free do Render também "dorme" depois de 15 min
+# sem tráfego (primeiro acesso demora ~50s de cold start). Se você
+# quiser que o link esteja SEMPRE quente, use um monitor externo tipo
+# UptimeRobot (gratuito, intervalo de 5 min) apontando para:
+#   https://rouanetconcilia-backend-y19v.onrender.com/health/db
+# O ping semanal abaixo cobre só o Supabase (baixa frequência deixa o
+# Render dormir — primeira visita do dia pode demorar ~50s).
+#
 # SETUP NECESSÁRIO (não faz nada até isso ser feito):
-#   1. Deploy do backend em algum lugar (Render, Fly.io, etc — ver
-#      SETUP.md e o dashboard de status pra decisão de hospedagem).
+#   1. Deploy do backend no Render (já está: rouanetconcilia-backend-y19v).
 #   2. Settings > Secrets and variables > Actions > New repository
-#      variable: BACKEND_URL = https://seu-backend.onrender.com
+#      variable: BACKEND_URL = https://rouanetconcilia-backend-y19v.onrender.com
 #      (sem barra no final, sem /health/db — só a origem)
 #
 # Pra testar manualmente sem esperar a semana: aba Actions > Keepalive

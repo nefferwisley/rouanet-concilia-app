@@ -13,15 +13,21 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+function sanitizarToken(t: string | null): string | null {
+  if (!t) return null;
+  const limpo = t.replace(/[^A-Za-z0-9\-_.]/g, "").trim();
+  return limpo.length > 10 ? limpo : null;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setTokenState] = useState<string | null>(() => localStorage.getItem("rc_token"));
+  const [token, setTokenState] = useState<string | null>(() => sanitizarToken(localStorage.getItem("rc_token")));
   const [user, setUser] = useState<AuthUser | null>(() => {
     const salvo = localStorage.getItem("rc_user");
     return salvo ? JSON.parse(salvo) : null;
   });
 
   function setToken(t: string | null, refreshToken?: string) {
-    const limpo = t ? t.replace(/[^A-Za-z0-9\-_.]/g, "") : t;
+    const limpo = sanitizarToken(t);
     setTokenState(limpo);
     if (limpo) {
       localStorage.setItem("rc_token", limpo);

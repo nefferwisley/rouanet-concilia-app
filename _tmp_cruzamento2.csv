@@ -1,0 +1,219 @@
+=== RESUMO ===
+Cruzamento — Banco de Dados Atual x Planilha Revisada (1961),
+,
+Projeto,1961 (PRONAC 20-7453)
+Data do cruzamento,2026-08-10
+Fonte da revisão,1961_Revisao_Financeira_26-07-2026.xlsx (aba CONCILIAÇÃO REVISADA)
+,
+Linhas na planilha revisada,179
+Linhas no banco de dados atual (produção),185
+  → casadas (mesma data + mesmo valor),175
+"  → casadas (mesmo valor, data diferente)",0
+  → sem correspondência no banco atual,4
+Linhas do banco atual sem correspondência na planilha,10
+,
+Soma valores — planilha revisada,898235.43
+Soma valores — banco atual,918855.74
+,
+,
+Como usar este arquivo,
+"- Aba ""Comparacao"": cada linha da planilha revisada, ao lado do que está hoje no banco (se achou correspondência).",
+"- Aba ""Somente no banco atual"": lançamentos que estão em produção hoje mas não bateram com nenhuma linha da planilha (podem ser os duplicados 59/122, ou registros que a revisão excluiu).",
+- Nenhuma alteração foi feita em produção — este arquivo é só para conferência antes de decidir o próximo passo.,
+
+
+=== COMPARACAO (planilha revisada x banco atual) ===
+Status do cruzamento,--- PLANILHA REVISADA ---,Data (planilha),Favorecido (planilha),Valor (planilha),Rubrica SALIC,Status da revisão,Documento fiscal,Nota/correção,--- BANCO ATUAL (produção) ---,Data (banco),Fornecedor (banco),Valor (banco),Diferença de valor
+OK — data e valor conferem,,2022-11-04,CIRCUNSTANCIA CINEMATOGRAF.,11000,1.5.1,OK,1. Mônica Guimarães - Produtora Executiva.pdf,,,2022-11-04,Circunstancia Cinematografica e Prod,11000,0
+OK — data e valor conferem,,2022-11-04,CIRCUNSTANCIA CINEMATOGRAF.,5000,1.2.1,OK,4. Amir Labaki - Roteirista.pdf,,,2022-11-04,Circunstancia Cinematografica e Prod,5000,0
+OK — data e valor conferem,,2022-11-04,CIRCUNSTANCIA CINEMATOGRAF.,20000,1.4.1,OK,3. Amir Labaki - Diretor.pdf,,,2022-11-04,Circunstancia Cinematografica e Prod,20000,0
+OK — data e valor conferem,,2022-11-04,CIRCUNSTANCIA CINEMATOGRAF.,30000,1.1.1,OK,2. Amir Labaki - Obras pré-existentes.pdf,,,2022-11-04,Circunstancia Cinematografica e Prod,30000,0
+OK — data e valor conferem,,2022-11-10,FELIPE GUIMARÃES ROSA,1200,3.5.1,OK,5. Frico Guimarães - Diretor de Fotografia.pdf,,,2022-11-10,Luis Felipe Labaki,1200,0
+OK — data e valor conferem,,2022-11-10,LUIS FELIPE LABAKI,1200,3.6.1,OK,6. Luis Felipe Labaki - Som Direto.pdf,,,2022-11-10,Felipe G Rosa,1200,0
+OK — data e valor conferem,,2022-11-21,LUIS FELIPE MONTE CIPULLO,800,3.6.2,OK,7. Luis Cipullo (1961).pdf,,,2022-11-21,Luis F Monte Cipullo,800,0
+OK — data e valor conferem,,2022-11-28,CIRCUNSTANCIA CINEMATOGRAF.,20000,2.1.1,OK,8. Amir Labaki - Diretor.pdf,,,2022-11-28,Circunstancia Cinematografica e Prod,20000,0
+OK — data e valor conferem,,2022-12-12,CIRCUNSTANCIA CINEMATOGRAF.,30000,3.1.1,OK,9. Amir Labaki - Diretor.pdf,,,2022-12-12,Circunstancia Cinematografica e Prod,30000,0
+OK — data e valor conferem,,2022-12-14,JULIA BARBARA MELO DE SOUSA.,6000,5.4.1,OK,10. Júlia Sousa - Controller.pdf,,,2022-12-14,Julia Barbara Melo de Sousa 40926175,6000,0
+OK — data e valor conferem,,2022-12-14,PLANIFILMES LTDA.,2000,1.6.1,OK,11. Lia Pini - Coordenador de Produção.pdf,,,2022-12-14,Planifilmes Ltda,2000,0
+OK — data e valor conferem,,2022-12-20,CIRCUNSTÂNCIA CINEMATOGRÁFICA,20000,6.1.1,OK,12. Circunstância - Gerenciamento.pdf,,,2022-12-20,Circunstancia Cinematografica e Prod,20000,0
+OK — data e valor conferem,,2023-01-23,CIRCUNSTANCIA CINEMATOGRAF.,30000,6.1.1,OK,13. Circunstância - Gerenciamento.pdf,,,2023-01-23,Circunstancia Cinematografica e Prod,30000,0
+OK — data e valor conferem,,2023-01-23,CIRCUNSTANCIA CINEMATOGRAF.,4500,6.1.1,OK,14. Circunstância - Gerenciamento.pdf,,,2023-01-23,Circunstancia Cinematografica e Prod,4500,0
+OK — data e valor conferem,,2023-02-22,Amir Labaki,19550,6.1.1,VALOR CORRIGIDO,15. Circunstância - Gerenciamento.pdf,"Planilha: R$ 19,500.00 em 22/02/2023 × Extrato: R$ 19,550.00 em 22/02/2023. Divergência de valor — prevalece o extrato.",,2023-02-22,Circunstancia Cinematografica e Prod,19550,0
+OK — data e valor conferem,,2023-07-03,CIRCUNSTANCIA CINEMATOGRAF.,25000,4.1.1,OK,16. Circunstância_diretor.pdf,,,2023-07-03,Mog Produtora,25000,0
+OK — data e valor conferem,,2023-07-03,MOG PRODUTORA,25000,2.2.1 / 3.3.1,OK,17. MoG Produtora - Produtora Executiva.pdf,Favorecido no extrato: MOG PRODUTORA.,,2023-07-03,Circunstancia Cinematografica e Prod,25000,0
+OK — data e valor conferem,,2023-08-18,RADIO E TELEVISAO BANDEIRANTES,380,1.3,OK,18. Bandeirantes - Pesquisa.pdf,,,2023-08-18,Radio e Televisao Bandeirantes S.a.,380,0
+OK — data e valor conferem,,2023-08-25,MEMORIA COLETIVA IMAGENS,10500,1.3,OK,19. Eloa Chouzal (primeira parcela) - Pesquisa.pdf,Favorecido no extrato: MEMORIA COLETIVA IMAGENS.,,2023-08-25,Memoria Coletiva Imagens e Textos Lt,10500,0
+OK — data e valor conferem,,2023-09-04,PORVIROSCOPIO PROJETOS,700,1.3,OK,20. Porviroscopio Projetos - Pesquisa.pdf,,,2023-09-04,Porviroscopio Projetos C. C. Ltda,700,0
+OK — data e valor conferem,,2023-09-05,FOGO FILMES LTDA,33000,4.4.1,OK,21. Fogo Filmes - Finalização.pdf,,,2023-09-05,favorecido,33000,0
+OK — data e valor conferem,,2023-09-05,GA - ITCD/TXS GOV RS (Impostos),120,1.3,OK,22. Guia de Arrecadação - Pesquisa.pdf,Favorecido no extrato: GA - ITCD/TXS GOV RS (Impostos).,,2023-09-05,:,120,0
+OK — data e valor conferem,,2023-09-06,Júlia Sousa,4900,5.4.1,VALOR CORRIGIDO,23. Júlia Sousa - Controller.pdf,"Planilha: R$ 4,950.00 em 08/09/2023 × Extrato: R$ 4,900.00 em 06/09/2023. Divergência de valor e de data — prevalece o extrato.",,2023-09-06,Julia Barbara Melo de Sousa 40926175,4900,0
+OK — data e valor conferem,,2023-09-11,ANA BEATRIZ HERMANSON POMAR,3000,3.4.2,OK,24. Beatriz Pomar - Assistente de Produção.pdf,,,2023-09-11,Ana Beatriz Hermanson Pomar Servicos,3000,0
+OK — data e valor conferem,,2023-09-20,GOL Linhas Aéreas,2870.87,3.11.2,OK,25. André Manfrim - Passagem Aérea.pdf,Favorecido no extrato: GOL Linhas Aéreas.,,2023-09-20,Gol Linhas Aéreas,2870.87,0
+OK — data e valor conferem,,2023-09-20,GOL Linhas Aéreas,2870.87,3.11.2,OK,26. Luis Cipullo - Passagem Aérea.pdf,Favorecido no extrato: GOL Linhas Aéreas.,,2023-09-20,Gol Linhas Aéreas,2870.87,0
+OK — data e valor conferem,,2023-09-20,GOL Linhas Aéreas,2870.87,3.11.2,OK,27. Thiago Cunha - Passagem Aérea.pdf,Favorecido no extrato: GOL Linhas Aéreas.,,2023-09-20,Gol Linhas Aéreas,2870.87,0
+OK — data e valor conferem,,2023-09-20,GOL Linhas Aéreas,2870.87,3.11.2,OK,28. Frico Guimarães - Passagem Aérea.pdf,Favorecido no extrato: GOL Linhas Aéreas.,,2023-09-20,Gol Linhas Aéreas,2870.87,0
+OK — data e valor conferem,,2023-09-20,GOL Linhas Aéreas,1524.64,3.11.2,OK,29. André Manfrim RJ - Passagem Aérea.pdf,Favorecido no extrato: GOL Linhas Aéreas.,,2023-09-20,Gol Linhas Aéreas,1524.64,0
+OK — data e valor conferem,,2023-09-20,GOL Linhas Aéreas,1524.64,3.11.2,OK,30. Luis Cipullo RJ - Passagem Aérea.pdf,Favorecido no extrato: GOL Linhas Aéreas.,,2023-09-20,Gol Linhas Aéreas,1524.64,0
+OK — data e valor conferem,,2023-09-20,GOL Linhas Aéreas,1524.64,3.11.2,OK,31. Frico Guimarães RJ - Passagem Aérea.pdf,Favorecido no extrato: GOL Linhas Aéreas.,,2023-09-20,Gol Linhas Aéreas,1524.64,0
+OK — data e valor conferem,,2023-09-20,GOL Linhas Aéreas,1524.64,3.11.2,OK,32. Thiago Cunha RJ - Passagem Aérea.pdf,Favorecido no extrato: GOL Linhas Aéreas.,,2023-09-20,Gol Linhas Aéreas,1524.64,0
+OK — data e valor conferem,,2023-09-26,Mônica Guimarães,10000,2.2.1 / 3.3.1,DATA CORRIGIDA,96. Mônica Guimarães - Produtora Executiva.pdf,Planilha: 25/10/2023 × Extrato: 26/09/2023. Corrigir para a data do extrato.,,2023-09-26,LUIS FELIPE LABAKI,10000,0
+OK — data e valor conferem,,2023-09-26,André Manfrim,11250,3.11.2,DATA CORRIGIDA,107. André Manfrin - Coordenador de Produção.pdf,Planilha: 26/10/2023 × Extrato: 26/09/2023. Corrigir para a data do extrato.,,2023-09-26,Filmes de Taipa Prod,11250,0
+OK — data e valor conferem,,2023-09-26,Camila Braune,3000,3.6.1,DATA CORRIGIDA,87. Camila Braune - Tecnica de som SP.pdf,Planilha: 16/10/2023 × Extrato: 26/09/2023. Corrigir para a data do extrato.,,2023-09-26,ANA BEATRIZ HERMANSON POMA,3000,0
+OK — data e valor conferem,,2023-09-28,CASA DO ROADIE,350,2.6.1,OK,36. Casa do Rodie - Material de Consumo.pdf,,,2023-09-28,Casa do Roadie,350,0
+OK — data e valor conferem,,2023-09-28,SOFIA VONTOBEL BACCARINI,1000,3.12,OK,37. Sofia Vontobel - Verba de Produção.pdf,,,2023-09-28,Sofia V Baccarini,1000,0
+OK — data e valor conferem,,2023-09-28,ANDRÉ LIMA MANFRIM,1000,3.12,OK,38. André Manfrin - Verba de Produção.pdf,,,2023-09-28,Andre Lima Manfrim,1000,0
+OK — data e valor conferem,,2023-09-28,CASA DO ROADIE,15.3,2.6.1,OK,39. Casa do Rodie (complemento) - Material de consumo.pdf,,,2023-09-28,Casa do Roadie,15.3,0
+OK — data e valor conferem,,2023-09-28,CITYHOME SERVICOS IMOBILIARIOS,8800,3.11.1,OK,40. Cityhome - Hospedagem sem alimentação.pdf,Favorecido no extrato: CITYHOME SERVICOS IMOBILIARIOS.,,2023-09-28,Cityhome Servicos Imobiliarios Ltda,8800,0
+OK — data e valor conferem,,2023-09-29,PATEO MOINHOS DE VENTO ADM,5768.4,3.11.1,OK,41. Hospedagem Amir Labaki - Hospedagem sem alimentação.pdf,Favorecido no extrato: PATEO MOINHOS DE VENTO ADM.,,2023-09-29,Pateo Moinhos de Vento Adm e Part Lt,5768.4,0
+OK — data e valor conferem,,2023-09-29,CITYHOME SERVICOS IMOBILIARIOS,500,3.11.1,OK,42. Cityhome Amir Labaki - Hospedagem sem alimentação.pdf,Favorecido no extrato: CITYHOME SERVICOS IMOBILIARIOS.,,2023-09-29,Cityhome Servicos Imobiliarios Ltda,500,0
+OK — data e valor conferem,,2023-09-29,MARTINA MILLA RAFFAELLI ME (MR5),35000,3.7,OK,43. MR5 - Locação de equipamentos.pdf,Favorecido no extrato: MARTINA MILLA RAFFAELLI ME (MR5).,,2023-09-29,Martina Milla Raffaelli Me,35000,0
+OK — data e valor conferem,,2023-09-29,MATRON INFORMATICA,3116,3.7,OK,44. HDS  - Hds externos.pdf,Favorecido no extrato: MATRON INFORMATICA.,,2023-09-29,Matron Informatica,3116,0
+OK — data e valor conferem,,2023-09-29,LUIS FELIPE MONTE CIPULLO,1050,3.10.1,OK,45. Luis Cipullo - verba de alimentação.pdf,,,2023-09-29,Luis F Monte Cipullo,1050,0
+OK — data e valor conferem,,2023-09-29,Felipe Guimarães Rosa,1050,3.10.1,OK,46. Frico Guimarães - verba de alimentação.pdf,Favorecido no extrato: Felipe Guimarães Rosa.,,2023-09-29,Felipe G Rosa,1050,0
+OK — data e valor conferem,,2023-09-29,FELIPE GUIMARÃES ROSA,1050,3.10.1,OK,47. Thiago Cunha - verba de alimentação.pdf,,,2023-09-29,Thiago A Gomas Cunha,1050,0
+OK — data e valor conferem,,2023-09-29,SOFIA VONTOBEL BACCARINI,560,3.10.1,OK,48. Sofia Vontobel - verba de alimentação.pdf,,,2023-09-29,Sofia V Baccarini,560,0
+OK — data e valor conferem,,2023-09-29,Fábio Baltar Duarte,560,3.10.1,OK,49. Fabio Baltar - verba de alimentação.pdf,Favorecido no extrato: Fábio Baltar Duarte.,,2023-09-29,Fabio Baltar Duarte,560,0
+OK — data e valor conferem,,2023-09-29,Andre Lima Monfrini,1050,3.10.1,OK,50. André Manfrin - verba de alimentação.pdf,Favorecido no extrato: Andre Lima Monfrini.,,2023-09-29,Andre Lima Monfrini,1050,0
+OK — data e valor conferem,,2023-09-29,CITYHOME SERVICOS IMOBILIARIOS,150,3.11.1,OK,51. Cityhome Amir Labaki complemento - Hospedagem sem alimentação.pdf,Favorecido no extrato: CITYHOME SERVICOS IMOBILIARIOS.,,2023-09-29,Cityhome Servicos Imobiliarios Ltda,150,0
+OK — data e valor conferem,,2023-09-29,SCM PREST SERV POSTAIS,35.1,Gerenciamento (cód. pendente),OK,52. Correios - envio de livros.pdf,Favorecido no extrato: SCM PREST SERV POSTAIS.,,2023-09-29,Scm Prest Serv Postais Ltda,35.1,0
+OK — data e valor conferem,,2023-10-02,PATEO MOINHOS DE VENTO ADM,1610,3.11.1,OK,53. Hospedagem Amir Labaki - Hospedagem sem alimentação.pdf,Favorecido no extrato: PATEO MOINHOS DE VENTO ADM.,,2023-10-02,Pateo Moinhos de Vento Adm e Part Lt,1610,0
+OK — data e valor conferem,,2023-10-03,Glademir Martins Machado,200,3.10.1,OK,54.  Motorista POA - verba de alimentação.pdf,Favorecido no extrato: Glademir Martins Machado.,,2023-10-03,Glademir M Machado,200,0
+OK — data e valor conferem,,2023-10-03,Hds Externos,3020,3.7,DATA CORRIGIDA,55. HDS - Hds externos.pdf,Planilha: 02/10/2023 × Extrato: 03/10/2023. Corrigir para a data do extrato.,,2023-10-03,Matron Informatica,3020,0
+OK — data e valor conferem,,2023-10-05,"1º Pix rejeitado e reenviado no mesmo dia (líquido R$ 700,00) Favorecido no extrato: EDSON DE CAMARGO TRANSPORTES.",700,3.9.1,OK,56. Motorista SP - transporte local.pdf,,,2023-10-05,Edson de Camargo Transportes,700,0
+OK — data e valor conferem,,2023-10-05,AMIR LABAKI,500,3.9.4,OK,57. Amir Labaki - Verba de transporte.pdf,,,2023-10-05,Amir Labaki,500,0
+OK — data e valor conferem,,2023-10-06,MEMORIA COLETIVA IMAGENS,10500,1.3,OK,58. Eloa Chouzal (parcela final) - Pesquisa.pdf,Favorecido no extrato: MEMORIA COLETIVA IMAGENS.,,2023-10-06,Memoria Coletiva Imagens e Textos Lt,10500,0
+SEM CORRESPONDÊNCIA NO BANCO ATUAL,,2023-10-09,"Pago em um único Pix de R$ 945,49 junto com a outra linha do controle 59 (136,69 + 808,80). Pix único de R$ 945,49",136.69,3.9.1,OK,59. Amir Labaki - Verba Transporte e AlimentaçÃo.pdf,,,,,,
+SEM CORRESPONDÊNCIA NO BANCO ATUAL,,2023-10-09,"Pago em um único Pix de R$ 945,49 junto com a outra linha do controle 59 (136,69 + 808,80). Pix único de R$ 945,49",808.8,3.10.1,OK,59. Amir Labaki - Verba Transporte e AlimentaçÃo.pdf,,,,,,
+OK — data e valor conferem,,2023-10-09,MOG PRODUTORA,13500,3.5.1,OK,60. Frico Guimarães - Diretor de fotografia.pdf,Favorecido no extrato: MOG PRODUTORA.,,2023-10-09,Mog Produtora,13500,0
+OK — data e valor conferem,,2023-10-09,LUIS FELIPE MONTE CIPULLO,7500,3.6.2,OK,61. Luis Cipullo - Assistente de Fotografia.pdf,,,2023-10-09,Luis Felipe Monte Cipullo 4425612981,7500,0
+OK — data e valor conferem,,2023-10-09,THIAGO AUGUSTO GOMAS CUNHA,4800,3.6.3,OK,62. Thiago Cunha - Logger.pdf,,,2023-10-09,Thiago Augusto Gomas Cunha 397893948,4800,0
+OK — data e valor conferem,,2023-10-09,FÁBIO BALTAR DUARTE,1800,3.6.1,OK,63. Fabio Baltar - som direto.pdf,,,2023-10-09,Fabio Baltar Duarte,1800.01,-0.01
+OK — data e valor conferem,,2023-10-09,FÁBIO BALTAR DUARTE,1800.01,3.7,OK,64. Fabio Baltar - equipamento de som.pdf,,,2023-10-09,Fabio Baltar Duarte,1800,0.01
+OK — data e valor conferem,,2023-10-09,MANDALA TOURS,9502.77,3.11.1,OK,65. Mandala Tour - Hospedagem sem alimentação.pdf,,,2023-10-09,Mandala Tours,9502.77,0
+OK — data e valor conferem,,2023-10-09,LUIS FELIPE MONTE CIPULLO,240,3.10.1,OK,66. Luis Cipullo - verba de alimentação.pdf,,,2023-10-09,Luis F Monte Cipullo,240,0
+OK — data e valor conferem,,2023-10-09,Andre Lima Monfrini,240,3.10.1,OK,67. André Manfrin - verba de alimentação.pdf,Favorecido no extrato: Andre Lima Monfrini.,,2023-10-09,Andre Lima Monfrini,240,0
+OK — data e valor conferem,,2023-10-09,Felipe Guimarães Rosa,240,3.10.1,OK,68. Frico Guimarães - verba de alimentação.pdf,Favorecido no extrato: Felipe Guimarães Rosa.,,2023-10-09,Thiago A Gomas Cunha,240,0
+OK — data e valor conferem,,2023-10-09,ANDRE LIMA MONFRINI,240,3.10.1,OK,69. Thiago Cunha - verba de alimentação.pdf,,,2023-10-09,Felipe G Rosa,240,0
+OK — data e valor conferem,,2023-10-10,Andre Lima Monfrini,500,3.12,OK,70. FAU - Locação de Espaço.pdf,Favorecido no extrato: Andre Lima Monfrini.,,2023-10-10,Andre Lima Monfrini,500,0
+OK — data e valor conferem,,2023-10-10,CONTA RECEITAS D F,2300,Locação de espaço (cód. pendente),OK,71. Beatriz Pomar - Assistente de produção.pdf,Favorecido no extrato: CONTA RECEITAS D F.,,2023-10-10,Faculdade de Arquitetura e Urbanismo,2300,0
+OK — data e valor conferem,,2023-10-11,ANA BEATRIZ HERMANSON POMAR,1500,3.4.2,OK,72. MAC RS - locação de espaço.pdf,,,2023-10-11,Ana Beatriz Hermanson Pomar Servicos,1500,0
+OK — data e valor conferem,,2023-10-11,AAMAC,400,Locação de espaço (cód. pendente),OK,73. Motorista SP - transporte local.pdf,Favorecido no extrato: AAMAC.,,2023-10-11,Aamac,400,0
+OK — data e valor conferem,,2023-10-11,Malnes Transporte e Produções,500,3.9.1,OK,74. Sofia Vontobel - Produtora Local POA.pdf,Favorecido no extrato: Malnes Transporte e Produções.,,2023-10-11,Malnes Transporte e Produção,500,0
+OK — data e valor conferem,,2023-10-11,VONDOC FILMES LTDA,4000,3.4.2,OK,75. Verba de produção Rio de Janeiro.pdf,Favorecido no extrato: VONDOC FILMES LTDA.,,2023-10-11,Vondoc Filmes Ltda,4000,0
+OK — data e valor conferem,,2023-10-11,IDALINA SOUZA RIBEIRO,1000,3.12,OK,76. Hospedagem Equipe RJ - Hospedagem sem alimentação.pdf,Favorecido no extrato: IDALINA SOUZA RIBEIRO.,,2023-10-11,Idalina S R Silva,1000,0
+OK — data e valor conferem,,2023-10-11,MANDALA TOURS,9672,3.11.1,OK,⚠ Comprovante não localizado na pasta,Favorecido no extrato: MANDALA TOURS.,,2023-10-11,Mandala Tours,9672,0
+OK — data e valor conferem,,2023-10-13,Andre Lima Monfrini,1200,3.11.3,OK,78. André Manfrim - verba de alimentação.pdf,Favorecido no extrato: Andre Lima Monfrini.,,2023-10-13,Andre Lima Monfrini,1200,0
+OK — data e valor conferem,,2023-10-13,Felipe Guimarães Rosa,1200,3.11.3,OK,79. Frico Guimarães - verba de alimentação.pdf,Favorecido no extrato: Felipe Guimarães Rosa.,,2023-10-13,Felipe G Rosa,1200,0
+OK — data e valor conferem,,2023-10-13,ANDRE LIMA MONFRINI,1200,3.11.3,OK,80. Luis Cipullo - verba de alimentação.pdf,,,2023-10-13,Luis F Monte Cipullo,1200,0
+OK — data e valor conferem,,2023-10-13,FELIPE GUIMARÃES ROSA,1200,3.11.3,OK,81. Thiago Cunha - verba de alimentação.pdf,,,2023-10-13,Thiago A Gomas Cunha,1200,0
+OK — data e valor conferem,,2023-10-13,ANDRÉ LIMA MANFRIM,1000, 3.11.3,OK,82. André Manfrim - verba de produção RJ.pdf,,,2023-10-13,Andre Lima Manfrim,1000,0
+OK — data e valor conferem,,2023-10-13,IDALINA SOUZA RIBEIRO,480,3.11.3,OK,83. Ida Leal - verba de alimentação.pdf,Favorecido no extrato: IDALINA SOUZA RIBEIRO.,,2023-10-13,Anne C Melo Santos,480,0
+OK — data e valor conferem,,2023-10-13,IDALINA SOUZA RIBEIRO,480,3.11.3,OK,84. Anne Santos - verba de alimentação.pdf,,,2023-10-13,Idalina S R Silva,480,0
+OK — data e valor conferem,,2023-10-13,RICARDO DIAS DOS SANTOS,300,3.11.3,OK,85. Motorista Rio - verba de alimentação.pdf,Favorecido no extrato: RICARDO DIAS DOS SANTOS.,,2023-10-13,Ricardo Dias Santos,300,0
+OK — data e valor conferem,,2023-10-13,MAGA PROJETOS CULTURAIS,2000,3.4.2,OK,86. Ida Leal (primeira parcela) - Prod. local RJ.pdf,Favorecido no extrato: MAGA PROJETOS CULTURAIS.,,2023-10-13,Maga Projetos Culturais,2000,0
+OK — data e valor conferem,,2023-10-16,Beatriz Pomar,3000,3.4.2,DATA CORRIGIDA,87. Camila Braune - Tecnica de som SP.pdf,Planilha: 26/10/2023 × Extrato: 16/10/2023. Corrigir para a data do extrato.,,2023-10-16,Camila Licariao de Carvalho Braune 4,3000,0
+OK — data e valor conferem,,2023-10-16,LUZ RIO LOCACAO DE EQUIPAMENTOS,1100,3.7,OK,88. Equipamento de Luz - Rio de Janeiro.pdf,,,2023-10-16,Luz Rio Locacao de Equipamentos Cine,1100,0
+OK — data e valor conferem,,2023-10-17,CRISTHIANO RODRIGUES DE JESUS,4375,3.9.3,OK,89. Van São Paulo - transporte local.pdf,Favorecido no extrato: CRISTHIANO RODRIGUES DE JESUS.,,2023-10-17,Cristhiano Rodrigues de Jesus 041338,4375,0
+OK — data e valor conferem,,2023-10-17,CLAUDIA,4900,3.9.3,OK,90. Van porto Alegre - transporte local.pdf,Favorecido no extrato: CLAUDIA.,,2023-10-17,Claudia,4900,0
+OK — data e valor conferem,,2023-10-18,FERNANDO MIGUEL EFRON,550,3.7,OK,91. Fernando Miguel - Locação de equipamentop de som.pdf,,,2023-10-18,Fernando M Efron,550,0
+OK — data e valor conferem,,2023-10-24,MONICA GUIMARAES P MORAES,9427.38,3.11.2,OK,92. Reembolso MG - Passagens Aéreas.pdf,Favorecido no extrato: MONICA GUIMARAES P MORAES.,,2023-10-24,Monica G P Moraes,9427.38,0
+OK — data e valor conferem,,2023-10-25,FOGO FILMES LTDA,20625,4.6,OK,93. André Finotti - Pacote de imagem.pdf,Favorecido no extrato: FOGO FILMES LTDA.,,2023-10-25,Fogo Filmes Ltda,20625,0
+OK — data e valor conferem,,2023-10-25,ANNE SANTOS,3600,3.6.1,OK,94. Anne Santos - Som Direto RJ.pdf,,,2023-10-25,Anne Santos,3600,0
+OK — data e valor conferem,,2023-10-25,MOG PRODUTORA,13500,3.5.1,OK,95. Frico Guimarães - Diretor de Fotografia.pdf,Favorecido no extrato: MOG PRODUTORA.,,2023-10-25,Mog Produtora,13500,0
+OK — data e valor conferem,,2023-10-25,Luiz Felipe G Labaki,10000,2.2.1 / 3.3.1,DATA CORRIGIDA,96. Mônica Guimarães - Produtora Executiva.pdf,Planilha: 26/10/2023 × Extrato: 25/10/2023. Corrigir para a data do extrato.,,2023-10-25,Mog Produtora,10000,0
+OK — data e valor conferem,,2023-10-25,MAGA PROJETOS CULTURAIS,2000,3.4.2,OK,97. Idalina - Produtora RJ.pdf,Favorecido no extrato: MAGA PROJETOS CULTURAIS.,,2023-10-25,Maga Projetos Culturais,2000,0
+OK — data e valor conferem,,2023-10-25,THIAGO AUGUSTO GOMAS CUNHA,1800,3.7,OK,98. Thiago Cunha - Equipamento de luz.pdf,,,2023-10-25,Thiago Augusto Gomas Cunha 397893948,1800,0
+OK — data e valor conferem,,2023-10-25,THIAGO AUGUSTO GOMAS CUNHA,4800,3.6.3,OK,99. Thiago Cunha - Logger.pdf,,,2023-10-25,Thiago Augusto Gomas Cunha 397893948,4800,0
+OK — data e valor conferem,,2023-10-25,SOFIA VONTOBEL BACCARINI,816.42,3.12,OK,100. Reembolso Sofia - Verba de Produção.pdf,,,2023-10-25,Sofia V Baccarini,816.42,0
+OK — data e valor conferem,,2023-10-25,CALEIDOSKOPICA PRODUCOES,450,3.7,OK,101. Calendoscopia - Locação equip. som.pdf,Favorecido no extrato: CALEIDOSKOPICA PRODUCOES.,,2023-10-25,Caleidoskopica Producoes,450,0
+OK — data e valor conferem,,2023-10-25,FILMES DE TAIPA PROD,4500,3.7,OK,102. Filmes de Taipa - Equipamento de Câmera.pdf,,,2023-10-25,Filmes de Taipa Prod,4500,0
+OK — data e valor conferem,,2023-10-25,ELECTRICA CINEMA E VIDEO (boleto),600,3.7,OK,103. Equipamento LUZ SP.pdf,Favorecido no extrato: ELECTRICA CINEMA E VIDEO (boleto).,,2023-10-25,:,600,0
+OK — data e valor conferem,,2023-10-26,GRIFE RIO LOCADORA LTDA (transferência),6550,3.9.3,OK,106. Van Rio de Janeiro - Transporte local.pdf,Favorecido no extrato: GRIFE RIO LOCADORA LTDA (transferência).,,2023-10-26,GRIFE RIO LOCADORA LTDA,6550,0
+OK — data e valor conferem,,2023-10-26,LOC ALL DE CINEMA E TELEVISAO,995,3.7,OK,104. Locall - Locação de equipamentos.pdf,Favorecido no extrato: LOC ALL DE CINEMA E TELEVISAO.,,2023-10-26,Loc All de Cinema e Televisao Limita,995,0
+OK — data e valor conferem,,2023-10-26,LUIS FELIPE MONTE CIPULLO,7500,3.6.2,OK,105. Luis Cipullo - Assistente de Fotografia.pdf,,,2023-10-26,Luis Felipe Monte Cipullo 4425612981,7500,0
+OK — data e valor conferem,,2023-10-26,FILMES DE TAIPA PROD,11250,2.3.1,OK,35. Manfrim_dir producao.pdf,Favorecido no extrato: FILMES DE TAIPA PROD.,,2023-10-26,Filmes de Taipa Prod,11250,0
+OK — data e valor conferem,,2023-10-30,WINDSOR ADMINISTRACAO DE HOTEIS,2529.85,3.11.1,OK,108. Hotel Equipe - Hospedagem.pdf,Favorecido no extrato: WINDSOR ADMINISTRACAO DE HOTEIS.,,2023-10-30,Windsor Administracao de Hoteis e Se,2529.85,0
+OK — data e valor conferem,,2023-10-30,WINDSOR ADMINISTRACAO DE HOTEIS,1559.33,3.11.1,OK,109. Hotel AL - Hospedagem.pdf,Favorecido no extrato: WINDSOR ADMINISTRACAO DE HOTEIS.,,2023-10-30,Windsor Administracao de Hoteis e Se,1559.33,0
+OK — data e valor conferem,,2023-10-30,(favorecido não identificado no extrato),450,3.7,OK,110. Arthur Rodrigues - Locação de equipamento.pdf,Favorecido no extrato: (favorecido não identificado no extrato).,,2023-10-30,-,450,0
+OK — data e valor conferem,,2023-10-30,BRILHO,211.5,3.7,OK,111. Brilho - Equipamento Luz (diária extra).pdf,,,2023-10-30,Brilho,211.5,0
+OK — data e valor conferem,,2023-10-30,MARTINA MILLA RAFFAELLI ME (MR5),1500,3.7,OK,112. MR5 - Equipamento de Câmera.pdf,Favorecido no extrato: MARTINA MILLA RAFFAELLI ME (MR5).,,2023-10-30,Martina Milla Raffaelli Me,1500,0
+OK — data e valor conferem,,2023-10-31,JEFFERSON MARCOS SILVA,320,3.11.3,OK,113. Alimentação motorista.pdf,Favorecido no extrato: JEFFERSON MARCOS SILVA.,,2023-10-31,Jefferson S Oliveira,320,0
+OK — data e valor conferem,,2023-10-31,Felipe Guimarães Rosa,1020,3.11.3,OK,114. Frico Guimarães - Ajuda de custo + Alimentação.pdf,Favorecido no extrato: Felipe Guimarães Rosa.,,2023-10-31,Felipe G Rosa,1020,0
+OK — data e valor conferem,,2023-10-31,FELIPE GUIMARÃES ROSA,1020,3.11.3,OK,115. Luis Cipullo - Ajuda de custo + Alimentação.pdf,,,2023-10-31,Luis F Monte Cipullo,1020,0
+OK — data e valor conferem,,2023-10-31,Andre Lima Monfrini,1020,3.11.3,OK,116. André Manfrin - Ajuda de custo + Alimentação.pdf,Favorecido no extrato: Andre Lima Monfrini.,,2023-10-31,Andre Lima Monfrini,1020,0
+OK — data e valor conferem,,2023-10-31,André Lima Manfrim,200,3.12,OK,117. Verba de produção RJ.pdf,Favorecido no extrato: André Lima Manfrim.,,2023-10-31,Andre Lima Manfrim,200,0
+OK — data e valor conferem,,2023-11-01,Late Check-out,316.23,3.11.1,VALOR CORRIGIDO,118. Late Check out.pdf,Planilha: R$ 316.25 em 01/11/2023 × Extrato: R$ 316.23 em 01/11/2023. Divergência de valor — prevalece o extrato.,,2023-11-01,Windsor Administracao de Hoteis e Se,316.23,0
+OK — data e valor conferem,,2023-11-08,"1º Pix rejeitado e reenviado (líquido R$ 300,00)",300,1.3,OK,119. Bernardo Tavares - assistente de pesquisa.pdf,,,2023-11-08,BERNARDO TAVARES ROSA,300,0
+OK — data e valor conferem,,2023-11-08,CRISTHIANO RODRIGUES DE JESUS,4750,3.9.3,OK,120. VAN São Paulo x Rio - transporte local.pdf,Favorecido no extrato: CRISTHIANO RODRIGUES DE JESUS.,,2023-11-08,Cristhiano Rodrigues de Jesus 041338,4750,0
+OK — data e valor conferem,,2023-11-14,Mônica Guimarães,27000,2.2.1 / 3.3.1,DATA CORRIGIDA,121. Mônica Guimarães - Produtora Executiva.pdf,Planilha: 16/11/2023 × Extrato: 14/11/2023. Corrigir para a data do extrato.,,2023-11-14,Mog Produtora,27000,0
+SEM CORRESPONDÊNCIA NO BANCO ATUAL,,2023-11-14,Reembolso Mônica Guimarães,3353.72,3.11.3,DATA CORRIGIDA,122. Reembolso MG (refeição e transporte).pdf,"Pago em um único Pix de R$ 3.724,74 (3.353,72 + 371,02) em 14/11/2023 — planilha registra 16/11/2023. Corrigir a data e tratar as duas linhas como parcelas do mesmo Pix (122 / 122-B). Pix único de R$ 3.724,74",,,,,
+SEM CORRESPONDÊNCIA NO BANCO ATUAL,,2023-11-14,Reembolso Mônica Guimarães,371.02,3.9.3,DATA CORRIGIDA,122. Reembolso MG (refeição e transporte).pdf,"Pago em um único Pix de R$ 3.724,74 (3.353,72 + 371,02) em 14/11/2023 — planilha registra 16/11/2023. Corrigir a data e tratar as duas linhas como parcelas do mesmo Pix (122 / 122-B). Pix único de R$ 3.724,74",,,,,
+OK — data e valor conferem,,2023-11-14,Bié Cinema e TV,750,3.7,DATA CORRIGIDA,123. Equipamento de som SP.pdf,Planilha: 16/11/2023 × Extrato: 14/11/2023. Corrigir para a data do extrato.,,2023-11-14,Bie Cinema e Tv Ltda Me,750,0
+OK — data e valor conferem,,2023-11-14,Filmes de Taipa,400,3.7,DATA CORRIGIDA,124. Locação de equipamento de camera.pdf,Planilha: 16/11/2023 × Extrato: 14/11/2023. Corrigir para a data do extrato.,,2023-11-14,Filmes de Taipa Prod,400,0
+OK — data e valor conferem,,2023-11-27,FOGO FILMES LTDA,20625,4.6,OK,125. André Finotti - Edicão e Finalização.pdf,Favorecido no extrato: FOGO FILMES LTDA.,,2023-11-27,Fogo Filmes Ltda,20625,0
+OK — data e valor conferem,,2023-12-11,MEMORIA COLETIVA IMAGENS,2000,1.3,OK,126. Eloa Chouzal - Pesquisador.pdf,Favorecido no extrato: MEMORIA COLETIVA IMAGENS.,,2023-12-11,Memoria Coletiva Imagens e Textos Lt,2000,0
+OK — data e valor conferem,,2023-12-20,RAQUEL DE OLIVEIRA LAZARO,585,3.6.1,OK,128. Raquel (diária extra) - Som direto.pdf,,,2023-12-20,Raquel de Oliveira Lazaro 0483723061,585,0
+OK — data e valor conferem,,2023-12-20,FOGO FILMES LTDA,20625,4.6,OK,127. André Finotti - Edição e Finalização .pdf,Favorecido no extrato: FOGO FILMES LTDA.,,2023-12-20,Fogo Filmes Ltda,20625,0
+OK — data e valor conferem,,2024-01-24,FOGO FILMES LTDA,20625,4.6,OK,129. André Finotti - Edição e Finalização .pdf,Favorecido no extrato: FOGO FILMES LTDA.,,2024-01-24,Fogo Filmes Ltda,20625,0
+OK — data e valor conferem,,2024-01-31,IN SAMPA COURIER ENTREGAS,487.2,3.9.3,OK,130. FP Courrier - Transporte Loca.pdf,Favorecido no extrato: IN SAMPA COURIER ENTREGAS.,,2024-01-31,In Sampa Courier Entregas Eireli,487.2,0
+OK — data e valor conferem,,2024-02-23,JUBA PRODUCOES,6000,5.4.1,OK,131. Júlia Sousa - controller.pdf,Favorecido no extrato: JUBA PRODUCOES.,,2024-02-23,Juba Producoes,6000,0
+OK — data e valor conferem,,2024-02-23,FOGO FILMES,22500,4.6,OK,132. André Finotti - Edição e Finalização .pdf,Favorecido no extrato: FOGO FILMES.,,2024-02-23,Fogo Filmes,22500,0
+OK — data e valor conferem,,2024-05-07,JULIA BARBARA MELO DE SOUSA,4000,5.4.1,OK,133. Júlia Sousa - controller.pdf,Favorecido no extrato: JULIA BARBARA MELO DE SOUSA.,,2024-05-07,Julia Barbara Melo de Sousa 40926175,4000,0
+OK — data e valor conferem,,2024-05-31,GANZAH,5000,4.8.1,OK,134. Ganzah - Trilha Musical.pdf,Favorecido no extrato: GANZAH.,,2024-05-31,Ganzah,5000,0
+OK — data e valor conferem,,2024-06-03,André Finotti,13500,4.6,DATA CORRIGIDA,135. André Finotti - Edição e Finalização.pdf,Planilha: 01/06/2024 × Extrato: 03/06/2024. Corrigir para a data do extrato.,,2024-06-03,Fogo Filmes,13500,0
+OK — data e valor conferem,,2024-07-03,Giovana Amano,5000,Produtora de Licenciamento (cód. pendente),DATA CORRIGIDA,136. Giovana Amano - Produtora de Licenciamento.pdf,Planilha: 05/07/2024 × Extrato: 03/07/2024. Corrigir para a data do extrato.,,2024-07-03,Giovana Amano,5000,0
+OK — data e valor conferem,,2024-07-30,BRASIL IMAGEM,8000,Licenciamento de conteúdo (cód. pendente),OK,137. Wagner Labs Anastacio ME _ Brasil Imagem - Licenciamento.pdf,Favorecido no extrato: BRASIL IMAGEM.,,2024-07-30,Brasil Imagem,8000,0
+OK — data e valor conferem,,2024-08-09,ANJO AZUL FILMES LTDA (transferência),2815,Licenciamento de conteúdo (cód. pendente),OK,140. Sylvio Back - Licenciamento.pdf,Favorecido no extrato: ANJO AZUL FILMES LTDA (transferência).,,2024-08-09,ANJO AZUL FILMES LTDA.,2815,0
+OK — data e valor conferem,,2024-08-09,Cinemateca,2873,Licenciamento de conteúdo (cód. pendente),VALOR CORRIGIDO,138. Cinemateca Brasileira - Licenciamento.pdf,"Planilha: R$ 2,973.00 em 09/08/2024 × Extrato: R$ 2,873.00 em 09/08/2024. Divergência de valor — prevalece o extrato.",,2024-08-09,Sociedade Amigos da Cinemateca - Sac,2873,0
+OK — data e valor conferem,,2024-08-09,F. WERNECK BARCINSKI LTDA,4000,Produtora de Licenciamento (cód. pendente),OK,139. Fabiana - Produtora de Licenciamento.pdf,Favorecido no extrato: F. WERNECK BARCINSKI LTDA.,,2024-08-09,F. Werneck Barcinski Ltda,4000,0
+OK — data e valor conferem,,2024-08-09,GRU - GUIA RECOLHIMENTO UNIÃO,550,Licenciamento de conteúdo (cód. pendente),OK,141. Biblioteca Nacional - Licenciamento.pdf,Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.,,2024-08-09,Biblioteca Nacional,550,0
+OK — data e valor conferem,,2024-08-16,FUNDACAO GETULIO VARGAS (boleto),130,Licenciamento de conteúdo (cód. pendente),OK,142. CPDOC - Licenciamento.pdf,Favorecido no extrato: FUNDACAO GETULIO VARGAS (boleto).,,2024-08-16,:,130,0
+OK — data e valor conferem,,2024-08-19,SOCIEDADE AMIGOS DA CINEMATECA,8627,Licenciamento de conteúdo (cód. pendente),OK,143. Cinemateca Brasileira - Licenciamento.pdf,,,2024-08-19,Sociedade Amigos da Cinemateca - Sac,8627,0
+OK — data e valor conferem,,2024-09-03,CAMILA BRAUNE,600,Som direto - SP (cód. pendente),OK,144. Som_SP_adicional.pdf,,,2024-09-03,Camila Braune,600,0
+OK — data e valor conferem,,2024-09-05,GLOBO COM E PART SA (boleto),938.5,Licenciamento de conteúdo (cód. pendente),OK,145. Licenc_Globo.pdf,Favorecido no extrato: GLOBO COM E PART SA (boleto).,,2024-09-05,GLOBO COMUNICACAO E PARTICIPACOES S.A. - CNPJ: 27.865.757/0001-02,938.5,0
+OK — data e valor conferem,,2024-09-17,LAPFILME P C LTDA,2250,Licenciamento de conteúdo (cód. pendente),OK,147. Lapfilme produções - Licenciamento.pdf,,,2024-09-17,LAPFILME P C LTDA,2250,0
+OK — data e valor conferem,,2024-09-17,S A O ESTADO DE S PAULO,2632.45,Licenciamento de conteúdo (cód. pendente),OK,146. Estadão - Licenciamento.pdf,,,2024-09-17,S.A. O ESTADO DE S.PAULO CNPJ 61.533.949/0001-41,2632.45,0
+OK — data e valor conferem,,2024-09-23,Jornal de Brasil,5500,Licenciamento de conteúdo (cód. pendente),VALOR CORRIGIDO,148. JB - Licenciamento.pdf,"Planilha: R$ 5,550.00 em 23/09/2024 × Extrato: R$ 5,500.00 em 23/09/2024. Divergência de valor — prevalece o extrato.",,2024-09-23,:,5500,0
+OK — data e valor conferem,,2024-09-25,COTACAO D.T.V.M. S/A,6726.23,Licenciamento de conteúdo (cód. pendente),OK,149. INA - Licenciamento.pdf,Favorecido no extrato: COTACAO D.T.V.M. S/A.,,2024-09-25,Cotacao D.t.v.m. S/a - Sefic,6726.23,0
+OK — data e valor conferem,,2024-09-30,GRU - GUIA RECOLHIMENTO UNIÃO,700,Licenciamento de conteúdo (cód. pendente),OK,150. Biblioteca Nacional - Licenciamento.pdf,Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.,,2024-09-30,do Contribuinte,700,0
+OK — data e valor conferem,,2024-09-30,GRU - GUIA RECOLHIMENTO UNIÃO,2400,Licenciamento de conteúdo (cód. pendente),OK,151. Biblioteca Nacional - Licenciamento.pdf,Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.,,2024-09-30,do Contribuinte,2400,0
+OK — data e valor conferem,,2024-10-10,COTACAO D.T.V.M. S/A,1836.22,Licenciamento de conteúdo (cód. pendente),OK,152. Le Monde - Licenciamento.pdf,Favorecido no extrato: COTACAO D.T.V.M. S/A.,,2024-10-10,Cotacao D.t.v.m. S/a - Sefic,1836.22,0
+OK — data e valor conferem,,2024-10-10,SOCIEDADE AMIGOS DA CINEMATECA,372,Licenciamento de conteúdo (cód. pendente),OK,153. Cinemateca Brasileira - Licenciamento.pdf,,,2024-10-10,Sociedade Amigos da Cinemateca - Sac,372,0
+OK — data e valor conferem,,2024-10-31,PORVIROSCOPIO PROJETOS,5000,Licenciamento de conteúdo (cód. pendente),OK,154. Iconografia - Licenciamento.pdf,Favorecido no extrato: PORVIROSCOPIO PROJETOS.,,2024-10-31,Porviroscopio Projetos C. C. Ltda,5000,0
+OK — data e valor conferem,,2024-10-31,CALIBAN PRODUCOES CINEMATOGRAFICAS,5500,Licenciamento de conteúdo (cód. pendente),OK,155. Silvio Tendler - Licenciamento.pdf,Favorecido no extrato: CALIBAN PRODUCOES CINEMATOGRAFICAS.,,2024-10-31,Caliban Producoes Cinematograficas L,5500,0
+OK — data e valor conferem,,2024-11-01,GRU - GUIA RECOLHIMENTO UNIÃO,140,Licenciamento de conteúdo (cód. pendente),OK,156. Biblioteca Nacional - Licenciamento.pdf,Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.,,2024-11-01,do Contribuinte,140,0
+OK — data e valor conferem,,2024-11-04,GRU - GUIA RECOLHIMENTO UNIÃO,400,Licenciamento de conteúdo (cód. pendente),OK,157. Arquivo Nacional - Licenciamento.pdf,Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.,,2024-11-04,do Contribuinte,400,0
+OK — data e valor conferem,,2024-11-08,ECHO S COMUNICACAO SONORA,600,Cópias Digitais (cód. pendente),OK,158. Echos Comunicação - Cópia Digital.pdf,Favorecido no extrato: ECHO S COMUNICACAO SONORA.,,2024-11-08,Echo S Comunicacao Sonora e Visual,600,0
+OK — data e valor conferem,,2024-11-08,ROBERTO FERRARETTO D AVILA,1000,Licenciamento de conteúdo (cód. pendente),OK,159. Roberto Davilla - Licenciamento.pdf,,,2024-11-08,Roberto F D Avila,1000,0
+OK — data e valor conferem,,2024-11-12,GRU - GUIA RECOLHIMENTO UNIÃO,12,Licenciamento de conteúdo (cód. pendente),OK,160. Biblioteca Nacional - Licenciamento.pdf,Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.,,2024-11-12,do Contribuinte,12,0
+OK — data e valor conferem,,2024-11-14,GRU - GUIA RECOLHIMENTO UNIÃO,200,Licenciamento de conteúdo (cód. pendente),OK,161. Arquivo Nacional - Licenciamento.pdf,Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.,,2024-11-14,do Contribuinte,200,0
+OK — data e valor conferem,,2024-11-28,MARACH SERVICOS AUDIOVISUAIS,230,Cópias Digitais (cód. pendente),OK,162. Procimar - Cópias Digitais.pdf,Favorecido no extrato: MARACH SERVICOS AUDIOVISUAIS.,,2024-11-28,Marach Servicos Audiovisuais Eireli,230,0
+OK — data e valor conferem,,2024-12-05,LIRA PARTICIPACOES E FOMENTO (boleto),6400,Licenciamento de conteúdo (cód. pendente),OK,163. Correios Brasiliense - Licenciamento.pdf,Favorecido no extrato: LIRA PARTICIPACOES E FOMENTO (boleto).,,2024-12-05,:,6400,0
+OK — data e valor conferem,,2024-12-05,GEISA DA SILVA DE JESUS,1500,Licenciamento de conteúdo (cód. pendente),OK,164. Geisa da Silva Jesus - Licenciamento.pdf,,,2024-12-05,Geisa Silva Jesus,1500,0
+OK — data e valor conferem,,2024-12-10,FUNDACAO GETULIO VARGAS (boleto),100,Licenciamento de conteúdo (cód. pendente),OK,165. FGV - Licenciamento.pdf,Favorecido no extrato: FUNDACAO GETULIO VARGAS (boleto).,,2024-12-10,:,100,0
+OK — data e valor conferem,,2024-12-17,EDITORA E IMPORTADORA MUSICAL (FERMATA),3000,Licenciamento de conteúdo (cód. pendente),OK,166. Fermata - Licenciamento.pdf,,,2024-12-17,Editora e Importadora Musical Fermat,3000,0
+OK — data e valor conferem,,2024-12-17,SOM LIVRE,2000,Licenciamento de conteúdo (cód. pendente),OK,Som Livre - Licenciamento (arquivo rotulado '168' na pasta),,,2024-12-17,Som Livre,2000,0
+OK — data e valor conferem,,2024-12-17,CARLOS LYRA EDICOES MUSICAIS,3500,Licenciamento de conteúdo (cód. pendente),OK,Carlos Lyra Edições Musicais - Licenciamento (arquivo rotulado '169' na pasta),,,2024-12-17,Carlos Lyra Edicoes Musicais,3500,0
+OK — data e valor conferem,,2024-12-17,COTACAO D.T.V.M. S/A,8393.3,Licenciamento de conteúdo (cód. pendente),OK,NYT - Licenciamento (arquivo rotulado '170' na pasta),Favorecido no extrato: COTACAO D.T.V.M. S/A.,,2024-12-17,Cotacao D.t.v.m. S/a - Sefic,8393.3,0
+OK — data e valor conferem,,2024-12-26,GIOVANA AMANO,5000,Produtora de Licenciamento (cód. pendente),OK,Giovana Amano - Produtora de Licenciamento (arquivo rotulado '171' na pasta),,,2024-12-26,Giovana Amano,5000,0
+OK — data e valor conferem,,2025-01-16,GRU - GUIA RECOLHIMENTO UNIÃO,50,Licenciamento de conteúdo (cód. pendente),OK,Arquivo Nacional - Licenciamento (arquivo rotulado '172' na pasta),Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.,,2025-01-16,Arquivo Nacional,50,0
+OK — data e valor conferem,,2025-02-03,"2 tentativas rejeitadas e estornadas no mesmo dia (líquido R$ 975,04) Favorecido no extrato: BANCO RENDIMENTO S/A.",975.04,Licenciamento de conteúdo (cód. pendente),OK,La Nacion - Licenciamento (arquivo rotulado '173' na pasta),,,2025-02-03,Banco Rendimento S/a,975.04,0
+OK — data e valor conferem,,2025-02-27,GANZAH,7000,Trilha Sonora (cód. pendente),OK,Marcos Azambuja / Ganzah - Trilha Sonora (arquivo rotulado '174' na pasta),Favorecido no extrato: GANZAH.,,2025-02-27,Ganzah,7000,0
+OK — data e valor conferem,,2025-03-25,Consta no extrato e não estava na conciliação.,626.3,,INCLUÍDO — AUSENTE NA PLANILHA,ANCINE - Boleto (arquivo rotulado 'CRT GRU / 175' na pasta),,,2025-03-25,:,626.3,0
+OK — data e valor conferem,,2025-04-30,GIOVANA AMANO,3000,Licenciamento de conteúdo (cód. pendente),OK,Giovana Amano - Produtora de Licenciamento (arquivo rotulado '176' na pasta),,,2025-04-30,Giovana Amano,3000,0
+OK — data e valor conferem,,2025-04-30,PLANIFILMES LTDA,1200,emissão CPB (cód. pendente),OK,Planifilmes Ltda (emissão CPB - Lia Pini) (arquivo rotulado '177' na pasta),Favorecido no extrato: PLANIFILMES LTDA.,,2025-04-30,Planifilmes Ltda,1200,0
+OK — data e valor conferem,,2025-05-07,FOGO FILMES,18093.63,Edição e Finalização (cód. pendente),OK,Fogo Filmes - Edição e Finalização (André Finotti) (arquivo rotulado '178' na pasta),Favorecido no extrato: FOGO FILMES.,,2025-05-07,Fogo Filmes,18093.63,0
+
+
+=== SOMENTE NO BANCO ATUAL (sem correspondencia na planilha) ===
+Fornecedor (banco),Data (banco),Valor (banco),Status (banco),Observação
+EDSON DE CAMARGO,2023-10-05,700,REVISAO_PENDENTE,"Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado)."
+Amir Labaki,2023-10-09,945.49,REVISAO_PENDENTE,"Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado)."
+Amir Labaki,2023-10-09,945.49,REVISAO_PENDENTE,"Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado)."
+Camila Licariao de Carvalho Braune 4,2023-10-16,3000,REVISAO_PENDENTE,"Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado)."
+Mog Produtora,2023-10-25,10000,REVISAO_PENDENTE,"Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado)."
+Bernardo T S Costa,2023-11-08,300,REVISAO_PENDENTE,"Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado)."
+Monica G P Moraes,2023-11-14,3724.74,REVISAO_PENDENTE,"Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado)."
+Monica G P Moraes,2023-11-14,3724.74,REVISAO_PENDENTE,"Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado)."
+CIRCUNSTANC 1961 FSAMPJFN,2025-02-03,975.04,REVISAO_PENDENTE,"Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado)."
+BANCO RENDIMENTO S/A,2025-02-03,975.04,REVISAO_PENDENTE,"Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado)."

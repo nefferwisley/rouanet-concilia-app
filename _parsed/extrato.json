@@ -1,0 +1,12 @@
+[
+  {
+    "data": "2023-01-15",
+    "favorecido": "EMPRESA A",
+    "valor": 1000.0
+  },
+  {
+    "data": "2023-01-20",
+    "favorecido": "EMPRESA B",
+    "valor": 2500.0
+  }
+]

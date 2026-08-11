@@ -1,0 +1,320 @@
+{
+  "timestamp": "2026-08-11T05:03:46.268034",
+  "config": {
+    "modo": "dry-run",
+    "fases_executar": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "paralelismo": 4,
+    "timeout_por_tarefa_seg": 600,
+    "economizar_tokens_claude": true,
+    "usar_ollama_primeiro": true,
+    "usar_opencode_para_ui": true,
+    "limite_diario_tokens": 100000,
+    "tokens_usados": 0
+  },
+  "estatísticas": {
+    "total_tarefas": 16,
+    "por_fase": {
+      "1": 2,
+      "2": 2,
+      "3": 3,
+      "4": 1,
+      "5": 2,
+      "6": 2,
+      "7": 4
+    },
+    "por_executor": {
+      "ollama": 7,
+      "opencode": 2,
+      "claude-code": 3,
+      "antigravity": 0,
+      "agent-especializado": 4
+    },
+    "por_prioridade": {
+      "CRÍTICA": 7,
+      "ALTA": 7,
+      "MÉDIA": 2,
+      "BAIXA": 0
+    },
+    "tempo_total_estimado_min": 1395,
+    "custo_total_tokens": 35000
+  },
+  "estratificação_por_executor": {
+    "ollama": [
+      {
+        "id": "fase1_parser_pdf",
+        "fase": 1,
+        "titulo": "Parser PDF/xlsx (ingestão)",
+        "descrição": "Criar parsers de PDF (NF, comprovante, extrato) e xlsx (planilhas)",
+        "executor_ideal": "ollama",
+        "priority": "CRÍTICA",
+        "custo_estimado": "MÉDIO",
+        "bloqueada_por": [],
+        "arquivo_saída": "motor/parsers/",
+        "prompt_template": null,
+        "tempo_estimado_min": 60
+      },
+      {
+        "id": "fase1_hash_dedupe",
+        "fase": 1,
+        "titulo": "Dedupe + SHA-256",
+        "descrição": "SHA-256 de cada arquivo na ingestão, registro de linhagem",
+        "executor_ideal": "ollama",
+        "priority": "ALTA",
+        "custo_estimado": "BAIXO",
+        "bloqueada_por": [],
+        "arquivo_saída": "motor/ingestao.py",
+        "prompt_template": null,
+        "tempo_estimado_min": 20
+      },
+      {
+        "id": "fase3_matching_determinístico",
+        "fase": 3,
+        "titulo": "Matching Determinístico",
+        "descrição": "CPF/CNPJ checksum, favorecido fuzzy, valores centavos",
+        "executor_ideal": "ollama",
+        "priority": "CRÍTICA",
+        "custo_estimado": "MÉDIO",
+        "bloqueada_por": [
+          "fase2_schema_migrations"
+        ],
+        "arquivo_saída": "motor/matching.py",
+        "prompt_template": null,
+        "tempo_estimado_min": 90
+      },
+      {
+        "id": "fase6_extração_planilha",
+        "fase": 6,
+        "titulo": "Extração: Planilha MINC",
+        "descrição": "Gerar planilha no modelo Google Sheets do usuário",
+        "executor_ideal": "ollama",
+        "priority": "ALTA",
+        "custo_estimado": "MÉDIO",
+        "bloqueada_por": [
+          "fase5_ui_edição_auditoria"
+        ],
+        "arquivo_saída": "motor/exportar_planilha.py",
+        "prompt_template": null,
+        "tempo_estimado_min": 90
+      },
+      {
+        "id": "fase6_extração_comprovantes",
+        "fase": 6,
+        "titulo": "Extração: Comprovantes PDF",
+        "descrição": "Organizar comprovantes/NFs em saida/prestacao-conta/",
+        "executor_ideal": "ollama",
+        "priority": "ALTA",
+        "custo_estimado": "BAIXO",
+        "bloqueada_por": [
+          "fase6_extração_planilha"
+        ],
+        "arquivo_saída": "motor/exportar_comprovantes.py",
+        "prompt_template": null,
+        "tempo_estimado_min": 60
+      },
+      {
+        "id": "fase7_docker_compose",
+        "fase": 7,
+        "titulo": "Docker Compose",
+        "descrição": "Dockerfile, docker-compose.yml, .dockerignore",
+        "executor_ideal": "ollama",
+        "priority": "ALTA",
+        "custo_estimado": "BAIXO",
+        "bloqueada_por": [
+          "fase7_rls_policies"
+        ],
+        "arquivo_saída": "Dockerfile, docker-compose.yml",
+        "prompt_template": null,
+        "tempo_estimado_min": 45
+      },
+      {
+        "id": "fase7_ci_cd",
+        "fase": 7,
+        "titulo": "CI/CD Pipeline",
+        "descrição": "GitHub Actions, lint, test, deploy",
+        "executor_ideal": "ollama",
+        "priority": "MÉDIA",
+        "custo_estimado": "MÉDIO",
+        "bloqueada_por": [
+          "fase7_docker_compose"
+        ],
+        "arquivo_saída": ".github/workflows/",
+        "prompt_template": null,
+        "tempo_estimado_min": 90
+      }
+    ],
+    "opencode": [
+      {
+        "id": "fase5_ui_tabela_lançamentos",
+        "fase": 5,
+        "titulo": "UI Tabela de Lançamentos",
+        "descrição": "React component, filtros, badges, PDF viewer inline",
+        "executor_ideal": "opencode",
+        "priority": "ALTA",
+        "custo_estimado": "MÉDIO",
+        "bloqueada_por": [
+          "fase4_sync_bidirecional"
+        ],
+        "arquivo_saída": "frontend/src/components/LancamentosList.tsx",
+        "prompt_template": null,
+        "tempo_estimado_min": 120
+      },
+      {
+        "id": "fase5_ui_edição_auditoria",
+        "fase": 5,
+        "titulo": "UI Edição com Auditoria",
+        "descrição": "Modal de edição, audit log inline, quem/quando/por quê",
+        "executor_ideal": "opencode",
+        "priority": "ALTA",
+        "custo_estimado": "MÉDIO",
+        "bloqueada_por": [
+          "fase5_ui_tabela_lançamentos"
+        ],
+        "arquivo_saída": "frontend/src/components/LancamentoEdit.tsx",
+        "prompt_template": null,
+        "tempo_estimado_min": 80
+      }
+    ],
+    "claude-code": [
+      {
+        "id": "fase2_schema_migrations",
+        "fase": 2,
+        "titulo": "Schema + Migrations",
+        "descrição": "0001_schema.sql, 0002_importacoes.sql — fonte única de verdade",
+        "executor_ideal": "claude-code",
+        "priority": "CRÍTICA",
+        "custo_estimado": "ALTO",
+        "bloqueada_por": [
+          "fase1_parser_pdf"
+        ],
+        "arquivo_saída": "db/migrations/",
+        "prompt_template": null,
+        "tempo_estimado_min": 90
+      },
+      {
+        "id": "fase4_sync_bidirecional",
+        "fase": 4,
+        "titulo": "Sync Planilha ↔ Site",
+        "descrição": "Sincronização bidirecional, CRDT/OT se real-time",
+        "executor_ideal": "claude-code",
+        "priority": "CRÍTICA",
+        "custo_estimado": "MUY_ALTO",
+        "bloqueada_por": [
+          "fase3_quarentena"
+        ],
+        "arquivo_saída": "backend/services/sync.py",
+        "prompt_template": null,
+        "tempo_estimado_min": 150
+      },
+      {
+        "id": "fase7_rls_policies",
+        "fase": 7,
+        "titulo": "RLS Policies (crítico)",
+        "descrição": "Row-level security, pode_acessar_projeto(), LGPD",
+        "executor_ideal": "claude-code",
+        "priority": "CRÍTICA",
+        "custo_estimado": "ALTO",
+        "bloqueada_por": [
+          "fase4_sync_bidirecional"
+        ],
+        "arquivo_saída": "db/migrations/0003_rls_policies.sql",
+        "prompt_template": null,
+        "tempo_estimado_min": 120
+      }
+    ],
+    "antigravity": [],
+    "agent-especializado": [
+      {
+        "id": "fase2_indices",
+        "fase": 2,
+        "titulo": "Índices + Performance",
+        "descrição": "Otimizar queries, índices em conciliacao_extrato, transacoes",
+        "executor_ideal": "agent-especializado",
+        "priority": "MÉDIA",
+        "custo_estimado": "MÉDIO",
+        "bloqueada_por": [
+          "fase2_schema_migrations"
+        ],
+        "arquivo_saída": null,
+        "prompt_template": null,
+        "tempo_estimado_min": 60
+      },
+      {
+        "id": "fase3_matching_rag",
+        "fase": 3,
+        "titulo": "Matching RAG (Gemini)",
+        "descrição": "Embeddings de rubricas, HNSW index, semantic matching",
+        "executor_ideal": "agent-especializado",
+        "priority": "ALTA",
+        "custo_estimado": "ALTO",
+        "bloqueada_por": [
+          "fase3_matching_determinístico"
+        ],
+        "arquivo_saída": null,
+        "prompt_template": null,
+        "tempo_estimado_min": 120
+      },
+      {
+        "id": "fase3_quarentena",
+        "fase": 3,
+        "titulo": "Quarentena + Auditoria",
+        "descrição": "Zero data loss, campos_revisao, audit log por linha",
+        "executor_ideal": "agent-especializado",
+        "priority": "CRÍTICA",
+        "custo_estimado": "MÉDIO",
+        "bloqueada_por": [
+          "fase3_matching_determinístico"
+        ],
+        "arquivo_saída": null,
+        "prompt_template": null,
+        "tempo_estimado_min": 80
+      },
+      {
+        "id": "fase7_security_review",
+        "fase": 7,
+        "titulo": "Security Review",
+        "descrição": "CORS, CSP, JWT, secrets scan, LGPD compliance",
+        "executor_ideal": "agent-especializado",
+        "priority": "CRÍTICA",
+        "custo_estimado": "ALTO",
+        "bloqueada_por": [
+          "fase7_rls_policies"
+        ],
+        "arquivo_saída": null,
+        "prompt_template": null,
+        "tempo_estimado_min": 120
+      }
+    ]
+  },
+  "ordem_topológica": [
+    "fase1_parser_pdf",
+    "fase1_hash_dedupe",
+    "fase2_schema_migrations",
+    "fase2_indices",
+    "fase3_matching_determinístico",
+    "fase3_matching_rag",
+    "fase3_quarentena",
+    "fase4_sync_bidirecional",
+    "fase5_ui_tabela_lançamentos",
+    "fase5_ui_edição_auditoria",
+    "fase6_extração_planilha",
+    "fase6_extração_comprovantes",
+    "fase7_rls_policies",
+    "fase7_docker_compose",
+    "fase7_ci_cd",
+    "fase7_security_review"
+  ],
+  "paralelismo_sugerido": {
+    "ollama": 7,
+    "opencode": 2,
+    "claude_code": 1,
+    "antigravity": 1
+  }
+}

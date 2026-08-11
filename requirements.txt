@@ -8,3 +8,7 @@ fpdf2
 plotly
 python-dotenv
 google-generativeai
+
+# Opcional — camada de remediação (P1/P2): embeddings locais e SLM local
+# sentence-transformers
+# ollama
