@@ -1,5 +1,5 @@
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://cibrdwuzikwzugojgbdw.supabase.co";
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.sb_publishable_GEEDSPKCooC6OKWZEPaKAw_k6hpGFnz || "sb_publishable_GEEDSPKCooC6OKWZEPaKAw_k6hpGFnz";
 
 export interface AuthUser {
   id: string;
