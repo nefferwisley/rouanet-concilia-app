@@ -15,9 +15,13 @@ interface MovimentoExtrato {
 interface TransacaoCandidata {
   id: string;
   fornecedor?: string;
+  cnpj_fornecedor?: string | null;
   data_pagamento?: string;
   valor_bruto?: number;
   status: string;
+  rubrica_codigo?: string | null;
+  rubrica_descricao?: string | null;
+  item_descricao?: string | null;
 }
 
 interface ParesResponse {
@@ -27,6 +31,17 @@ interface ParesResponse {
 
 const brl = (v: number | undefined) =>
   (v ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+function limparTextoExtrato(str?: string | null): string {
+  if (!str) return "-";
+  const limpo = str
+    .replace(/^Favorecido\s*(no\s*extrato)?\s*:\s*/i, "")
+    .replace(/^Favorecido\s*:\s*/i, "")
+    .replace(/^Doc\s*:\s*linha-\d+/i, "")
+    .replace(/^Doc\s*:\s*/i, "")
+    .trim();
+  return limpo || str.trim();
+}
 
 /** P3 — Conciliação com botões (extrato × lançamento):
  *  exibe os lançamentos do extrato bancário e permite associar manualmente
@@ -134,16 +149,16 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
       <div className="card space-y-3">
         <div className="flex flex-wrap justify-between items-center gap-3">
           <div>
-            <h3 className="section-title">🏦 Conciliação Extrato × Lançamentos do Projeto</h3>
+            <h3 className="section-title">🏦 Conciliação Extrato Bancário × Lançamentos do Projeto</h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              {pendentesCount} movimento(s) pendente(s) no extrato bancário do projeto.
+              {pendentesCount} movimento(s) pendente(s) no extrato bancário para vincular aos lançamentos da planilha.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <input
               type="text"
-              className="input text-xs w-52"
-              placeholder="🔍 Buscar no extrato..."
+              className="input text-xs w-56"
+              placeholder="🔍 Filtrar extrato ou favorecido..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
             />
@@ -167,17 +182,17 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
         {mensagemImportacao && <p className="text-xs text-emerald-400 font-medium mt-1">{mensagemImportacao}</p>}
       </div>
 
-      {/* Tabela Estilizada */}
+      {/* Tabela de Conciliação Limpa e Alinhada */}
       <div className="card p-0 overflow-hidden border border-slate-700/60 shadow-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
               <tr className="bg-navy-900/90 text-slate-300 border-b border-slate-700 font-bold uppercase tracking-wider text-[11px]">
-                <th className="py-3 px-3 text-left">DATA</th>
-                <th className="py-3 px-3 text-left">HISTÓRICO / EXTRATO BANCÁRIO</th>
+                <th className="py-3 px-3 text-left">DATA EXTRATO</th>
+                <th className="py-3 px-3 text-left">FAVORECIDO / EXTRATO (NOME LIMPO)</th>
                 <th className="py-3 px-3 text-right">VALOR EXTRATO</th>
                 <th className="py-3 px-3 text-center">STATUS</th>
-                <th className="py-3 px-3 text-left">LANÇAMENTO CORRESPONDENTE DO PROJETO</th>
+                <th className="py-3 px-3 text-left">LANÇAMENTO CORRESPONDENTE (RUBRICA, PRESTADOR & VALOR)</th>
                 <th className="py-3 px-3 text-right">AÇÕES</th>
               </tr>
             </thead>
@@ -186,6 +201,17 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
                 const valorSelecionado = selecoes[m.id] ?? m.transacao_id ?? "";
                 const alterouSelecao = valorSelecionado !== (m.transacao_id ?? "");
 
+                // Nome do favorecido/histórico limpo sem prefixos poluídos
+                const historicoLimpo = limparTextoExtrato(m.historico);
+
+                // Documento formatado se existir e não for linha genérica
+                const docLimpo = m.documento && !m.documento.toLowerCase().startsWith("linha-")
+                  ? limparTextoExtrato(m.documento)
+                  : null;
+
+                // Transação selecionada no dropdown
+                const transacaoAtual = dados.transacoes.find((t) => t.id === valorSelecionado);
+
                 // Sugere automaticamente lançamentos com o mesmo valor absoluto
                 const temMatchValor = dados.transacoes.some(
                   (t) => Math.abs((t.valor_bruto ?? 0) - Math.abs(m.valor)) < 0.01
@@ -193,20 +219,31 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
 
                 return (
                   <tr key={m.id} className="hover:bg-navy-700/40 transition-colors align-top">
+                    {/* DATA EXTRATO */}
                     <td className="py-3 px-3 whitespace-nowrap font-medium text-slate-200">
                       {new Date(m.data + "T00:00:00").toLocaleDateString("pt-BR")}
                     </td>
-                    <td className="py-3 px-3 max-w-sm">
-                      <div className="font-bold text-slate-100 uppercase tracking-tight">{m.historico}</div>
-                      {m.documento && (
-                        <div className="text-[11px] text-slate-400 mt-0.5 truncate">Doc: {m.documento}</div>
+
+                    {/* FAVORECIDO / EXTRATO LIMPO */}
+                    <td className="py-3 px-3 max-w-xs">
+                      <div className="font-bold text-slate-100 uppercase tracking-tight" title={historicoLimpo}>
+                        {historicoLimpo}
+                      </div>
+                      {docLimpo && (
+                        <div className="text-[11px] text-slate-400 mt-0.5 truncate" title={docLimpo}>
+                          📄 {docLimpo}
+                        </div>
                       )}
                     </td>
+
+                    {/* VALOR EXTRATO */}
                     <td className="py-3 px-3 text-right whitespace-nowrap font-bold text-sm">
                       <span className={m.valor < 0 ? "text-rose-400" : "text-emerald-400"}>
                         {m.valor < 0 ? `- ${brl(Math.abs(m.valor))}` : `+ ${brl(m.valor)}`}
                       </span>
                     </td>
+
+                    {/* STATUS */}
                     <td className="py-3 px-3 text-center whitespace-nowrap">
                       <span
                         className={`inline-flex px-2.5 py-1 rounded-md text-[11px] font-bold ${
@@ -218,37 +255,60 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
                         {m.status_conciliacao}
                       </span>
                     </td>
+
+                    {/* LANÇAMENTO CORRESPONDENTE (SELECT RICO) */}
                     <td className="py-3 px-3">
                       <div className="space-y-1">
                         <select
-                          className="input text-xs w-full max-w-sm bg-navy-900 border-slate-700 text-slate-200"
+                          className="input text-xs w-full max-w-md bg-navy-900 border-slate-700 text-slate-200"
                           value={valorSelecionado}
                           onChange={(e) => setSelecoes({ ...selecoes, [m.id]: e.target.value })}
                         >
-                          <option value="">-- Selecione o lançamento do projeto --</option>
+                          <option value="">-- Selecione o lançamento correspondente da planilha --</option>
                           {dados.transacoes.map((t) => {
                             const mesmoValor = Math.abs((t.valor_bruto ?? 0) - Math.abs(m.valor)) < 0.01;
+                            const nomePrestador = limparTextoExtrato(t.cnpj_fornecedor || t.fornecedor);
+                            const rubricaTag = t.rubrica_codigo ? `[Rubrica ${t.rubrica_codigo}] ` : "";
+
                             return (
                               <option key={t.id} value={t.id}>
-                                {mesmoValor ? "✨ " : ""}{t.fornecedor || "Sem fornecedor"} · {brl(t.valor_bruto)} ({t.status})
+                                {mesmoValor ? "✨ " : ""}{rubricaTag}{nomePrestador} — {brl(t.valor_bruto)} ({t.status === "CONCILIADO_OK" ? "OK" : t.status})
                               </option>
                             );
                           })}
                         </select>
 
-                        {m.transacao_id ? (
-                          <p className="text-[11px] text-slate-400">
-                            {alterouSelecao ? "⚠️ Vínculo alterado acima — clique em Vincular para salvar." : "✓ Já vinculado a este lançamento"}
-                          </p>
+                        {/* Detalhes do vínculo */}
+                        {transacaoAtual ? (
+                          <div className="text-[11px] text-slate-300 flex flex-wrap items-center gap-2 mt-1">
+                            <span className="font-semibold text-emerald-400">
+                              {alterouSelecao ? "⚠️ Clique em Vincular para confirmar." : "✓ Vinculado:"}
+                            </span>
+                            {transacaoAtual.rubrica_codigo && (
+                              <span className="px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 font-mono font-bold">
+                                Rubrica {transacaoAtual.rubrica_codigo}
+                              </span>
+                            )}
+                            <span className="font-bold text-slate-200">
+                              {limparTextoExtrato(transacaoAtual.fornecedor)}
+                            </span>
+                            {transacaoAtual.item_descricao && (
+                              <span className="text-slate-400 italic">
+                                ({transacaoAtual.item_descricao})
+                              </span>
+                            )}
+                          </div>
                         ) : (
                           temMatchValor && (
-                            <p className="text-[11px] text-emerald-400 font-medium">
-                              ✨ Sugestão: Há despesa cadastrada com o valor exato no projeto.
+                            <p className="text-[11px] text-emerald-400 font-medium mt-1">
+                              ✨ Sugestão: Há despesa cadastrada na planilha com o valor exato no projeto.
                             </p>
                           )
                         )}
                       </div>
                     </td>
+
+                    {/* AÇÕES */}
                     <td className="py-3 px-3 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1.5">
                         <button

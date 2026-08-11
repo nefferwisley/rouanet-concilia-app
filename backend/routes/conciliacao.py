@@ -199,9 +199,13 @@ async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
     )
     transacoes = await conn.fetch(
         """
-        select id, fornecedor, data_pagamento, valor_bruto, status
-        from transacoes where projeto_id = $1
-        order by data_pagamento nulls last, created_at
+        select t.id, t.fornecedor, t.cnpj_fornecedor, t.data_pagamento, t.valor_bruto, t.status,
+               r.codigo as rubrica_codigo, r.descricao as rubrica_descricao, d.descricao as item_descricao
+        from transacoes t
+        left join despesas d on d.transacao_id = t.id
+        left join rubricas r on r.id = d.rubrica_id
+        where t.projeto_id = $1
+        order by t.data_pagamento nulls last, t.created_at
         """,
         projeto_id,
     )
@@ -223,9 +227,13 @@ async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
             {
                 "id": str(t["id"]),
                 "fornecedor": t["fornecedor"],
+                "cnpj_fornecedor": t["cnpj_fornecedor"],
                 "data_pagamento": t["data_pagamento"].isoformat() if t["data_pagamento"] else None,
                 "valor_bruto": float(t["valor_bruto"]) if t["valor_bruto"] is not None else None,
                 "status": t["status"],
+                "rubrica_codigo": t["rubrica_codigo"],
+                "rubrica_descricao": t["rubrica_descricao"],
+                "item_descricao": t["item_descricao"],
             }
             for t in transacoes
         ],
