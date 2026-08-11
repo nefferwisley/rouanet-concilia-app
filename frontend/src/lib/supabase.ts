@@ -75,3 +75,28 @@ export async function cadastrarComEmailESenha(email: string, password: string): 
     },
   };
 }
+
+export async function renovarSessao(refreshToken: string): Promise<AuthSession> {
+  const resp = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: SUPABASE_ANON_KEY,
+    },
+    body: JSON.stringify({ refresh_token: refreshToken }),
+  });
+
+  if (!resp.ok) {
+    throw new Error("Sessão expirada. Faça login novamente.");
+  }
+
+  const data = await resp.json();
+  return {
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    user: {
+      id: data.user?.id || "",
+      email: data.user?.email || "",
+    },
+  };
+}

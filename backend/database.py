@@ -77,6 +77,8 @@ def verificar_jwt(token: str) -> str:
         erros.append(f"HS256 legado: {e}")
 
     log.warning("Falha ao validar JWT por ambos os métodos: %s", "; ".join(erros))
+    if any("expired" in e.lower() for e in erros):
+        raise HTTPException(status_code=401, detail="Sessão expirada. Faça login novamente para continuar.")
     raise HTTPException(status_code=401, detail=f"Token inválido: {'; '.join(erros)}")
 
 

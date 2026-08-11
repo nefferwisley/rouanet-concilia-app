@@ -1,3 +1,5 @@
+import { renovarSessao } from "./supabase";
+
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
 export class ApiError extends Error {
@@ -9,16 +11,19 @@ export class ApiError extends Error {
 }
 
 function headers(token: string | null, extra: Record<string, string> = {}) {
+  const t = token || localStorage.getItem("rc_token");
   const h: Record<string, string> = { ...extra };
-  if (token) h["Authorization"] = `Bearer ${token}`;
+  if (t) h["Authorization"] = `Bearer ${t}`;
   return h;
 }
 
 function formatarDetail(detail: unknown, fallback: string): string {
-  if (typeof detail === "string") return detail;
-  // Erro de validação automático do FastAPI: detail vem como lista de
-  // {loc, msg, type} em vez de string — sem isso, o Error acaba com
-  // "[object Object]" na mensagem (Error() coage o valor pra string).
+  if (typeof detail === "string") {
+    if (detail.includes("Signature has expired") || detail.includes("Token inválido")) {
+      return "Sua sessão expirou. Faça login novamente para continuar.";
+    }
+    return detail;
+  }
   if (Array.isArray(detail)) {
     const msgs = detail.map((d) => (d && typeof d === "object" && "msg" in d ? String(d.msg) : String(d)));
     return msgs.join("; ") || fallback;
@@ -27,6 +32,39 @@ function formatarDetail(detail: unknown, fallback: string): string {
     return JSON.stringify(detail);
   }
   return fallback;
+}
+
+async function fetchComAutoRefresh(url: string, init: RequestInit, tentouRefresh = false): Promise<Response> {
+  const token = localStorage.getItem("rc_token");
+  const reqInit = {
+    ...init,
+    headers: headers(token, (init.headers as Record<string, string>) || {}),
+  };
+
+  const resp = await fetch(url, reqInit);
+
+  if (resp.status === 401 && !tentouRefresh) {
+    const rt = localStorage.getItem("rc_refresh_token");
+    if (rt) {
+      try {
+        const nova = await renovarSessao(rt);
+        localStorage.setItem("rc_token", nova.access_token);
+        if (nova.refresh_token) localStorage.setItem("rc_refresh_token", nova.refresh_token);
+        // Tenta a requisição novamente com o novo token
+        return fetchComAutoRefresh(url, init, true);
+      } catch {
+        localStorage.removeItem("rc_token");
+        localStorage.removeItem("rc_refresh_token");
+        localStorage.removeItem("rc_user");
+        window.location.href = "/login";
+      }
+    } else {
+      localStorage.removeItem("rc_token");
+      window.location.href = "/login";
+    }
+  }
+
+  return resp;
 }
 
 async function tratar<T>(resp: Response): Promise<T> {
@@ -45,20 +83,20 @@ async function tratar<T>(resp: Response): Promise<T> {
 
 export function apiClient(token: string | null) {
   return {
-    get: <T,>(path: string) => fetch(`${API_URL}${path}`, { headers: headers(token) }).then((r) => tratar<T>(r)),
+    get: <T,>(path: string) => fetchComAutoRefresh(`${API_URL}${path}`, { method: "GET" }).then((r) => tratar<T>(r)),
 
     post: <T,>(path: string, data: unknown) =>
-      fetch(`${API_URL}${path}`, {
+      fetchComAutoRefresh(`${API_URL}${path}`, {
         method: "POST",
-        headers: headers(token, { "Content-Type": "application/json" }),
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       }).then((r) => tratar<T>(r)),
 
     postForm: <T,>(path: string, form: FormData) =>
-      fetch(`${API_URL}${path}`, { method: "POST", headers: headers(token), body: form }).then((r) => tratar<T>(r)),
+      fetchComAutoRefresh(`${API_URL}${path}`, { method: "POST", body: form }).then((r) => tratar<T>(r)),
 
     download: (path: string, filename: string) =>
-      fetch(`${API_URL}${path}`, { headers: headers(token) }).then(async (r) => {
+      fetchComAutoRefresh(`${API_URL}${path}`, { method: "GET" }).then(async (r) => {
         if (!r.ok) {
           let detail: unknown = r.statusText;
           try {
@@ -81,16 +119,16 @@ export function apiClient(token: string | null) {
       }),
 
     patch: <T,>(path: string, data: unknown) =>
-      fetch(`${API_URL}${path}`, {
+      fetchComAutoRefresh(`${API_URL}${path}`, {
         method: "PATCH",
-        headers: headers(token, { "Content-Type": "application/json" }),
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       }).then((r) => tratar<T>(r)),
 
     patchForm: <T,>(path: string, form: FormData) =>
-      fetch(`${API_URL}${path}`, { method: "PATCH", headers: headers(token), body: form }).then((r) => tratar<T>(r)),
+      fetchComAutoRefresh(`${API_URL}${path}`, { method: "PATCH", body: form }).then((r) => tratar<T>(r)),
 
     delete: <T,>(path: string) =>
-      fetch(`${API_URL}${path}`, { method: "DELETE", headers: headers(token) }).then((r) => tratar<T>(r)),
+      fetchComAutoRefresh(`${API_URL}${path}`, { method: "DELETE" }).then((r) => tratar<T>(r)),
   };
 }
