@@ -34,37 +34,46 @@ function formatarDetail(detail: unknown, fallback: string): string {
   return fallback;
 }
 
-async function fetchComAutoRefresh(url: string, init: RequestInit, tentouRefresh = false): Promise<Response> {
+async function fetchComAutoRefresh(url: string, init: RequestInit, tentouRefresh = false, tentouRetry = false): Promise<Response> {
   const token = localStorage.getItem("rc_token");
   const reqInit = {
     ...init,
     headers: headers(token, (init.headers as Record<string, string>) || {}),
   };
 
-  const resp = await fetch(url, reqInit);
+  try {
+    const resp = await fetch(url, reqInit);
 
-  if (resp.status === 401 && !tentouRefresh) {
-    const rt = localStorage.getItem("rc_refresh_token");
-    if (rt) {
-      try {
-        const nova = await renovarSessao(rt);
-        localStorage.setItem("rc_token", nova.access_token);
-        if (nova.refresh_token) localStorage.setItem("rc_refresh_token", nova.refresh_token);
-        // Tenta a requisição novamente com o novo token
-        return fetchComAutoRefresh(url, init, true);
-      } catch {
+    if (resp.status === 401 && !tentouRefresh) {
+      const rt = localStorage.getItem("rc_refresh_token");
+      if (rt) {
+        try {
+          const nova = await renovarSessao(rt);
+          localStorage.setItem("rc_token", nova.access_token);
+          if (nova.refresh_token) localStorage.setItem("rc_refresh_token", nova.refresh_token);
+          // Tenta a requisição novamente com o novo token
+          return fetchComAutoRefresh(url, init, true, tentouRetry);
+        } catch {
+          localStorage.removeItem("rc_token");
+          localStorage.removeItem("rc_refresh_token");
+          localStorage.removeItem("rc_user");
+          window.location.href = "/login";
+        }
+      } else {
         localStorage.removeItem("rc_token");
-        localStorage.removeItem("rc_refresh_token");
-        localStorage.removeItem("rc_user");
         window.location.href = "/login";
       }
-    } else {
-      localStorage.removeItem("rc_token");
-      window.location.href = "/login";
     }
-  }
 
-  return resp;
+    return resp;
+  } catch (err: any) {
+    // Se for erro de rede (Render acordando do sono), tenta mais uma vez após 1.5s
+    if (!tentouRetry) {
+      await new Promise((r) => setTimeout(r, 1500));
+      return fetchComAutoRefresh(url, init, tentouRefresh, true);
+    }
+    throw new ApiError(503, "O servidor backend está iniciando. Por favor, aguarde alguns segundos e atualize a página.");
+  }
 }
 
 async function tratar<T>(resp: Response): Promise<T> {
