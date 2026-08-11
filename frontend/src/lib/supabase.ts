@@ -1,7 +1,8 @@
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://cibrdwuzikwzugojgbdw.supabase.co";
-const SUPABASE_ANON_KEY =
-  import.meta.env.VITE_SUPABASE_ANON_KEY ||
+const RAW_KEY = String(import.meta.env.VITE_SUPABASE_ANON_KEY || "").trim();
+const DEFAULT_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpYnJkd3V6aWt3enVnb2pnYmR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyMDU4OTAsImV4cCI6MjEwMTc4MTg5MH0.Ud9J5XZa4fo0j-CE6HXe6esFEHeG7H03KXO9Wp7ePXE";
+const SUPABASE_ANON_KEY = RAW_KEY.startsWith("eyJ") ? RAW_KEY : DEFAULT_ANON_KEY;
 
 export interface AuthUser {
   id: string;
