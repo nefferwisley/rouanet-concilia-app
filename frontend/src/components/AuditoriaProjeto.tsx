@@ -13,6 +13,7 @@ interface TransacaoAuditoria {
   status: string;
   rubrica_codigo?: string | null;
   rubrica_descricao?: string | null;
+  item_descricao?: string | null;
   documento_id?: string | null;
   documento?: string;
   confianca_ocr?: number;
@@ -28,12 +29,20 @@ interface AuditoriaResponse {
 const brl = (v: number | undefined) =>
   (v ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+function limparTextoFavorecido(str?: string | null): string {
+  if (!str) return "-";
+  return str
+    .replace(/^Favorecido\s*(no\s*extrato)?\s*:\s*/i, "")
+    .replace(/^Favorecido\s*:\s*/i, "")
+    .trim();
+}
+
 const FILTROS = [
   { valor: "", rotulo: "Todos" },
-  { valor: "ok", rotulo: "Conciliação Revisada" },
+  { valor: "ok", rotulo: "Conciliação Revisada (OK)" },
   { valor: "pendente", rotulo: "Pendências" },
-  { valor: "com_docs", rotulo: "Divergências / PJ" },
-  { valor: "sem_docs", rotulo: "Contrapartida Social & Acessibilidade" },
+  { valor: "com_docs", rotulo: "Com Documentos" },
+  { valor: "sem_docs", rotulo: "Sem Documento" },
 ];
 
 export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
@@ -83,15 +92,15 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
 
   return (
     <div className="space-y-4">
-      {/* Barra de Filtros em Pílulas (Igual ao Protótipo) */}
+      {/* Barra de Filtros em Pílulas (Alinhada à Planilha) */}
       <div className="flex flex-wrap items-center gap-2">
         {FILTROS.map((f) => (
           <button
             key={f.valor}
             onClick={() => { setFiltro(f.valor); setPage(1); }}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${
               filtro === f.valor
-                ? "bg-blue-600 border-blue-500 text-white shadow-md"
+                ? "bg-blue-600 border-blue-500 text-white shadow-lg"
                 : "bg-navy-800/80 border-navy-700 text-slate-300 hover:bg-navy-700 hover:text-white"
             }`}
           >
@@ -106,115 +115,139 @@ export function AuditoriaProjeto({ projetoId }: { projetoId: string }) {
           <input
             type="text"
             className="input w-full md:w-80 text-xs"
-            placeholder="Buscar prestador, razão social, rubrica..."
+            placeholder="🔍 Filtrar prestador, razão social, item, rubrica..."
             value={busca}
             onChange={(e) => { setBusca(e.target.value); setPage(1); }}
           />
           <div className="text-xs text-slate-400 font-medium">
-            Exibindo página <span className="text-blue-400 font-bold">{page}</span> de {totalPaginas} ({total} lançamentos no total)
+            Exibindo página <span className="text-blue-400 font-bold">{page}</span> de {totalPaginas} ({total} lançamentos)
           </div>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-700/60">
+        {/* Tabela Alinhada 1:1 com as Colunas da Planilha Oficial */}
+        <div className="overflow-x-auto rounded-xl border border-slate-700/60 shadow-xl">
           <table className="w-full text-xs">
             <thead>
               <tr className="bg-navy-900/90 text-slate-300 border-b border-slate-700 font-bold uppercase tracking-wider text-[11px]">
-                <th className="py-3 px-3 text-left"># ORDEM</th>
-                <th className="py-3 px-3 text-left">DATA</th>
-                <th className="py-3 px-3 text-left">RAZÃO SOCIAL (PJ) & PRESTADOR (PF)</th>
-                <th className="py-3 px-3 text-left">RUBRICA SALIC & DOCUMENTOS (ABRIR PDF)</th>
-                <th className="py-3 px-3 text-right">VALOR & SALDO RESTANTE</th>
+                <th className="py-3 px-3 text-left">CONTROLE</th>
+                <th className="py-3 px-3 text-left">PRESTADOR DE SERVIÇO</th>
+                <th className="py-3 px-3 text-left">RAZÃO SOCIAL</th>
+                <th className="py-3 px-3 text-center">DATA</th>
+                <th className="py-3 px-3 text-right">VALOR</th>
+                <th className="py-3 px-3 text-right">SALDO</th>
+                <th className="py-3 px-3 text-left">ITEM / SERVIÇO</th>
+                <th className="py-3 px-3 text-center">RUBRICA</th>
                 <th className="py-3 px-3 text-center">STATUS REVISÃO</th>
-                <th className="py-3 px-3 text-center">CHECKLIST DE ANEXOS</th>
-                <th className="py-3 px-3 text-center">AÇÃO RÁPIDA</th>
+                <th className="py-3 px-3 text-left">DOCUMENTO FISCAL</th>
+                <th className="py-3 px-3 text-center">AÇÃO</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 bg-navy-800/40">
               {transacoes.map((t, i) => {
-                const anexos = (t.tem_nf ? 1 : 0) + (t.tem_comprovante ? 1 : 0);
-                const completo = anexos === 2;
+                const prestadorLimpo = limparTextoFavorecido(t.cnpj_fornecedor || t.fornecedor);
+                const razaoSocialLimpa = limparTextoFavorecido(t.fornecedor);
+                const itemDescricao = t.item_descricao || t.rubrica_descricao || "-";
+                const nomeDocLimpo = t.documento ? t.documento.split(/[\\/]/).pop() : null;
+
                 return (
                   <tr key={t.id} className="hover:bg-navy-700/40 transition-colors align-top">
-                    <td className="py-3 px-3 font-mono font-bold text-slate-400">
-                      #{(page - 1) * limit + i + 1}
+                    {/* CONTROLE */}
+                    <td className="py-3 px-3 font-mono font-bold text-slate-400 whitespace-nowrap">
+                      {(page - 1) * limit + i + 1}
                     </td>
-                    <td className="py-3 px-3 whitespace-nowrap font-medium text-slate-200">
+
+                    {/* PRESTADOR DE SERVIÇO */}
+                    <td className="py-3 px-3 max-w-[12rem]">
+                      <div className="font-bold text-slate-100 uppercase tracking-tight truncate" title={prestadorLimpo}>
+                        {prestadorLimpo}
+                      </div>
+                    </td>
+
+                    {/* RAZÃO SOCIAL */}
+                    <td className="py-3 px-3 max-w-[14rem]">
+                      <div className="font-semibold text-slate-300 uppercase tracking-tight truncate" title={razaoSocialLimpa}>
+                        {razaoSocialLimpa}
+                      </div>
+                    </td>
+
+                    {/* DATA */}
+                    <td className="py-3 px-3 text-center whitespace-nowrap font-medium text-slate-200">
                       {t.data_pagamento ? new Date(t.data_pagamento + "T00:00:00").toLocaleDateString("pt-BR") : "-"}
                     </td>
-                    <td className="py-3 px-3 max-w-[15rem]">
-                      <div className="font-bold text-slate-100 uppercase tracking-tight truncate" title={t.fornecedor}>
-                        {t.fornecedor || "-"}
-                      </div>
-                      {t.cnpj_fornecedor && (
-                        <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-blue-950/60 border border-blue-800/40 text-[11px] text-blue-300 font-medium">
-                          👤 Prestador (PF): {t.cnpj_fornecedor}
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3 px-3 max-w-[18rem]">
-                      {t.rubrica_codigo ? (
-                        <div className="font-bold text-slate-200 mb-1 text-[11px]" title={t.rubrica_descricao ?? undefined}>
-                          Rubrica {t.rubrica_codigo}{t.rubrica_descricao ? ` — ${t.rubrica_descricao}` : ""}
-                        </div>
-                      ) : (
-                        <div className="text-amber-400 font-bold mb-1 text-[11px]">sem rubrica associada</div>
-                      )}
 
-                      <div className="flex flex-col gap-1">
-                        {t.documento ? (
-                          <button
-                            onClick={async () => {
-                              try {
-                                if (t.documento_id) {
-                                  await download(`/api/v1/documentos/${t.documento_id}/arquivo`, t.documento!.split(/[\\/]/).pop() ?? "doc.pdf");
-                                } else {
-                                  alert(`Documento registrado: ${t.documento}`);
-                                }
-                              } catch (err: any) {
-                                alert(err?.message || "Erro ao abrir o documento.");
-                              }
-                            }}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-950/70 border border-emerald-700/50 text-emerald-300 hover:bg-emerald-900/80 text-[11px] font-semibold transition-colors w-fit"
-                          >
-                            ✓ {t.documento.split(/[\\/]/).pop()}
-                          </button>
-                        ) : (
-                          <span className="text-slate-500 italic text-[11px]">sem comprovante anexado</span>
-                        )}
+                    {/* VALOR */}
+                    <td className="py-3 px-3 text-right whitespace-nowrap font-bold text-rose-400 text-sm">
+                      {brl(t.valor_bruto)}
+                    </td>
+
+                    {/* SALDO RESTANTE */}
+                    <td className="py-3 px-3 text-right whitespace-nowrap font-mono text-blue-300 text-xs font-semibold">
+                      {t.saldo_restante != null ? brl(t.saldo_restante) : "-"}
+                    </td>
+
+                    {/* ITEM / SERVIÇO */}
+                    <td className="py-3 px-3 max-w-[12rem]">
+                      <div className="font-medium text-slate-200 truncate" title={itemDescricao}>
+                        {itemDescricao}
                       </div>
                     </td>
-                    <td className="py-3 px-3 text-right whitespace-nowrap">
-                      <div className="font-bold text-rose-400 text-sm">- {brl(t.valor_bruto)}</div>
-                      <div className="inline-block mt-0.5 px-2 py-0.5 rounded bg-blue-950/50 border border-blue-900/40 text-blue-300 text-[10px] font-mono">
-                        Saldo Restante: {t.saldo_restante != null ? brl(t.saldo_restante) : "-"}
-                      </div>
+
+                    {/* RUBRICA SALIC */}
+                    <td className="py-3 px-3 text-center whitespace-nowrap">
+                      {t.rubrica_codigo ? (
+                        <span className="inline-flex px-2 py-0.5 rounded bg-blue-950/60 border border-blue-800/40 text-blue-300 font-mono font-bold text-[11px]">
+                          {t.rubrica_codigo}
+                        </span>
+                      ) : (
+                        <span className="text-amber-400 italic text-[11px]">sem rubrica</span>
+                      )}
                     </td>
+
+                    {/* STATUS REVISÃO */}
                     <td className="py-3 px-3 text-center whitespace-nowrap">
                       <span className={`inline-flex px-2.5 py-1 rounded-md text-[11px] font-bold ${
                         t.status === "CONCILIADO_OK" || t.status === "OK"
                           ? "bg-emerald-950/80 text-emerald-300 border border-emerald-700/50"
-                          : t.status?.startsWith("ALERTA")
-                          ? "bg-rose-950/80 text-rose-300 border border-rose-700/50"
-                          : "bg-amber-950/80 text-amber-300 border border-amber-700/50"
+                          : t.status === "VALOR_CORRIGIDO"
+                          ? "bg-amber-950/80 text-amber-300 border border-amber-700/50"
+                          : "bg-rose-950/80 text-rose-300 border border-rose-700/50"
                       }`}>
-                        {t.status}
+                        {t.status === "CONCILIADO_OK" ? "OK" : t.status}
                       </span>
                     </td>
-                    <td className="py-3 px-3 text-center whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold ${
-                        completo
-                          ? "bg-emerald-950/80 text-emerald-300 border border-emerald-700/50"
-                          : "bg-amber-950/80 text-amber-300 border border-amber-700/50"
-                      }`}>
-                        {completo ? "Completo (2/2 docs)" : `Incompleto (${anexos}/2 docs)`}
-                      </span>
+
+                    {/* DOCUMENTO FISCAL */}
+                    <td className="py-3 px-3 max-w-[14rem]">
+                      {nomeDocLimpo ? (
+                        <button
+                          onClick={async () => {
+                            try {
+                              if (t.documento_id) {
+                                await download(`/api/v1/documentos/${t.documento_id}/arquivo`, nomeDocLimpo);
+                              } else {
+                                alert(`Documento registrado: ${t.documento}`);
+                              }
+                            } catch (err: any) {
+                              alert(err?.message || "Erro ao abrir o documento.");
+                            }
+                          }}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-950/70 border border-emerald-700/50 text-emerald-300 hover:bg-emerald-900/80 text-[11px] font-semibold transition-colors truncate max-w-full"
+                          title={nomeDocLimpo}
+                        >
+                          📄 {nomeDocLimpo}
+                        </button>
+                      ) : (
+                        <span className="text-slate-500 italic text-[11px]">Sem documento</span>
+                      )}
                     </td>
+
+                    {/* AÇÃO */}
                     <td className="py-3 px-3 text-center whitespace-nowrap">
                       <button
                         onClick={() => setTransacaoSelecionada(t)}
-                        className="px-3 py-1 rounded-md bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 border border-blue-500/40 text-[11px] font-semibold transition-colors"
+                        className="px-2.5 py-1 rounded-md bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 border border-blue-500/40 text-[11px] font-semibold transition-colors"
                       >
-                        🔍 Ver Detalhes
+                        🔍 Ver
                       </button>
                     </td>
                   </tr>

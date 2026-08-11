@@ -56,12 +56,12 @@ describe('AuditoriaProjeto', () => {
     mockGet.mockResolvedValue(mockAuditoria);
   });
 
-  it('numera os lançamentos sequencialmente (#1, #2)', async () => {
+  it('numera os lançamentos sequencialmente (1, 2)', async () => {
     render(<AuditoriaProjeto projetoId="projeto-123" />);
 
     await waitFor(() => {
-      expect(screen.getByText('#1')).toBeInTheDocument();
-      expect(screen.getByText('#2')).toBeInTheDocument();
+      expect(screen.getAllByText('1')[0]).toBeInTheDocument();
+      expect(screen.getByText('2')).toBeInTheDocument();
     });
   });
 
@@ -69,8 +69,8 @@ describe('AuditoriaProjeto', () => {
     render(<AuditoriaProjeto projetoId="projeto-123" />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Rubrica 1\.5\.1/)).toBeInTheDocument();
-      expect(screen.getByText(/sem rubrica associada/i)).toBeInTheDocument();
+      expect(screen.getByText('1.5.1')).toBeInTheDocument();
+      expect(screen.getByText('sem rubrica')).toBeInTheDocument();
     });
   });
 
@@ -83,11 +83,11 @@ describe('AuditoriaProjeto', () => {
     });
   });
 
-  it('status CONCILIADO_OK aparece com badge verde (bug antigo checava CONCILIADA/OK, que não existem)', async () => {
+  it('status CONCILIADO_OK aparece com badge OK verde', async () => {
     render(<AuditoriaProjeto projetoId="projeto-123" />);
 
     await waitFor(() => {
-      const badge = screen.getByText('CONCILIADO_OK');
+      const badge = screen.getByText('OK');
       expect(badge.className).toMatch(/emerald|pill-sucesso/);
     });
   });

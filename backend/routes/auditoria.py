@@ -103,6 +103,7 @@ async def auditoria_projeto(
         select t.id, t.fornecedor, t.cnpj_fornecedor, t.data_pagamento, t.valor_bruto,
                t.tem_nf, t.tem_comprovante, t.status, t.score_conciliacao,
                r.codigo as rubrica_codigo, r.descricao as rubrica_descricao,
+               d.descricao as item_descricao,
                dt.id as documento_id, dt.arquivo_ref as documento, dt.confianca_ocr,
                sa.debitado_acumulado
         from transacoes t
@@ -146,6 +147,7 @@ async def auditoria_projeto(
             "score_conciliacao": r["score_conciliacao"],
             "rubrica_codigo": r["rubrica_codigo"],
             "rubrica_descricao": r["rubrica_descricao"],
+            "item_descricao": r["item_descricao"],
             "documento_id": str(r["documento_id"]) if r["documento_id"] else None,
             "documento": r["documento"],
             "confianca_ocr": r["confianca_ocr"],
