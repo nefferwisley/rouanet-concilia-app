@@ -29,6 +29,13 @@ log = logging.getLogger("rouanet-api")
 async def lifespan(app: FastAPI):
     await get_pool()
     log.info("Pool de conexões pronto.")
+    try:
+        from backend.scripts.apply_migrations import aplicar_migrations
+
+        await aplicar_migrations()
+        log.info("Migrations verificadas/aplicadas no startup.")
+    except Exception as e:  # noqa: BLE001 — não derrubar o app se o banco estiver fora
+        log.warning("Migrations não puderam ser aplicadas no startup: %s", e)
     yield
     await close_pool()
 
