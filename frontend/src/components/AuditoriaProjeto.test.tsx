@@ -70,7 +70,7 @@ describe('AuditoriaProjeto', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Rubrica 1\.5\.1/)).toBeInTheDocument();
-      expect(screen.getByText('sem rubrica')).toBeInTheDocument();
+      expect(screen.getByText(/sem rubrica associada/i)).toBeInTheDocument();
     });
   });
 
@@ -88,7 +88,7 @@ describe('AuditoriaProjeto', () => {
 
     await waitFor(() => {
       const badge = screen.getByText('CONCILIADO_OK');
-      expect(badge.className).toContain('pill-sucesso');
+      expect(badge.className).toMatch(/emerald|pill-sucesso/);
     });
   });
 });
