@@ -44,7 +44,12 @@ export function LoginPage() {
         setTimeout(() => navigate("/"), 1500);
       }
     } catch (err: any) {
-      setErro(err.message || "Falha na autenticação.");
+      const m = String(err?.message || "");
+      if (m.toLowerCase().includes("invalid api key") || m.toLowerCase().includes("apikey")) {
+        setErro("A chave anon do Supabase não foi configurada nas variáveis do Netlify. Use a opção 'Colar Token Manualmente' abaixo para acessar.");
+      } else {
+        setErro(m || "Falha na autenticação.");
+      }
     } finally {
       setCarregando(false);
     }
@@ -68,8 +73,17 @@ export function LoginPage() {
         </div>
 
         {erro && (
-          <div className="p-3.5 text-sm rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 font-medium">
-            ⚠️ {erro}
+          <div className="p-3.5 text-sm rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 font-medium space-y-2">
+            <div>⚠️ {erro}</div>
+            {erro.includes("Colar Token") && (
+              <button
+                type="button"
+                onClick={() => { setModo("manual"); setErro(null); }}
+                className="btn-secondary text-xs w-full py-2 justify-center"
+              >
+                🔑 Entrar via Token Manual
+              </button>
+            )}
           </div>
         )}
 
