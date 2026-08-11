@@ -18,35 +18,68 @@ def _vetor_para_literal_pg(vetor):
 
 
 class BuscadorRubricaRAG:
-    """Busca a rubrica mais próxima semanticamente de uma descrição de despesa."""
+    """Busca a rubrica mais próxima semanticamente de uma descrição de despesa.
+
+    Dois backends de embedding (P4):
+        - Gemini (text-embedding-004) quando há api_key;
+        - Ollama local (nomic-embed-text, 768d) caso contrário — zero egress.
+    A busca é sempre no pgvector; só a GERAÇÃO do vetor muda de fonte.
+    """
 
     def __init__(self, conn, api_key_gemini, projeto_id, limite_score=0.75):
         self.conn = conn
         self.projeto_id = projeto_id
         self.limite_score = limite_score
+        self.fonte_embedding = "nenhum"
         self._configurado = False
         if api_key_gemini:
             try:
                 genai.configure(api_key=api_key_gemini)
                 self._configurado = True
+                self.fonte_embedding = "gemini"
             except Exception as e:
                 log.warning("Falha ao configurar Gemini: %s — RAG desabilitado.", e)
+        else:
+            from motor.embedding_provider import embeddings_ollama_disponiveis
+            if embeddings_ollama_disponiveis():
+                self._configurado = True
+                self.fonte_embedding = "ollama"
+                log.info("RAG usando embeddings locais via Ollama (nomic-embed-text).")
 
     def disponivel(self) -> bool:
         return self._configurado
+
+    def _embedding_query(self, descricao: str):
+        """list[float] | None — gera o vetor da query na fonte configurada."""
+        if self.fonte_embedding == "gemini":
+            try:
+                resp = genai.embed_content(
+                    model=MODELO_EMBEDDING, content=descricao, task_type="RETRIEVAL_QUERY"
+                )
+                return resp["embedding"]
+            except Exception as e:
+                log.warning("Gemini falhou na query (%s) — RAG desabilitado nesta chamada.", e)
+                return None
+        from motor.embedding_provider import embed_texto
+        return embed_texto(descricao)
 
     def buscar(self, descricao: str, top_k: int = 3):
         """(rubrica_id | None, score: float, metodo: 'RAG' | 'nao_encontrado')"""
         if not self._configurado or not descricao:
             return None, 0.0, "nao_encontrado"
 
-        try:
-            resp = genai.embed_content(
-                model=MODELO_EMBEDDING, content=descricao, task_type="RETRIEVAL_QUERY"
+        vetor_query = self._embedding_query(descricao)
+        if vetor_query is None:
+            return None, 0.0, "nao_encontrado"
+
+        # schema: rubricas.embedding vector(768). Vetor de outra dimensão não
+        # casa com o índice HNSW — desabilita a busca em vez de quebrar.
+        from motor.embedding_provider import DIMENSAO_PADRAO, dimensao_correta
+        if not dimensao_correta(vetor_query, DIMENSAO_PADRAO):
+            log.warning(
+                "Embedding com %d dims (schema espera %d) — RAG desabilitado nesta chamada.",
+                len(vetor_query), DIMENSAO_PADRAO,
             )
-            vetor_query = resp["embedding"]
-        except Exception as e:
-            log.warning("Gemini falhou na query (%s) — RAG desabilitado nesta chamada.", e)
             return None, 0.0, "nao_encontrado"
 
         literal = _vetor_para_literal_pg(vetor_query)

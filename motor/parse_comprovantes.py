@@ -31,6 +31,8 @@ from pathlib import Path
 
 import pymupdf
 
+from motor.correcoes_manuais import aplicar_correcoes
+
 RE_NOME_ARQ = re.compile(r"^(\d{3})(?:-B)?\s*-\s*(\d{2}-\d{2}-\d{4})\s*-\s*(.+?)\.pdf$", re.IGNORECASE)
 
 # Rótulos reconhecidos (ordem importa: mais específicos primeiro).
@@ -226,7 +228,7 @@ def nome_arquivo_padronizado(nome: str) -> dict | None:
     return {"numero": int(m.group(1)), "data": data, "descricao": m.group(3).strip()}
 
 
-def parse_comprovantes(pasta: Path) -> tuple[list[dict], list[str]]:
+def parse_comprovantes(pasta: Path, projeto_id: str | None = None) -> tuple[list[dict], list[str]]:
     """Varre a pasta (recursivo), parseia cada PDF e anexa fonte + metadado."""
     achados, sem_valor = [], []
     for pdf in sorted(Path(pasta).rglob("*.pdf")):
@@ -242,6 +244,7 @@ def parse_comprovantes(pasta: Path) -> tuple[list[dict], list[str]]:
             dado["data_arquivo"] = meta["data"]
             dado["descricao_arquivo"] = meta["descricao"]
         achados.append(dado)
+    achados = aplicar_correcoes(achados, projeto_id=projeto_id)
     return achados, sem_valor
 
 

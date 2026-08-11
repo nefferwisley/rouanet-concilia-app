@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
 """
-gerar_embeddings.py — Fase 4: popula rubricas.embedding via Gemini text-embedding-004.
+gerar_embeddings.py — Fase 4: popula rubricas.embedding (768d).
 Script de uso único por projeto (roda de novo só se entrarem rubricas novas).
+
+Backends (P4):
+    - gemini: Google text-embedding-004 (requer GOOGLE_API_KEY, nuvem).
+    - ollama : nomic-embed-text via Ollama local (zero egress) — o MESMO
+      modelo que o RAG local usa nas queries (matching_rag.py). NUNCA misture
+      fontes no mesmo projeto: cosseno só é comparável na mesma dimensão/
+      modelo.
 
 USO:
     GOOGLE_API_KEY=... python -m motor.gerar_embeddings \
         --db-url="postgresql://postgres:SENHA@db.xxxx.supabase.co:5432/postgres" \
-        --pronac="20.7453" [--dry-run] [--criar-indice]
+        --pronac="20.7453" [--backend gemini|ollama] [--dry-run] [--criar-indice]
 
-requirements: psycopg2-binary, google-generativeai
+requirements: psycopg2-binary (+ google-generativeai p/ gemini; ollama p/ local)
 """
 import argparse
 import os
 import sys
 
-import google.generativeai as genai
 import psycopg2
 
 MODELO_EMBEDDING = "models/text-embedding-004"
@@ -25,30 +31,59 @@ def vetor_para_literal_pg(vetor):
     return "[" + ",".join(f"{x:.8f}" for x in vetor) + "]"
 
 
-def gerar_embedding(texto: str):
+def _embed_gemini(texto: str):
+    import google.generativeai as genai  # import tardio: só no backend gemini
+
     resp = genai.embed_content(model=MODELO_EMBEDDING, content=texto, task_type="RETRIEVAL_DOCUMENT")
-    vetor = resp["embedding"]
+    return resp["embedding"]
+
+
+def _embed_ollama(texto: str):
+    from motor.embedding_provider import embed_texto
+
+    vetor = embed_texto(texto)
+    if vetor is None:
+        raise RuntimeError("Ollama indisponível ou falhou ao gerar embedding.")
+    return vetor
+
+
+def gerar_embedding(texto: str, backend: str = "gemini"):
+    if backend == "ollama":
+        vetor = _embed_ollama(texto)
+    else:
+        vetor = _embed_gemini(texto)
     if len(vetor) != DIMENSAO:
-        raise ValueError(f"Gemini retornou {len(vetor)} dims, schema espera {DIMENSAO}.")
+        raise ValueError(f"Backend {backend} retornou {len(vetor)} dims, schema espera {DIMENSAO}.")
     return vetor
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Popula rubricas.embedding (Gemini text-embedding-004).")
+    ap = argparse.ArgumentParser(
+        description="Popula rubricas.embedding com backend gemini (nuvem) ou ollama (local)."
+    )
     ap.add_argument("--db-url", required=True)
     ap.add_argument("--pronac", required=True, help='Ex: "20.7453" (mesmo formato de projetos.pronac)')
-    ap.add_argument("--api-key", help="Google API Key (ou var env GOOGLE_API_KEY)")
+    ap.add_argument("--api-key", help="Google API Key (ou var env GOOGLE_API_KEY) — só p/ backend gemini")
+    ap.add_argument("--backend", choices=["gemini", "ollama"], default="gemini",
+                    help="Fonte dos embeddings (default: gemini). ollama = nomic-embed-text local, 768d.")
     ap.add_argument("--dry-run", action="store_true", help="Gera mas não grava — ROLLBACK no final.")
     ap.add_argument("--criar-indice", action="store_true",
                      help="Ao final, cria o índice HNSW ix_rubricas_embedding (rode depois que TODAS as "
                           "rubricas do projeto tiverem embedding).")
     args = ap.parse_args()
 
-    api_key = args.api_key or os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        print("✗ Faltou API Key: use --api-key ou GOOGLE_API_KEY.")
-        sys.exit(1)
-    genai.configure(api_key=api_key)
+    if args.backend == "gemini":
+        api_key = args.api_key or os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            print("✗ Faltou API Key: use --api-key ou GOOGLE_API_KEY (backend gemini).")
+            sys.exit(1)
+        import google.generativeai as genai
+        genai.configure(api_key=api_key)
+    else:
+        from motor.embedding_provider import embeddings_ollama_disponiveis
+        if not embeddings_ollama_disponiveis():
+            print("✗ Backend ollama pedido, mas o pacote `ollama` não está instalado.")
+            sys.exit(1)
 
     conn = psycopg2.connect(args.db_url)
     conn.autocommit = False
@@ -75,7 +110,7 @@ def main():
             print(f"Encontradas {len(linhas)} rubricas. Gerando embeddings...")
             for rubrica_id, codigo, texto in linhas:
                 try:
-                    vetor = gerar_embedding(texto)
+                    vetor = gerar_embedding(texto, backend=args.backend)
                 except Exception as e:
                     falhas.append((codigo, str(e)))
                     print(f"  ✗ {codigo}: falhou ao gerar embedding ({e})")

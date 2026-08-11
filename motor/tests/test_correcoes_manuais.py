@@ -2,6 +2,7 @@
 Testes para motor/correcoes_manuais.py (Fase F0 — overlay de correções manuais).
 """
 import json
+from pathlib import Path
 
 import pytest
 
@@ -62,3 +63,27 @@ def test_registrar_correcao_grava_json_valido(correcoes_path_isolado):
     correcoes_manuais.registrar_correcao(111, "valor", 211.50, "motivo")
     bruto = json.loads(correcoes_path_isolado.read_text(encoding="utf-8"))
     assert bruto["111"]["valor"] == 211.50
+
+
+def test_parse_comprovantes_aplica_overlay_automaticamente(correcoes_path_isolado, monkeypatch):
+    """Garante que a função parse_comprovantes invoca aplicar_correcoes."""
+    from motor import parse_comprovantes
+    correcoes_manuais.registrar_correcao(111, "valor", 211.50, "brilho corrigido")
+    
+    # Mock do parse_comprovante_pdf para não precisar de PDFs reais no teste
+    def mock_parse(caminho):
+        return {
+            "numero_arquivo": 111,
+            "valor": 0.00,
+            "favorecido": "Brilho",
+            "fonte": "111 - 30-10-2023 - Brilho.pdf",
+            "caminho": str(caminho),
+        }
+    
+    monkeypatch.setattr(parse_comprovantes, "parse_comprovante_pdf", mock_parse)
+    monkeypatch.setattr(Path, "rglob", lambda self, pattern: [Path("111 - 30-10-2023 - Brilho.pdf")])
+    
+    achados, _ = parse_comprovantes.parse_comprovantes(Path("fake_dir"))
+    assert len(achados) == 1
+    assert achados[0]["valor"] == 211.50
+

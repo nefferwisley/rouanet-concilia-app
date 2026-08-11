@@ -1,0 +1,108 @@
+{
+ "reconciliacao": {
+  "total_deb": 181,
+  "coberto_deb": 181,
+  "bate_deb": true,
+  "total_comp": 178,
+  "coberto_comp": 178,
+  "bate_comp": true,
+  "ok": true
+ },
+ "total_sobras": 11,
+ "n_clusters": 8,
+ "clusters": [
+  {
+   "cluster_id": "C1",
+   "tamanho": 4,
+   "classes": {
+    "orfaos_extrato": 4
+   },
+   "representantes": [
+    "orfaos_extrato | EDSON DE CAMARGO | 700.0 | comprovante do mesmo valor na data já vinculado a outro débito | extrato Pix - Enviado doc 100.501",
+    "orfaos_extrato | BERNARDO TAVARES ROSA | 300.0 | comprovante do mesmo valor na data já vinculado a outro débito | extrato Pix - Enviado doc 110.801",
+    "orfaos_extrato | CIRCUNSTANC 1961 FSAMPJFN | 975.04 | comprovante do mesmo valor na data já vinculado a outro débito | extrato Pix - Enviado doc 20.301"
+   ],
+   "exemplo": "orfaos_extrato | CIRCUNSTANC 1961 FSAMPJFN | 975.04 | comprovante do mesmo valor na data já vinculado a outro débito | extrato Pix - Enviado doc 20.301"
+  },
+  {
+   "cluster_id": "C2",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_extrato": 1
+   },
+   "representantes": [
+    "orfaos_extrato | Andre Lima Monfrini | 500.0 | data/valor não bate | extrato Pix - Enviado doc 101.001"
+   ],
+   "exemplo": "orfaos_extrato | Andre Lima Monfrini | 500.0 | data/valor não bate | extrato Pix - Enviado doc 101.001"
+  },
+  {
+   "cluster_id": "C3",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_extrato": 1
+   },
+   "representantes": [
+    "orfaos_extrato | LUIS FELIPE LABAKI | 10000.0 | data/valor não bate | extrato Pix - Enviado doc 92.601"
+   ],
+   "exemplo": "orfaos_extrato | LUIS FELIPE LABAKI | 10000.0 | data/valor não bate | extrato Pix - Enviado doc 92.601"
+  },
+  {
+   "cluster_id": "C4",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_extrato": 1
+   },
+   "representantes": [
+    "orfaos_extrato | ANA BEATRIZ HERMANSON POMA | 3000.0 | data/valor não bate | extrato Pix - Enviado doc 92.603"
+   ],
+   "exemplo": "orfaos_extrato | ANA BEATRIZ HERMANSON POMA | 3000.0 | data/valor não bate | extrato Pix - Enviado doc 92.603"
+  },
+  {
+   "cluster_id": "C5",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_comprovante": 1
+   },
+   "representantes": [
+    "orfaos_comprovante | Amir Labaki | 945.49 | sem débito correspondente | comprovante 60"
+   ],
+   "exemplo": "orfaos_comprovante | Amir Labaki | 945.49 | sem débito correspondente | comprovante 60"
+  },
+  {
+   "cluster_id": "C6",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_comprovante": 1
+   },
+   "representantes": [
+    "orfaos_comprovante | Camila Licariao de Carvalho Braune 4 | 3000.0 | sem débito correspondente | comprovante 87"
+   ],
+   "exemplo": "orfaos_comprovante | Camila Licariao de Carvalho Braune 4 | 3000.0 | sem débito correspondente | comprovante 87"
+  },
+  {
+   "cluster_id": "C7",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_comprovante": 1
+   },
+   "representantes": [
+    "orfaos_comprovante | Mog Produtora | 10000.0 | sem débito correspondente | comprovante 96"
+   ],
+   "exemplo": "orfaos_comprovante | Mog Produtora | 10000.0 | sem débito correspondente | comprovante 96"
+  },
+  {
+   "cluster_id": "C8",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_comprovante": 1
+   },
+   "representantes": [
+    "orfaos_comprovante | Monica G P Moraes | 3724.74 | sem débito correspondente | comprovante 123"
+   ],
+   "exemplo": "orfaos_comprovante | Monica G P Moraes | 3724.74 | sem débito correspondente | comprovante 123"
+  }
+ ],
+ "sugestoes": [],
+ "para_humano": 11,
+ "com_sugestao": 0
+}

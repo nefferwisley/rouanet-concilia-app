@@ -60,6 +60,54 @@ LIMIAR_DIVERGENTE = 0.85   # score de nome p/ classificar divergente_valor
 CLASSES = ["conciliado", "orfao_extrato", "orfao_comprovante", "divergente_valor", "ambiguo"]
 
 
+class DataLossException(Exception):
+    """Falha de reconciliação: linhas de origem sumiram entre as classes de saída (Sev-1)."""
+
+
+def verificar_reconciliacao(resultado: dict, total_deb: int, total_comp: int) -> dict:
+    """
+    P0 — invariante de zero perda de dados.
+
+    Para cada lado, a soma das classes de saída precisa cobrir exatamente o
+    total de linhas de origem:
+        débitos:      conciliados + ambiguos_extrato + divergentes_valor + orfaos_extrato
+        comprovantes: conciliados + ambiguos_comprovante + divergentes_valor + orfaos_comprovante
+
+    Retorna o dict auditável da checagem; levanta DataLossException se a conta
+    não fechar — linha sem classe é perda silenciosa e bloqueia a promoção.
+    """
+    coberto_deb = (
+        len(resultado["conciliados"])
+        + len(resultado["ambiguos_extrato"])
+        + len(resultado["divergentes_valor"])
+        + len(resultado["orfaos_extrato"])
+    )
+    coberto_comp = (
+        len(resultado["conciliados"])
+        + len(resultado["ambiguos_comprovante"])
+        + len(resultado["divergentes_valor"])
+        + len(resultado["orfaos_comprovante"])
+    )
+    bate_deb = coberto_deb == total_deb
+    bate_comp = coberto_comp == total_comp
+    checagem = {
+        "total_deb": total_deb,
+        "coberto_deb": coberto_deb,
+        "bate_deb": bate_deb,
+        "total_comp": total_comp,
+        "coberto_comp": coberto_comp,
+        "bate_comp": bate_comp,
+        "ok": bate_deb and bate_comp,
+    }
+    if not checagem["ok"]:
+        raise DataLossException(
+            f"RECONCILIAÇÃO QUEBRADA: débitos {coberto_deb}/{total_deb} cobertos, "
+            f"comprovantes {coberto_comp}/{total_comp} cobertos. "
+            "Nenhuma linha pode ficar sem classe (perda silenciosa)."
+        )
+    return checagem
+
+
 # ---------------------------------------------------------------- helpers
 def _normalizar(m):
     """Converte date/Decimal nativos (vindos dos parsers) pro formato JSON das _parsed."""
@@ -440,6 +488,11 @@ class Cruzador:
 
         self._passo_divergente()
         self._passo_orfao()
+        self._verificar_reconciliacao()
+
+    def _verificar_reconciliacao(self):
+        """P0: toda linha de origem precisa estar em exatamente uma das 5 classes."""
+        verificar_reconciliacao(self._result, len(self._debs), len(self._comps))
 
     def resultado(self) -> dict:
         return self._gerar_json()

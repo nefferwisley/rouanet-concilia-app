@@ -1,9 +1,13 @@
 """
 routes/revisao.py — revisão documental e manual dos lançamentos.
 
-P1: upload de documento (PDF/XML/PNG/JPG) por transação + OCR via Gemini
-    quando há chave (sem chave, registra sem OCR — não 503).
+P1: upload de documento (PDF/XML/PNG/JPG) por transação + OCR via IA
+    (Gemini na nuvem OU Ollama local — dispatcher extract_documento, P4).
+    Sem nenhum backend disponível, registra sem OCR — não 503.
 P2: fila de revisão manual (campos_revisao) com confirmar/corrigir/descartar.
+P3: feedback loop — revisões CONFIRMADO/CORRIGIDO viram regras aprendidas
+    (motor/aprendizado.py) via POST .../revisoes/exportar-regras; GET
+    .../revisoes/regras expõe o estado atual pra auditoria.
 """
 import hashlib
 import json
@@ -17,8 +21,9 @@ from starlette.concurrency import run_in_threadpool
 
 from backend.config import settings
 from backend.database import get_conn
+from motor.aprendizado import carregar_regras, exportar_regras
 from motor.importar import parse_tipo_doc
-from motor.ocr_service import extract_with_gemini
+from motor.ocr_service import extract_documento
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1", tags=["revisao"])
@@ -38,9 +43,10 @@ async def enviar_documento_transacao(
 ):
     """Anexa um documento fiscal a um lançamento (P1 — revisão documental).
 
-    Com GOOGLE_API_KEY (ou api_key_gemini), roda o OCR via Gemini e cria
-    campos_revisao se a confiança ficar abaixo do limiar. Sem chave, o
-    documento é registrado mesmo assim (confianca_ocr = null).
+    Roda o OCR via dispatcher (Gemini se houver chave, Ollama local caso
+    contrário — P4) e cria campos_revisao se a confiança ficar abaixo do
+    limiar. Sem NENHUM backend disponível, o documento é registrado mesmo
+    assim (confianca_ocr = null) — o upload nunca trava por causa do OCR.
     """
     conn, _ = dep
 
@@ -68,18 +74,20 @@ async def enviar_documento_transacao(
     sha = hashlib.sha256(conteudo).hexdigest()
     mime_type = arquivo.content_type or "application/pdf"
 
-    # OCR: apenas se houver chave — o que importa é não travar o upload.
+    # OCR via dispatcher (P4): Gemini (chave) ou Ollama local. Sem backend
+    # disponível, registra sem confiança — o que importa é não travar o upload.
     ocr_dados = None
     confianca = None
     motivos = []
     api_key = api_key_gemini or settings.google_api_key
-    if api_key:
-        ocr_dados = await run_in_threadpool(extract_with_gemini, conteudo, mime_type, api_key)
-        if ocr_dados is None:
-            logger.warning("OCR falhou para transação %s (%s) — registrando sem confiança.", transacao_id, arquivo.filename)
-        else:
-            motivos = ocr_dados.pop("_motivos_confianca", [])
-            confianca = ocr_dados["confianca_ocr"]
+    ocr_dados = await run_in_threadpool(
+        extract_documento, conteudo, mime_type, api_key, settings.ocr_backend or None,
+    )
+    if ocr_dados is None:
+        logger.warning("OCR não executado para transação %s (%s) — registrando sem confiança.", transacao_id, arquivo.filename)
+    else:
+        motivos = ocr_dados.pop("_motivos_confianca", [])
+        confianca = ocr_dados["confianca_ocr"]
 
     row = await conn.fetchrow(
         """
@@ -244,3 +252,57 @@ async def revisar_campo(
     if not row:
         raise HTTPException(404, "Revisão não encontrada (ou sem permissão via RLS).")
     return {"id": str(row["id"]), "status_revisao": novo_status}
+
+
+# ---------- P3: feedback loop (regras aprendidas) ----------
+
+
+@router.post("/projetos/{projeto_id}/revisoes/exportar-regras")
+async def exportar_regras_aprendidas(projeto_id: str, dep=Depends(get_conn)):
+    """Transforma correções humanas em regras reaproveitáveis pelo motor.
+
+    Só revisões CONFIRMADO e CORRIGIDO com valor_corrigido preenchido entram
+    (a filtragem de campo relevante é do próprio motor/aprendizado.py —
+    _CAMPOS_ALVO). O arquivo motor/_parsed/regras_aprendidas.json alimenta a
+    próxima rodada de conciliação: o padrão que o humano corrigiu uma vez o
+    motor passa a reconhecer sozinho (A.8 — feedback loop).
+    """
+    conn, _ = dep
+    rows = await conn.fetch(
+        """
+        select r.campo, r.valor_extraido, r.valor_corrigido
+        from campos_revisao r
+        join transacoes t on t.id = r.transacao_id
+        where t.projeto_id = $1
+          and r.status_revisao in ('CONFIRMADO', 'CORRIGIDO')
+          and r.valor_corrigido is not null
+        """,
+        projeto_id,
+    )
+    correcoes = [dict(row) for row in rows]
+    if not correcoes:
+        return {"projeto_id": projeto_id, "correcoes_consideradas": 0, "regras": {}}
+
+    # exportar_regras é síncrona e escreve em disco — fora do event loop.
+    regras = await run_in_threadpool(exportar_regras, correcoes)
+    total = sum(len(v) for v in regras.values())
+    logger.info("Projeto %s: %d correção(ões) exportada(s) — %d regra(s) ativa(s).",
+                projeto_id, len(correcoes), total)
+    return {
+        "projeto_id": projeto_id,
+        "correcoes_consideradas": len(correcoes),
+        "total_regras": total,
+        "regras": regras,
+    }
+
+
+@router.get("/projetos/{projeto_id}/revisoes/regras")
+async def listar_regras_aprendidas(projeto_id: str, dep=Depends(get_conn)):
+    """Auditoria: mostra as regras aprendidas atualmente ativas pro motor."""
+    conn, _ = dep
+    projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
+    if not projeto:
+        raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
+    regras = await run_in_threadpool(carregar_regras)
+    total = sum(len(v) for v in regras.values())
+    return {"projeto_id": projeto_id, "total_regras": total, "regras": regras}

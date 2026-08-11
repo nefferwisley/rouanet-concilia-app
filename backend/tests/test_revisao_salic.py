@@ -58,6 +58,16 @@ def test_revisar_campo_decisao_invalida_ainda_exige_auth():
     assert response.status_code == 401
 
 
+def test_exportar_regras_aprendidas_requires_auth():
+    response = client.post("/api/v1/projetos/fake-uuid/revisoes/exportar-regras")
+    assert response.status_code == 401
+
+
+def test_listar_regras_aprendidas_requires_auth():
+    response = client.get("/api/v1/projetos/fake-uuid/revisoes/regras")
+    assert response.status_code == 401
+
+
 # ============================================================
 # SALIC — consulta pública por PRONAC
 # ============================================================

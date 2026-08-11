@@ -1,14 +1,13 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 
 export function Header() {
-  const { token, setToken } = useAuth();
+  const { token, user, logout } = useAuth();
   const { dark, toggle } = useTheme();
-  const [editando, setEditando] = useState(false);
-  const [rascunho, setRascunho] = useState(token ?? "");
+  const navigate = useNavigate();
 
   return (
     <nav className="sticky top-0 z-40 bg-white/90 dark:bg-navy-800/90 backdrop-blur border-b border-slate-200 dark:border-navy-700">
@@ -19,32 +18,29 @@ export function Header() {
           </span>
           <span className="text-lg font-bold tracking-tight">RouanetConcilia</span>
         </Link>
-        <div className="flex items-center gap-2">
-          {editando ? (
+        <div className="flex items-center gap-3">
+          {token ? (
             <div className="flex items-center gap-2">
-              <input
-                className="input w-72"
-                placeholder="Cole o access_token do Supabase Auth"
-                value={rascunho}
-                onChange={(e) => setRascunho(e.target.value)}
-              />
+              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                👤 {user?.email || "Conectado"}
+              </span>
               <button
-                className="btn-primary"
+                className="btn-secondary text-xs px-3 py-1.5"
                 onClick={() => {
-                  setToken(rascunho || null);
-                  setEditando(false);
+                  logout();
+                  navigate("/login");
                 }}
               >
-                Salvar
+                Sair
               </button>
             </div>
           ) : (
-            <button className="btn-secondary" onClick={() => setEditando(true)}>
-              {token ? "🔑 Conectado" : "Definir token"}
-            </button>
+            <Link to="/login" className="btn-primary text-xs px-3 py-1.5">
+              Entrar
+            </Link>
           )}
           <button
-            className="h-8 w-8 flex items-center justify-center rounded-lg bg-slate-200 dark:bg-white/[0.04] hover:bg-slate-300 dark:hover:bg-white/10 transition-colors"
+            className="h-8 w-8 flex items-center justify-center rounded-lg bg-slate-200 dark:bg-white/[0.04] hover:bg-slate-300 dark:hover:bg-white/10 transition-colors text-sm"
             onClick={toggle}
             title="Alternar tema"
           >

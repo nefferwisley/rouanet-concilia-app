@@ -1,0 +1,307 @@
+{
+ "reconciliacao": {
+  "total_deb": 181,
+  "coberto_deb": 181,
+  "bate_deb": true,
+  "total_comp": 178,
+  "coberto_comp": 178,
+  "bate_comp": true,
+  "ok": true
+ },
+ "total_sobras": 11,
+ "n_clusters": 8,
+ "clusters": [
+  {
+   "cluster_id": "C1",
+   "tamanho": 4,
+   "classes": {
+    "orfaos_extrato": 4
+   },
+   "representantes": [
+    "orfaos_extrato | EDSON DE CAMARGO | 700.0 | comprovante do mesmo valor na data já vinculado a outro débito | extrato Pix - Enviado doc 100.501",
+    "orfaos_extrato | BERNARDO TAVARES ROSA | 300.0 | comprovante do mesmo valor na data já vinculado a outro débito | extrato Pix - Enviado doc 110.801",
+    "orfaos_extrato | CIRCUNSTANC 1961 FSAMPJFN | 975.04 | comprovante do mesmo valor na data já vinculado a outro débito | extrato Pix - Enviado doc 20.301"
+   ],
+   "exemplo": "orfaos_extrato | CIRCUNSTANC 1961 FSAMPJFN | 975.04 | comprovante do mesmo valor na data já vinculado a outro débito | extrato Pix - Enviado doc 20.301"
+  },
+  {
+   "cluster_id": "C2",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_extrato": 1
+   },
+   "representantes": [
+    "orfaos_extrato | Andre Lima Monfrini | 500.0 | data/valor não bate | extrato Pix - Enviado doc 101.001"
+   ],
+   "exemplo": "orfaos_extrato | Andre Lima Monfrini | 500.0 | data/valor não bate | extrato Pix - Enviado doc 101.001"
+  },
+  {
+   "cluster_id": "C3",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_extrato": 1
+   },
+   "representantes": [
+    "orfaos_extrato | LUIS FELIPE LABAKI | 10000.0 | data/valor não bate | extrato Pix - Enviado doc 92.601"
+   ],
+   "exemplo": "orfaos_extrato | LUIS FELIPE LABAKI | 10000.0 | data/valor não bate | extrato Pix - Enviado doc 92.601"
+  },
+  {
+   "cluster_id": "C4",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_extrato": 1
+   },
+   "representantes": [
+    "orfaos_extrato | ANA BEATRIZ HERMANSON POMA | 3000.0 | data/valor não bate | extrato Pix - Enviado doc 92.603"
+   ],
+   "exemplo": "orfaos_extrato | ANA BEATRIZ HERMANSON POMA | 3000.0 | data/valor não bate | extrato Pix - Enviado doc 92.603"
+  },
+  {
+   "cluster_id": "C5",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_comprovante": 1
+   },
+   "representantes": [
+    "orfaos_comprovante | Amir Labaki | 945.49 | sem débito correspondente | comprovante 60"
+   ],
+   "exemplo": "orfaos_comprovante | Amir Labaki | 945.49 | sem débito correspondente | comprovante 60"
+  },
+  {
+   "cluster_id": "C6",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_comprovante": 1
+   },
+   "representantes": [
+    "orfaos_comprovante | Camila Licariao de Carvalho Braune 4 | 3000.0 | sem débito correspondente | comprovante 87"
+   ],
+   "exemplo": "orfaos_comprovante | Camila Licariao de Carvalho Braune 4 | 3000.0 | sem débito correspondente | comprovante 87"
+  },
+  {
+   "cluster_id": "C7",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_comprovante": 1
+   },
+   "representantes": [
+    "orfaos_comprovante | Mog Produtora | 10000.0 | sem débito correspondente | comprovante 96"
+   ],
+   "exemplo": "orfaos_comprovante | Mog Produtora | 10000.0 | sem débito correspondente | comprovante 96"
+  },
+  {
+   "cluster_id": "C8",
+   "tamanho": 1,
+   "classes": {
+    "orfaos_comprovante": 1
+   },
+   "representantes": [
+    "orfaos_comprovante | Monica G P Moraes | 3724.74 | sem débito correspondente | comprovante 123"
+   ],
+   "exemplo": "orfaos_comprovante | Monica G P Moraes | 3724.74 | sem débito correspondente | comprovante 123"
+  }
+ ],
+ "sugestoes": [
+  {
+   "cluster_id": "C1",
+   "sobra_id": "orfaos_extrato#0",
+   "classe": "orfaos_extrato",
+   "campo": "favorecido",
+   "valor_atual": "EDSON DE CAMARGO",
+   "valor_sugerido": "EDSON DE CAMARGO",
+   "status": "HUMANO_REVISAO",
+   "confianca": 0.85,
+   "motivo": "lambda falhou ou não alterou o valor",
+   "audit": {
+    "modelo": "qwen2.5-coder:7b",
+    "transformation": "lambda x: x.strip() if isinstance(x, str) else x",
+    "confidence_score": 0.85,
+    "reasoning": "Remove espaços em branco no início e fim do nome",
+    "pattern_type": "favorecido"
+   }
+  },
+  {
+   "cluster_id": "C1",
+   "sobra_id": "orfaos_extrato#2",
+   "classe": "orfaos_extrato",
+   "campo": "favorecido",
+   "valor_atual": "BERNARDO TAVARES ROSA",
+   "valor_sugerido": "BERNARDO TAVARES ROSA",
+   "status": "HUMANO_REVISAO",
+   "confianca": 0.85,
+   "motivo": "lambda falhou ou não alterou o valor",
+   "audit": {
+    "modelo": "qwen2.5-coder:7b",
+    "transformation": "lambda x: x.strip() if isinstance(x, str) else x",
+    "confidence_score": 0.85,
+    "reasoning": "Remove espaços em branco no início e fim do nome",
+    "pattern_type": "favorecido"
+   }
+  },
+  {
+   "cluster_id": "C1",
+   "sobra_id": "orfaos_extrato#5",
+   "classe": "orfaos_extrato",
+   "campo": "favorecido",
+   "valor_atual": "CIRCUNSTANC 1961 FSAMPJFN",
+   "valor_sugerido": "CIRCUNSTANC 1961 FSAMPJFN",
+   "status": "HUMANO_REVISAO",
+   "confianca": 0.85,
+   "motivo": "lambda falhou ou não alterou o valor",
+   "audit": {
+    "modelo": "qwen2.5-coder:7b",
+    "transformation": "lambda x: x.strip() if isinstance(x, str) else x",
+    "confidence_score": 0.85,
+    "reasoning": "Remove espaços em branco no início e fim do nome",
+    "pattern_type": "favorecido"
+   }
+  },
+  {
+   "cluster_id": "C1",
+   "sobra_id": "orfaos_extrato#6",
+   "classe": "orfaos_extrato",
+   "campo": "favorecido",
+   "valor_atual": "BANCO RENDIMENTO S/A",
+   "valor_sugerido": "BANCO RENDIMENTO S/A",
+   "status": "HUMANO_REVISAO",
+   "confianca": 0.85,
+   "motivo": "lambda falhou ou não alterou o valor",
+   "audit": {
+    "modelo": "qwen2.5-coder:7b",
+    "transformation": "lambda x: x.strip() if isinstance(x, str) else x",
+    "confidence_score": 0.85,
+    "reasoning": "Remove espaços em branco no início e fim do nome",
+    "pattern_type": "favorecido"
+   }
+  },
+  {
+   "cluster_id": "C2",
+   "sobra_id": "orfaos_extrato#1",
+   "classe": "orfaos_extrato",
+   "campo": "favorecido",
+   "valor_atual": "Andre Lima Monfrini",
+   "valor_sugerido": "Andre Lima Monfrini",
+   "status": "HUMANO_REVISAO",
+   "confianca": 0.9,
+   "motivo": "lambda falhou ou não alterou o valor",
+   "audit": {
+    "modelo": "qwen2.5-coder:7b",
+    "transformation": "lambda x: x.strip() if 'doc' in x else x",
+    "confidence_score": 0.9,
+    "reasoning": "A amostra 'extrato Pix - Enviado doc 101.001' contém o termo 'doc', que sugere que o nome do favorecido foi truncado e deve ser expandido.",
+    "pattern_type": "favorecido"
+   }
+  },
+  {
+   "cluster_id": "C3",
+   "sobra_id": "orfaos_extrato#3",
+   "classe": "orfaos_extrato",
+   "campo": "favorecido",
+   "valor_atual": "LUIS FELIPE LABAKI",
+   "valor_sugerido": "LUIS FELIPE LABAKI",
+   "status": "HUMANO_REVISAO",
+   "confianca": 0.85,
+   "motivo": "lambda falhou ou não alterou o valor",
+   "audit": {
+    "modelo": "qwen2.5-coder:7b",
+    "transformation": "lambda x: 'LUIS FELIPE LABAKI'",
+    "confidence_score": 0.85,
+    "reasoning": "A amostra contém o nome completo do favorecido.",
+    "pattern_type": "favorecido"
+   }
+  },
+  {
+   "cluster_id": "C4",
+   "sobra_id": "orfaos_extrato#4",
+   "classe": "orfaos_extrato",
+   "campo": "favorecido",
+   "valor_atual": "ANA BEATRIZ HERMANSON POMA",
+   "valor_sugerido": "ANA BEATRIZ HERMANSON POMA",
+   "status": "HUMANO_REVISAO",
+   "confianca": 1.0,
+   "motivo": "lambda falhou ou não alterou o valor",
+   "audit": {
+    "modelo": "qwen2.5-coder:7b",
+    "transformation": "lambda x: 'ANA BEATRIZ HERMANSON POMA'",
+    "confidence_score": 1.0,
+    "reasoning": "O nome completo do favorecido é fornecido em todas as amostras e não há variações.",
+    "pattern_type": "favorecido"
+   }
+  },
+  {
+   "cluster_id": "C5",
+   "sobra_id": "orfaos_comprovante#7",
+   "classe": "orfaos_comprovante",
+   "campo": "favorecido",
+   "valor_atual": "Amir Labaki",
+   "valor_sugerido": "Amir Labaki",
+   "status": "HUMANO_REVISAO",
+   "confianca": 1.0,
+   "motivo": "lambda falhou ou não alterou o valor",
+   "audit": {
+    "modelo": "qwen2.5-coder:7b",
+    "transformation": "lambda x: x",
+    "confidence_score": 1.0,
+    "reasoning": "A amostra já está em um formato corretamente identificado.",
+    "pattern_type": "favorecido"
+   }
+  },
+  {
+   "cluster_id": "C6",
+   "sobra_id": "orfaos_comprovante#8",
+   "classe": "orfaos_comprovante",
+   "campo": "favorecido",
+   "valor_atual": "Camila Licariao de Carvalho Braune 4",
+   "valor_sugerido": "Camila Licariao de Carvalho Braune 4",
+   "status": "HUMANO_REVISAO",
+   "confianca": 0.95,
+   "motivo": "lambda falhou ou não alterou o valor",
+   "audit": {
+    "modelo": "qwen2.5-coder:7b",
+    "transformation": "lambda x: x.strip() if isinstance(x, str) else x",
+    "confidence_score": 0.95,
+    "reasoning": "A amostra contém um nome completo com espaços em branco e uma referência de número (87), que pode ser parte do nome ou um identificador.",
+    "pattern_type": "favorecido"
+   }
+  },
+  {
+   "cluster_id": "C7",
+   "sobra_id": "orfaos_comprovante#9",
+   "classe": "orfaos_comprovante",
+   "campo": "favorecido",
+   "valor_atual": "Mog Produtora",
+   "valor_sugerido": "Mog",
+   "status": "SLM_SUGERIDO",
+   "confianca": 0.85,
+   "motivo": "A amostra contém 'Mog Produtora', e a transformação remove ' Produtora' para corrigir o valor.",
+   "audit": {
+    "modelo": "qwen2.5-coder:7b",
+    "transformation": "lambda x: x.replace(' Produtora', '') if ' Produtora' in x else x",
+    "confidence_score": 0.85,
+    "reasoning": "A amostra contém 'Mog Produtora', e a transformação remove ' Produtora' para corrigir o valor.",
+    "pattern_type": "favorecido"
+   }
+  },
+  {
+   "cluster_id": "C8",
+   "sobra_id": "orfaos_comprovante#10",
+   "classe": "orfaos_comprovante",
+   "campo": "favorecido",
+   "valor_atual": "Monica G P Moraes",
+   "valor_sugerido": "Monica G P Moraes",
+   "status": "HUMANO_REVISAO",
+   "confianca": 0.85,
+   "motivo": "lambda falhou ou não alterou o valor",
+   "audit": {
+    "modelo": "qwen2.5-coder:7b",
+    "transformation": "lambda x: x",
+    "confidence_score": 0.85,
+    "reasoning": "A amostra já contém o nome completo do favorecido.",
+    "pattern_type": "favorecido"
+   }
+  }
+ ],
+ "para_humano": 10,
+ "com_sugestao": 1
+}

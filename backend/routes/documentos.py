@@ -1,11 +1,14 @@
 """
-routes/documentos.py — leitura automática de documento fiscal via Gemini Vision.
+routes/documentos.py — leitura automática de documento fiscal via IA.
 
 Primeiro consumidor real de motor/ocr_service.py: o protótipo antigo
 (api/api/services/ocr_service.py) tinha o mesmo código de extração mas nunca
 foi ligado ao backend servido, e não calculava confiança nenhuma. Aqui:
 extrai, calcula confiança (heurística — ver ocr_service.py), e se vier abaixo
 do limiar, cai em campos_revisao pra alguém confirmar manualmente.
+
+Backends (P4): Gemini Vision (nuvem) ou Ollama local (llava — air-gapped),
+escolhidos pelo dispatcher extract_documento + settings.ocr_backend.
 """
 import json
 import logging
@@ -17,9 +20,10 @@ from starlette.concurrency import run_in_threadpool
 
 from backend.config import settings
 from backend.database import get_conn
+from motor.correcoes_manuais import carregar_correcoes
 from motor.drive_service import baixar_arquivo, extrair_folder_id, listar_arquivos
 from motor.importar import parse_tipo_doc
-from motor.ocr_service import extract_with_gemini
+from motor.ocr_service import extract_documento, ollama_ocr_disponivel
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/documentos", tags=["documentos"])
@@ -43,10 +47,19 @@ async def extrair_documento(
     conn, user_id = dep
 
     api_key = api_key_gemini or settings.google_api_key
-    if not api_key:
+    backend = settings.ocr_backend or None  # "" (auto) | "gemini" | "ollama"
+
+    # Erros de CONFIGURAÇÃO → 503 (dá pra corrigir sem tocar no código):
+    if backend == "gemini" and not api_key:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE,
-            "Leitura automática de documento indisponível: nenhuma GOOGLE_API_KEY configurada.",
+            "OCR configurado pra Gemini, mas nenhuma GOOGLE_API_KEY foi fornecida.",
+        )
+    if not api_key and not ollama_ocr_disponivel():
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "Leitura automática de documento indisponível: nem GOOGLE_API_KEY (Gemini) "
+            "nem Ollama local estão disponíveis.",
         )
 
     conteudo = await arquivo.read()
@@ -57,10 +70,10 @@ async def extrair_documento(
         )
 
     mime_type = arquivo.content_type or "application/pdf"
-    # extract_with_gemini é síncrona e agora pode dormir (retry com backoff
-    # em rate limit) — sem threadpool, isso trava o event loop inteiro da
-    # API pra todo mundo enquanto espera o Gemini.
-    dados = await run_in_threadpool(extract_with_gemini, conteudo, mime_type, api_key)
+    # extract_documento é síncrona e agora pode dormir (retry com backoff em
+    # rate limit) — sem threadpool, isso trava o event loop inteiro da API
+    # pra todo mundo enquanto espera o backend de IA.
+    dados = await run_in_threadpool(extract_documento, conteudo, mime_type, api_key, backend)
     if dados is None:
         raise HTTPException(
             status.HTTP_502_BAD_GATEWAY,
@@ -280,6 +293,7 @@ async def sincronizar_drive(projeto_id: str, dep=Depends(get_conn)):
         "documentos": registrados,
         "ja_sincronizado_antes": ja_sincronizado_antes,
         "outros_projetos_mesma_pasta": sorted(set(outros_projetos_mesma_pasta)),
+        "correcoes_manuais_ativas": len(carregar_correcoes()),
     }
 
 

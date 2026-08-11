@@ -62,9 +62,18 @@ def _nome_fonte(comp) -> str:
     return Path(str(comp.get("caminho") or comp.get("fonte") or "")).name
 
 
-def carregar():
-    comp = json.loads((PARSED / "comprovantes.json").read_text(encoding="utf-8"))
-    ext = json.loads((PARSED / "extrato.json").read_text(encoding="utf-8"))
+def obter_pasta_parsed(projeto_id: str | None = None) -> Path:
+    if projeto_id:
+        p = PARSED / str(projeto_id)
+        if p.exists():
+            return p
+    return PARSED
+
+
+def carregar(projeto_id: str | None = None):
+    pasta = obter_pasta_parsed(projeto_id)
+    comp = json.loads((pasta / "comprovantes.json").read_text(encoding="utf-8"))
+    ext = json.loads((pasta / "extrato.json").read_text(encoding="utf-8"))
     deb = [m for m in ext if m["sinal"] == "D"]
     return comp, deb
 
@@ -118,8 +127,8 @@ def _melhor_par(comps, debs):
     return pares
 
 
-def main():
-    comp, deb = carregar()
+def main(projeto_id: str | None = None):
+    comp, deb = carregar(projeto_id)
     print(f"comprovantes: {len(comp)} | débitos: {len(deb)}")
 
     n_corr = corrigir_valor_ilegivel(comp, deb)
@@ -207,19 +216,30 @@ def main():
     # 3) ordena por data de pagamento (estável: mantém número do arquivo)
     linhas.sort(key=lambda r: (r["data_pagamento"], r["numero_arquivo"] or 0))
 
-    (PARSED / "cruzamento.json").write_text(
+    pasta_saida = PARSED / str(projeto_id) if projeto_id else PARSED
+    pasta_saida.mkdir(parents=True, exist_ok=True)
+    caminho_saida = pasta_saida / "cruzamento.json"
+
+    caminho_saida.write_text(
         json.dumps(linhas, ensure_ascii=False, indent=1), encoding="utf-8")
 
     from collections import Counter as C
     print("\nResultado do cruzamento:")
     for st, n in C(r["status"] for r in linhas).most_common():
         print(f"  {st:16s} {n}")
-    print(f"total linhas: {len(linhas)} | arquivo: {SAIDA}")
+    print(f"total linhas: {len(linhas)} | arquivo: {caminho_saida}")
     if msg_conciliado_extra:
         print("\nchaves com excedente de comprovante (AMBIGUO):")
         for k in sorted(set(msg_conciliado_extra)):
             print(f"  {k[0]} R$ {k[1]:,.2f}")
 
 
+def main(projeto_id: str | None = None):
+    comp, deb = carregar(projeto_id)
+    gerar(comp, deb, projeto_id=projeto_id)
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    proj = sys.argv[1] if len(sys.argv) > 1 else None
+    main(proj)

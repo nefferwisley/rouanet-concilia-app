@@ -437,6 +437,23 @@ def conciliar(comprovantes: list[dict], movimentos: list[dict]) -> dict:
         "sem_lancamento_no_extrato": len(r["orfaos_comprovante"]),
         "sem_comprovante": len(r["orfaos_extrato"]),
     }
+    # P0+P1: invariante de zero perda + compressão semântica das sobras.
+    # Best-effort de propósito: falha aqui NÃO derruba a conciliação — a
+    # planilha e o relatório já estão completos; fica só sem clusters.
+    rem = {
+        "reconciliacao": None,
+        "total_sobras": 0,
+        "n_clusters": 0,
+        "clusters": [],
+        "para_humano": 0,
+        "com_sugestao": 0,
+    }
+    try:
+        from motor.remediacao import remediar
+        rem = remediar(resultado, gerar_sugestoes=False, backend="auto")
+    except Exception as e:  # noqa: BLE001
+        logger.warning("Remediação indisponível nesta rodada: %s", e)
+    resumo["remediacao"] = rem
     return {"linhas": linhas, "resumo": resumo}
 
 

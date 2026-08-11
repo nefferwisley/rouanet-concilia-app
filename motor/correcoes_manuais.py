@@ -35,18 +35,27 @@ CORRECOES_PATH = PARSED / "correcoes_manuais.json"
 _CAMPOS_CORRIGIVEIS = {"valor", "data", "favorecido", "cnpj"}
 
 
-def carregar_correcoes() -> dict:
+def obter_caminho_correcoes(projeto_id: str | None = None) -> Path:
+    if projeto_id:
+        caminho_proj = PARSED / str(projeto_id) / "correcoes_manuais.json"
+        if caminho_proj.exists():
+            return caminho_proj
+    return CORRECOES_PATH
+
+
+def carregar_correcoes(projeto_id: str | None = None) -> dict:
     """{numero_arquivo (int): {campo: valor, motivo: str}} — {} se o arquivo não existir."""
-    if not CORRECOES_PATH.exists():
+    caminho = obter_caminho_correcoes(projeto_id)
+    if not caminho.exists():
         return {}
-    bruto = json.loads(CORRECOES_PATH.read_text(encoding="utf-8"))
+    bruto = json.loads(caminho.read_text(encoding="utf-8"))
     return {int(k): v for k, v in bruto.items()}
 
 
-def aplicar_correcoes(comprovantes: list[dict]) -> list[dict]:
+def aplicar_correcoes(comprovantes: list[dict], projeto_id: str | None = None) -> list[dict]:
     """Sobrescreve, por cima do resultado bruto do parser, os campos corrigidos
     manualmente — casando por numero_arquivo. Não altera a lista original."""
-    correcoes = carregar_correcoes()
+    correcoes = carregar_correcoes(projeto_id)
     if not correcoes:
         return comprovantes
 
@@ -69,19 +78,21 @@ def aplicar_correcoes(comprovantes: list[dict]) -> list[dict]:
     return resultado
 
 
-def registrar_correcao(numero_arquivo: int, campo: str, valor, motivo: str) -> None:
+def registrar_correcao(numero_arquivo: int, campo: str, valor, motivo: str, projeto_id: str | None = None) -> None:
     """Grava (ou atualiza) uma correção manual — chamar depois de confirmar o
     valor certo com um humano, nunca automaticamente."""
     if campo not in _CAMPOS_CORRIGIVEIS:
         raise ValueError(f"Campo '{campo}' não é corrigível (opções: {sorted(_CAMPOS_CORRIGIVEIS)}).")
-    correcoes = carregar_correcoes()
+    correcoes = carregar_correcoes(projeto_id)
     entrada = correcoes.get(numero_arquivo, {})
     entrada[campo] = valor
     entrada["motivo"] = motivo
     correcoes[numero_arquivo] = entrada
 
-    PARSED.mkdir(parents=True, exist_ok=True)
-    CORRECOES_PATH.write_text(
+    pasta_destino = PARSED / str(projeto_id) if projeto_id else PARSED
+    pasta_destino.mkdir(parents=True, exist_ok=True)
+    caminho_destino = pasta_destino / "correcoes_manuais.json"
+    caminho_destino.write_text(
         json.dumps({str(k): v for k, v in correcoes.items()}, ensure_ascii=False, indent=1),
         encoding="utf-8",
     )

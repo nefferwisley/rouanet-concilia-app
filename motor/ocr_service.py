@@ -1,20 +1,22 @@
 """
-motor/ocr_service.py — extração de dados de documento fiscal via Gemini Vision.
+motor/ocr_service.py — extração de dados de documento fiscal via IA.
 
-Substitui o protótipo desconectado em api/api/services/ocr_service.py: mesma
-chamada ao Gemini 1.5 Flash em modo visão, mas dentro do caminho servido
-(backend/+motor/) e com um score de confiança calculado de verdade — o
-protótipo original não devolvia nenhum, apesar do schema (documentos_transacao
-.confianca_ocr) e do motor (importar.py) esperarem que existisse.
+Dois backends com o MESMO contrato de saída (JSON + confianca_ocr):
+    - extract_with_gemini: Gemini 1.5 Flash em modo visão (nuvem).
+    - extract_with_ollama: modelo de visão local (llava/qwen2.5-vl via Ollama)
+      — zero egress, para ambientes air-gapped (P4). PDF é renderizado
+      (pymupdf) antes de virar imagem pro modelo local.
+    - extract_documento: dispatcher — escolhe o backend por configuração.
 
-IMPORTANTE: a confiança abaixo é uma HEURÍSTICA (completude dos campos +
+IMPORTANTE: a confiança é uma HEURÍSTICA (completude dos campos +
 consistência matemática entre Valor_Total e Subtotal-Impostos), não uma
-probabilidade calibrada do modelo — o Gemini não devolve isso nativamente.
-Documentado assim de propósito pra não ser lido como mais rigoroso do que é.
+probabilidade calibrada do modelo — documentado assim pra não ser lido
+como mais rigoroso do que é.
 """
 import base64
 import json
 import logging
+import os
 import time
 
 import google.generativeai as genai
@@ -143,3 +145,110 @@ def extract_with_gemini(bytes_data: bytes, mime_type: str, api_key: str):
         log.info("OCR com confianca_ocr=%.2f — %s", confianca, "; ".join(motivos))
 
     return dados
+
+
+# ---------------------------------------------------------------- P4: OCR local (Ollama)
+def ollama_ocr_disponivel() -> bool:
+    """Só o pacote importa — o daemon pode estar desligado (aí a chamada
+    falha e devolve None, quem chama decide)."""
+    try:
+        import ollama  # noqa: PLC0415
+        return True
+    except ImportError:
+        return False
+
+
+def _pdf_para_imagem(bytes_data: bytes, pagina: int = 0, dpi: int = 150) -> bytes | None:
+    """Renderiza uma página de PDF pra PNG — modelos de visão do Ollama
+    (llava, qwen2.5-vl) não leem PDF direto; o Gemini aceita."""
+    try:
+        import pymupdf
+        doc = pymupdf.open(stream=bytes_data, filetype="pdf")
+        if pagina >= doc.page_count:
+            return None
+        pix = doc[pagina].get_pixmap(dpi=dpi)
+        return pix.tobytes("png")
+    except Exception as e:
+        log.warning("Render de PDF falhou (%s).", e)
+        return None
+
+
+def extract_with_ollama(
+    bytes_data: bytes,
+    mime_type: str,
+    modelo: str = "llava",
+    cliente=None,
+) -> dict | None:
+    """Mesmo contrato de extract_with_gemini, mas via Ollama local.
+
+    PDF é renderizado (pymupdf) antes de virar imagem. `cliente` injetável
+    (testes); None -> tenta `import ollama`. Sem daemon/modelo -> None (quem
+    chama decide: nunca finge sucesso).
+    """
+    if cliente is None:
+        try:
+            import ollama as cliente  # noqa: PLC0415
+        except ImportError:
+            log.warning("Ollama indisponível — OCR local abortado.")
+            return None
+
+    imagem = None
+    if mime_type == "application/pdf" or str(bytes_data[:4]) == "%PDF":
+        imagem = _pdf_para_imagem(bytes_data)
+        if imagem is None:
+            log.warning("Não foi possível renderizar o PDF p/ OCR local.")
+            return None
+    else:
+        imagem = bytes_data
+
+    try:
+        resp = cliente.generate(
+            model=modelo,
+            prompt=PROMPT_EXTRACAO,
+            images=[base64.b64encode(imagem).decode("ascii")],
+            format="json",  # Ollama 0.2+: força resposta JSON
+        )
+        texto = resp["response"]
+    except Exception as e:
+        log.warning("OCR via Ollama falhou (%s).", e)
+        return None
+
+    try:
+        dados = json.loads(texto)
+    except json.JSONDecodeError:
+        log.warning("OCR via Ollama devolveu JSON inválido.")
+        return None
+    if not isinstance(dados, dict):
+        log.warning("OCR via Ollama devolveu algo que não é dict.")
+        return None
+
+    confianca, motivos = _calcular_confianca(dados)
+    dados["confianca_ocr"] = confianca
+    dados["_motivos_confianca"] = motivos
+    dados["_fonte_extracao"] = "ollama"
+    if motivos:
+        log.info("OCR local com confianca_ocr=%.2f — %s", confianca, "; ".join(motivos))
+    return dados
+
+
+def extract_documento(
+    conteudo: bytes,
+    mime_type: str,
+    api_key: str | None = None,
+    backend: str | None = None,
+    modelo_ollama: str = "llava",
+) -> dict | None:
+    """Dispatcher P4: escolhe o backend de extração.
+
+    backend explícito ("gemini" | "ollama") vence; sem ele:
+        - OCR_BACKEND no ambiente (ou settings.ocr_backend) decide;
+        - senão: Gemini se houver api_key, Ollama caso contrário.
+    Retorna None se nenhum backend estiver disponível na prática.
+    """
+    if not backend:
+        backend = os.environ.get("OCR_BACKEND", "gemini" if api_key else "ollama")
+    if backend == "ollama":
+        return extract_with_ollama(conteudo, mime_type, modelo=modelo_ollama)
+    if api_key:
+        return extract_with_gemini(conteudo, mime_type, api_key)
+    return None

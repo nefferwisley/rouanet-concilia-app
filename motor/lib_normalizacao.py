@@ -81,3 +81,31 @@ def score_nome(a, b) -> float:
 def nome_curto(texto, limite=40) -> str:
     n = normalizar(texto)
     return n if len(n) <= limite else n[: limite - 1] + "…"
+
+
+def substituir_aliases(texto: str, aliases: dict) -> str:
+    """Substitui aliases (1..N tokens) no texto, casando a chave MAIS LONGA
+    primeiro (guloso) — 'CIRCUNSTANCIA CINEM' casa antes de 'CINEM'. Por token
+    inteiro: nunca casa substring de token ('POMA' não casa em 'POMAR').
+
+    aliases: {chave_normalizada -> canônico}. Texto sem alias volta normalizado."""
+    if not texto or not aliases:
+        return normalizar(texto) if texto else ""
+    palavras = texto.split()
+    chaves = sorted(aliases, key=lambda k: len(k.split()), reverse=True)
+    saida = []
+    i = 0
+    while i < len(palavras):
+        casado = None
+        for chave in chaves:
+            n = len(chave.split())
+            if i + n <= len(palavras) and " ".join(palavras[i:i + n]).upper() == chave:
+                casado = aliases[chave]
+                i += n
+                break
+        if casado is None:
+            saida.append(palavras[i])
+            i += 1
+        else:
+            saida.extend(normalizar(casado).split())
+    return " ".join(saida)
