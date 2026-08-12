@@ -110,7 +110,7 @@ class ExtratoBB:
                 i = j
                 continue
 
-            if any(hist.upper().startswith(h) for h in HIST_IGNORAR):
+            if any(hist.upper().startswith(h.upper()) for h in HIST_IGNORAR):
                 i = j
                 continue
 

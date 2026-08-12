@@ -46,11 +46,10 @@ else:
 
 
 def _gemini_key_valida(chave: str) -> bool:
-    """Chaves reais do Gemini (aistudio.google.com/apikey) começam com
-    AIzaSy e têm 39 caracteres. Contas afetadas pelo bug atual do Google
-    (ago/2026) só emitem chaves no formato "AQ." — essas são rejeitadas
-    pela API REST, então tratamos como ausente e caímos pro Ollama."""
-    return chave.startswith("AIzaSy") and len(chave) == 39
+    """Aceita chaves clássicas (AIzaSy...) ou novas chaves de autenticação (AQ...)."""
+    if not chave:
+        return False
+    return chave.startswith("AIzaSy") or chave.startswith("AQ.")
 
 
 def criar_modelo():

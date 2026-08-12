@@ -337,7 +337,40 @@ class MotorImportacao:
                 self.log(f"  \U0001f9e0 linha {linha_num}: RAG match rubrica (score={score_rubrica:.2f})")
             rubrica_incerta = rubrica_id is None
 
-            fornecedor = dados.get("razao_social") or dados["prestador"]
+            # Extração semântica inteligente de nomes e itens do comprovante
+            doc_ref = dados.get("documento_ref")
+            prestador_extraido = None
+            item_extraido = None
+            if doc_ref:
+                nome_doc = Path(doc_ref).name
+                match_dashes = re.match(r"^\d+\s*-\s*\d{2}-\d{2}-\d{4}\s*-\s*([^-(\n]+)\s*-\s*([^-.\n]+)", nome_doc)
+                if match_dashes:
+                    prestador_extraido = match_dashes.group(1).strip()
+                    item_extraido = match_dashes.group(2).replace(".pdf", "").replace(".png", "").replace(".jpg", "").strip()
+                else:
+                    match_dot = re.match(r"^\d+\.\s+([^-(\n]+)\s*-\s*([^-.\n]+)", nome_doc)
+                    if match_dot:
+                        prestador_extraido = match_dot.group(1).strip()
+                        item_extraido = match_dot.group(2).replace(".pdf", "").replace(".png", "").replace(".jpg", "").strip()
+
+            cnpj_cpf = dados.get("cnpj_cpf")
+            is_cnpj = False
+            if cnpj_cpf:
+                is_cnpj = len(re.sub(r"\D", "", cnpj_cpf)) == 14
+
+            if is_cnpj:
+                fornecedor = dados.get("razao_social") or dados.get("prestador")
+            else:
+                fornecedor = prestador_extraido or dados.get("prestador")
+
+            descricao_despesa = item_extraido or dados.get("descricao")
+            if not descricao_despesa or descricao_despesa == fornecedor or (prestador_extraido and descricao_despesa == prestador_extraido):
+                if rubrica_id:
+                    cur.execute("select descricao from rubricas where id = %s", (rubrica_id,))
+                    row_rub = cur.fetchone()
+                    descricao_despesa = row_rub[0] if row_rub else "Serviço Prestado"
+                else:
+                    descricao_despesa = "Serviço Prestado"
 
             motivos_revisao = []
             if dados["_revisao_pendente"]:
@@ -384,7 +417,7 @@ class MotorImportacao:
                 insert into despesas (transacao_id, projeto_id, rubrica_id, descricao, valor)
                 values (%s, %s, %s, %s, %s) returning id
                 """,
-                (transacao_id, projeto_id, rubrica_id, dados.get("descricao"), valor_despesa),
+                (transacao_id, projeto_id, rubrica_id, descricao_despesa, valor_despesa),
             )
             despesa_id = cur.fetchone()[0]
             self.stats["despesas"] += 1

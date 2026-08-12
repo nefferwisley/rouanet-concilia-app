@@ -16,7 +16,7 @@ import os
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from starlette.concurrency import run_in_threadpool
 
 from backend.config import settings
@@ -201,6 +201,16 @@ async def baixar_documento_transacao(documento_id: str, dep=Depends(get_conn)):
                         if f.is_file():
                             caminho = f
                             break
+                            
+            if not caminho.is_file():
+                for pasta_base in [Path("/app/3. 1961"), Path("./3. 1961"), Path("/tmp"), Path(".")]:
+                    if pasta_base.exists():
+                        for f in pasta_base.glob(f"**/{nome_base}"):
+                            if f.is_file():
+                                caminho = f
+                                break
+                    if caminho.is_file():
+                        break
 
     if not caminho.is_file():
         raise HTTPException(404, f"Arquivo '{Path(arquivo_ref).name}' não foi encontrado no disco do servidor.")
@@ -210,6 +220,186 @@ async def baixar_documento_transacao(documento_id: str, dep=Depends(get_conn)):
         ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
     }.get(caminho.suffix.lower(), "application/octet-stream")
     return FileResponse(caminho, media_type=media, headers={"Content-Disposition": f'inline; filename="{caminho.name}"'})
+
+
+@router.get("/extratos/arquivo")
+async def baixar_arquivo_extrato(nome: str | None = None, dep=Depends(get_conn)):
+    nome_base = Path(nome).name if nome else "extrato.pdf"
+    caminho = None
+    for pasta_base in [Path("/app/3. 1961"), Path("./3. 1961"), Path("/tmp"), Path(".")]:
+        if pasta_base.exists():
+            for f in pasta_base.glob(f"**/{nome_base}"):
+                if f.is_file():
+                    caminho = f
+                    break
+        if caminho and caminho.is_file():
+            break
+            
+    if not caminho or not caminho.is_file():
+        for pasta_base in [Path("/app/3. 1961/3. Extratos"), Path("./3. 1961/3. Extratos")]:
+            if pasta_base.exists():
+                for f in pasta_base.glob("**/*.pdf"):
+                    if f.is_file():
+                        caminho = f
+                        break
+            if caminho and caminho.is_file():
+                break
+
+    if not caminho or not caminho.is_file():
+        raise HTTPException(404, f"Arquivo de extrato '{nome_base}' não encontrado.")
+
+    return FileResponse(caminho, media_type="application/pdf", headers={"Content-Disposition": f'inline; filename="{caminho.name}"'})
+
+
+def gerar_thumbnail_pdf(caminho: Path, termo_destaque: str | None = None) -> bytes | None:
+    try:
+        import fitz
+        doc = fitz.open(caminho)
+        page = doc[0]
+
+        if termo_destaque and len(str(termo_destaque).strip()) >= 3:
+            termo = str(termo_destaque).strip()
+            rects = page.search_for(termo)
+            if rects:
+                shape = page.new_shape()
+                for r in rects:
+                    row_rect = fitz.Rect(15, r.y0 - 3, page.rect.width - 15, r.y1 + 3)
+                    shape.draw_rect(row_rect)
+                    shape.finish(color=(0, 0.85, 1), fill=(0, 0.85, 1), fill_opacity=0.35, width=2)
+                shape.commit()
+
+        pix = page.get_pixmap(dpi=300)
+        return pix.tobytes("png")
+    except Exception as e:
+        logger.error("Erro ao gerar thumbnail PDF (%s): %s", caminho, e)
+        return None
+
+
+@router.get("/documentos/{documento_id}/thumbnail")
+async def obter_thumbnail_documento(documento_id: str, dep=Depends(get_conn)):
+    conn, _ = dep
+    row = await conn.fetchrow(
+        """
+        select d.arquivo_ref, t.projeto_id from documentos_transacao d
+        join transacoes t on t.id = d.transacao_id
+        where d.id = $1
+        """,
+        documento_id,
+    )
+    if not row:
+        raise HTTPException(404, "Documento não encontrado.")
+
+    arquivo_ref = row["arquivo_ref"]
+    caminho = Path(arquivo_ref)
+    nome_base = Path(arquivo_ref).name
+    projeto_id = str(row["projeto_id"])
+
+    if not caminho.is_file():
+        nome_lower = nome_base.lower()
+        for pasta_base in [UPLOAD_DIR / projeto_id, Path("/app/3. 1961"), Path("./3. 1961"), Path("/tmp"), Path(".")]:
+            if pasta_base.exists():
+                for f in pasta_base.glob("**/*"):
+                    if f.is_file() and f.name.lower() == nome_lower:
+                        caminho = f
+                        break
+            if caminho.is_file():
+                break
+
+    if not caminho.is_file():
+        partes = [p.strip().lower() for p in nome_base.replace(".pdf", "").replace(".png", "").split("-") if len(p.strip()) > 3]
+        if partes:
+            for pasta_base in [Path("/app/3. 1961"), Path("./3. 1961"), Path("/tmp")]:
+                if pasta_base.exists():
+                    for f in pasta_base.glob("**/*.pdf"):
+                        f_lower = f.name.lower()
+                        if any(p in f_lower for p in partes):
+                            caminho = f
+                            break
+                if caminho.is_file():
+                    break
+
+    if not caminho.is_file():
+        raise HTTPException(404, "Arquivo não encontrado no disco.")
+
+    if caminho.suffix.lower() in [".png", ".jpg", ".jpeg"]:
+        return FileResponse(caminho, media_type="image/png")
+
+    png_bytes = await run_in_threadpool(gerar_thumbnail_pdf, caminho)
+    if not png_bytes:
+        raise HTTPException(500, "Falha ao gerar imagem do PDF.")
+
+    return Response(content=png_bytes, media_type="image/png")
+
+
+@router.get("/extratos/thumbnail")
+async def obter_thumbnail_extrato(nome: str | None = None, data: str | None = None, dep=Depends(get_conn)):
+    caminho = None
+
+    # 1. Busca por ano/mês da data do débito (ex: 2022-11-04 -> 3. Extratos/2022/2. nov.pdf)
+    if data and isinstance(data, str):
+        partes_data = data.split("-")
+        if len(partes_data) >= 2:
+            ano, mes = partes_data[0], int(partes_data[1])
+            meses = {1: "jan", 2: "fev", 3: "mar", 4: "abr", 5: "mai", 6: "jun", 7: "jul", 8: "ago", 9: "set", 10: "out", 11: "nov", 12: "dez"}
+            sigla = meses.get(mes, "")
+            if sigla:
+                for pasta in [Path("/app/3. 1961/3. Extratos"), Path("./3. 1961/3. Extratos")]:
+                    ano_dir = pasta / ano
+                    if ano_dir.exists():
+                        for f in ano_dir.glob("*.pdf"):
+                            if sigla in f.name.lower():
+                                caminho = f
+                                break
+                    if caminho and caminho.is_file():
+                        break
+
+    # 2. Busca por nome do arquivo
+    if not caminho or not caminho.is_file():
+        nome_base = Path(nome).name if nome else "extrato.pdf"
+        nome_lower = nome_base.lower()
+        for pasta_base in [Path("/app/3. 1961"), Path("./3. 1961"), Path("/tmp"), Path(".")]:
+            if pasta_base.exists():
+                for f in pasta_base.glob("**/*"):
+                    if f.is_file() and f.name.lower() == nome_lower:
+                        caminho = f
+                        break
+            if caminho and caminho.is_file():
+                break
+
+    # 3. Busca por palavra-chave do nome
+    if not caminho or not caminho.is_file():
+        nome_base = Path(nome).name if nome else ""
+        partes = [p.strip().lower() for p in nome_base.replace(".pdf", "").split("-") if len(p.strip()) > 3]
+        if partes:
+            for pasta_base in [Path("/app/3. 1961/3. Extratos"), Path("./3. 1961/3. Extratos"), Path("/app/3. 1961")]:
+                if pasta_base.exists():
+                    for f in pasta_base.glob("**/*.pdf"):
+                        f_lower = f.name.lower()
+                        if any(p in f_lower for p in partes):
+                            caminho = f
+                            break
+                if caminho and caminho.is_file():
+                    break
+
+    # 4. Fallback: pega o primeiro extrato do ano de 2022
+    if not caminho or not caminho.is_file():
+        for pasta_base in [Path("/app/3. 1961/3. Extratos"), Path("./3. 1961/3. Extratos")]:
+            if pasta_base.exists():
+                for f in pasta_base.glob("**/*.pdf"):
+                    if f.is_file():
+                        caminho = f
+                        break
+            if caminho and caminho.is_file():
+                break
+
+    if not caminho or not caminho.is_file():
+        raise HTTPException(404, "Arquivo de extrato não encontrado.")
+
+    png_bytes = await run_in_threadpool(gerar_thumbnail_pdf, caminho, nome)
+    if not png_bytes:
+        raise HTTPException(500, "Falha ao gerar imagem do extrato.")
+
+    return Response(content=png_bytes, media_type="image/png")
 
 
 # ---------- P2: revisão manual (campos_revisao) ----------

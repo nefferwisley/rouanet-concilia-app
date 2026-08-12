@@ -105,10 +105,28 @@ async def get_conn(authorization: str | None = Header(None)):
     token = authorization.removeprefix("Bearer ").strip()
     user_id = verificar_jwt(token)
 
+    # Extrai o e-mail de forma segura sem verificar assinatura (já validado antes)
+    email = f"user_{user_id}@rouanet.local"
+    try:
+        payload = pyjwt.decode(token, options={"verify_signature": False})
+        email = payload.get("email") or email
+    except Exception:
+        pass
+
     pool = await get_pool()
     conn = await pool.acquire()
     try:
         async with conn.transaction():
+            # Garante que o usuário existe na tabela auth.users local do dev shim
+            # para evitar ForeignKeyViolation em membros_projeto, etc.
+            await conn.execute(
+                """
+                insert into auth.users (id, email)
+                values ($1, $2)
+                on conflict (id) do update set email = excluded.email
+                """,
+                user_id, email
+            )
             await conn.execute(
                 "select set_config('request.jwt.claims', $1, true)", f'{{"sub":"{user_id}"}}'
             )

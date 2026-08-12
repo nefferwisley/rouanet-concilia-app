@@ -112,12 +112,22 @@ def obter_status(conciliacao_id: str, user_id: str) -> dict:
 
 
 def _limpar_execucoes_antigas() -> None:
-    """Remove do dict (e do disco) as execuções concluídas mais antigas além do limite."""
+    """Remove do dict (e do disco) as execuções concluídas mais antigas além do limite.
+
+    Mantém apenas as últimas _MAX_EXECUCOES_GUARDADAS execuções concluídas
+    pra não vazar disco indefinidamente. Execuções em andamento nunca são
+    removidas.
+
+    Nota: como esta função é chamada ANTES de criar uma nova execução,
+    consideramos +1 no cálculo do excedente pra garantir que o total
+    de concluídas nunca exceda o limite.
+    """
     concluidas = [
         cid for cid, e in _EXECUCOES.items()
         if e.get("status") in ("sucesso", "erro")
     ]
-    excedente = len(concluidas) - _MAX_EXECUCOES_GUARDADAS
+    # +1 porque uma nova execução será criada logo após esta limpeza
+    excedente = len(concluidas) + 1 - _MAX_EXECUCOES_GUARDADAS
     if excedente <= 0:
         return
     for cid in concluidas[:excedente]:
@@ -556,3 +566,276 @@ def _zipar_pasta(
         zf.write(planilha, planilha.name)
         zf.write(relatorio, relatorio.name)
     return out
+
+
+async def executar_importacao_pasta_bg(
+    projeto_id: str,
+    conciliacao_id: str,
+    user_id: str,
+    extrato_bytes: bytes | None,
+    extrato_nome: str | None,
+    comprovantes_dados: list[tuple[str, bytes]],
+) -> None:
+    import re
+    from datetime import date
+    from decimal import Decimal
+    import tempfile
+    import shutil
+    import asyncio
+    from pathlib import Path
+    from backend.database import get_pool
+    from motor.importar import parse_tipo_doc
+    from motor.extrato_importer import tipo_por_sinal
+
+    base = Path(tempfile.mkdtemp(prefix="importacao_pasta_"))
+    _registrar(conciliacao_id, base=str(base))
+    try:
+        _registrar(conciliacao_id, status="em_progresso", etapa="preparando arquivos", progresso=10)
+        
+        pag_dir = base / "pagamentos"
+        pag_dir.mkdir(parents=True, exist_ok=True)
+        ext_dir = base / "extratos"
+        ext_dir.mkdir(parents=True, exist_ok=True)
+        
+        if extrato_bytes and extrato_nome:
+            extrato_file = ext_dir / Path(extrato_nome).name
+            extrato_file.write_bytes(extrato_bytes)
+        
+        import hashlib
+        hashes_salvos = set()
+        
+        for nome_arq, c_bytes in comprovantes_dados:
+            if nome_arq.lower().endswith(".zip"):
+                import io
+                import zipfile
+                with zipfile.ZipFile(io.BytesIO(c_bytes)) as z:
+                    for member in z.namelist():
+                        if member.startswith("__MACOSX") or member.endswith("/") or Path(member).name.startswith("."):
+                            continue
+                        member_bytes = z.read(member)
+                        
+                        m_hash = hashlib.sha256(member_bytes).hexdigest()
+                        if m_hash in hashes_salvos:
+                            continue
+                        hashes_salvos.add(m_hash)
+                        
+                        caminho_dest = pag_dir / Path(member)
+                        caminho_dest.parent.mkdir(parents=True, exist_ok=True)
+                        caminho_dest.write_bytes(member_bytes)
+            else:
+                f_hash = hashlib.sha256(c_bytes).hexdigest()
+                if f_hash in hashes_salvos:
+                    continue
+                hashes_salvos.add(f_hash)
+                
+                caminho_dest = pag_dir / Path(nome_arq)
+                caminho_dest.parent.mkdir(parents=True, exist_ok=True)
+                caminho_dest.write_bytes(c_bytes)
+        
+        # Move arquivos identificados como extrato para a pasta de extratos
+        for p in list(pag_dir.glob("**/*")):
+            if p.is_file():
+                p_name_lower = p.name.lower()
+                p_path_lower = str(p).lower()
+                if "extrato" in p_name_lower or "extract" in p_name_lower or "conta_corrente" in p_name_lower or "extratos" in p_path_lower or "extrato" in p_path_lower:
+                    dest = ext_dir / p.name
+                    dest.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.move(str(p), str(dest))
+        
+        raiz_pag = pag_dir
+        
+        _registrar(conciliacao_id, etapa="lendo comprovantes", progresso=30)
+        comprovantes, sem_valor = _parse_comprovantes(raiz_pag)
+        
+        _registrar(conciliacao_id, etapa="lendo extratos", progresso=50)
+        movimentos = _parse_extratos(ext_dir)
+        
+        _registrar(conciliacao_id, etapa="conciliando e cruzando dados", progresso=70)
+        resultado = conciliar(comprovantes, movimentos)
+        
+        _registrar(conciliacao_id, etapa="gravando dados no banco de dados", progresso=85)
+        
+        async def db_ops():
+            pool = await get_pool()
+            async with pool.acquire() as conn:
+                async with conn.transaction():
+                    conta = await conn.fetchrow("select id from contas_captadoras where projeto_id = $1", projeto_id)
+                    if not conta:
+                        conta = await conn.fetchrow("insert into contas_captadoras (projeto_id) values ($1) returning id", projeto_id)
+                    conta_id = conta["id"]
+                    
+                    await conn.execute("delete from conciliacao_extrato where transacao_id in (select id from transacoes where projeto_id = $1)", projeto_id)
+                    await conn.execute("delete from extrato_movimentos where conta_id = $1", conta_id)
+                    await conn.execute("delete from transacoes where projeto_id = $1", projeto_id)
+                    
+                    transacoes_inseridas = {}
+                    
+                    for comp in comprovantes:
+                        nome_doc = Path(comp["fonte"]).name
+                        prestador_extraido = None
+                        item_extraido = None
+                        
+                        match_dashes = re.match(r"^\d+\s*-\s*\d{2}-\d{2}-\d{4}\s*-\s*([^-(\n]+)\s*-\s*([^-.\n]+)", nome_doc)
+                        if match_dashes:
+                            prestador_extraido = match_dashes.group(1).strip()
+                            item_extraido = match_dashes.group(2).replace(".pdf", "").replace(".png", "").replace(".jpg", "").strip()
+                        else:
+                            match_dot = re.match(r"^\d+\.\s+([^-(\n]+)\s*-\s*([^-.\n]+)", nome_doc)
+                            if match_dot:
+                                prestador_extraido = match_dot.group(1).strip()
+                                item_extraido = match_dot.group(2).replace(".pdf", "").replace(".png", "").replace(".jpg", "").strip()
+
+                        cnpj_cpf = comp.get("cnpj")
+                        is_cnpj = False
+                        if cnpj_cpf:
+                            is_cnpj = len(re.sub(r"\D", "", cnpj_cpf)) == 14
+
+                        prestador = prestador_extraido or comp.get("favorecido") or "Prestador de Serviço"
+                        favorecido_banco = comp.get("favorecido") or prestador_extraido
+                        razao_social = f"Favorecido no extrato: {favorecido_banco}." if favorecido_banco else "-"
+
+                        data_pag = comp.get("data")
+                        if isinstance(data_pag, str):
+                            try:
+                                data_pag = date.fromisoformat(data_pag)
+                            except ValueError:
+                                data_pag = date(1970, 1, 1)
+                        elif not isinstance(data_pag, date):
+                            data_pag = date(1970, 1, 1)
+                            
+                        valor = Decimal(str(comp.get("valor") or 0))
+                        
+                        row_t = await conn.fetchrow(
+                            """
+                            insert into transacoes (
+                                projeto_id, fornecedor, razao_social, cnpj_fornecedor, data_pagamento,
+                                valor_bruto, valor_liquido, tem_nf, tem_comprovante, status
+                            ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                            returning id
+                            """,
+                            projeto_id, prestador, razao_social, cnpj_cpf, data_pag,
+                            valor, valor, True, True, "PENDENTE"
+                        )
+                        t_id = row_t["id"]
+                        
+                        tipo_doc = parse_tipo_doc(comp["fonte"]) or "OUTRO"
+                        await conn.execute(
+                            """
+                            insert into documentos_transacao (transacao_id, tipo, arquivo_ref, confianca_ocr)
+                            values ($1, $2, $3, $4)
+                            """,
+                            t_id, tipo_doc, comp["fonte"], 1.0
+                        )
+                        
+                        descricao_despesa = item_extraido or "Serviço Prestado"
+                        await conn.execute(
+                            """
+                            insert into despesas (transacao_id, projeto_id, descricao, valor)
+                            values ($1, $2, $3, $4)
+                            """,
+                            t_id, projeto_id, descricao_despesa, valor
+                        )
+                        
+                        transacoes_inseridas[str(comp["fonte"]).lower()] = t_id
+                        transacoes_inseridas[Path(comp["fonte"]).name.lower()] = t_id
+                    
+                    mapa_status_cruzado = {}
+                    mapa_transacao_vincular = {}
+                    
+                    for l in resultado["linhas"]:
+                        d_str = l.get("data")
+                        d_obj = None
+                        if isinstance(d_str, str):
+                            try:
+                                d_obj = date.fromisoformat(d_str)
+                            except ValueError:
+                                pass
+                        elif isinstance(d_str, date):
+                            d_obj = d_str
+                        
+                        val_dec = None
+                        if l.get("valor") is not None:
+                            val_dec = abs(Decimal(str(l.get("valor"))))
+                            
+                        doc_str = str(l.get("doc_extrato") or "")
+                        chave_mov = (d_obj, doc_str, val_dec)
+                        
+                        if l.get("status") == "conferido":
+                            mapa_status_cruzado[chave_mov] = "CONCILIADO"
+                            fonte = str(l.get("fonte_comprovante") or "").lower()
+                            fonte_nome = Path(fonte).name if fonte else ""
+                            v_id = transacoes_inseridas.get(fonte) or transacoes_inseridas.get(fonte_nome)
+                            if not v_id and d_obj and val_dec:
+                                row_fb = await conn.fetchrow(
+                                    "select id from transacoes where projeto_id = $1 and data_pagamento = $2 and abs(valor_bruto - $3) < 0.01 limit 1",
+                                    projeto_id, d_obj, val_dec
+                                )
+                                if row_fb:
+                                    v_id = row_fb["id"]
+                            if v_id:
+                                mapa_transacao_vincular[chave_mov] = v_id
+                        else:
+                            mapa_status_cruzado[chave_mov] = "PENDENTE"
+                    
+                    for m in movimentos:
+                        valor_m = Decimal(str(m["valor"]))
+                        if m["sinal"] == "D":
+                            valor_m = -valor_m
+                            
+                        data_mov = m["data"]
+                        if isinstance(data_mov, str):
+                            try:
+                                data_mov = date.fromisoformat(data_mov)
+                            except ValueError:
+                                data_mov = date(1970, 1, 1)
+                        
+                        doc_mov_str = str(m.get("doc") or "")
+                        chave_mov = (data_mov, doc_mov_str, abs(valor_m))
+                        status_mov = mapa_status_cruzado.get(chave_mov, "PENDENTE")
+                        t_id_vinculo = mapa_transacao_vincular.get(chave_mov, None)
+                        
+                        row_m = await conn.fetchrow(
+                            """
+                            insert into extrato_movimentos (
+                                conta_id, data, historico, documento, tipo, valor, status_conciliacao
+                            ) values ($1, $2, $3, $4, $5, $6, $7)
+                            returning id
+                            """,
+                            conta_id, data_mov, m.get("historico") or m.get("favorecido"),
+                            m["doc"], tipo_por_sinal(m["sinal"]), valor_m, status_mov
+                        )
+                        mov_id = row_m["id"]
+                        
+                        if status_mov == "CONCILIADO" and t_id_vinculo:
+                            await conn.execute(
+                                "update transacoes set status = 'CONCILIADO_OK' where id = $1",
+                                t_id_vinculo
+                            )
+                            await conn.execute(
+                                "insert into conciliacao_extrato (transacao_id, movimento_id) values ($1, $2) on conflict do nothing",
+                                t_id_vinculo, mov_id
+                            )
+                            
+                    await conn.execute(
+                        """
+                        update transacoes set status = 'CONCILIADO_OK'
+                        where id in (select transacao_id from conciliacao_extrato)
+                          and projeto_id = $1
+                        """,
+                        projeto_id
+                    )
+
+        await db_ops()
+        
+        _registrar(
+            conciliacao_id,
+            status="sucesso",
+            progresso=100,
+            etapa="concluído",
+            resumo=resultado["resumo"]
+        )
+    except Exception as e:
+        logger.exception("Falha na importação de pasta bg %s", conciliacao_id)
+        _registrar(conciliacao_id, status="erro", etapa="erro", erro_fatal=str(e))
+    finally:
+        shutil.rmtree(base, ignore_errors=True)

@@ -48,3 +48,39 @@ def test_estados_finais_nao_tem_transicao():
 
 def test_nao_pode_pular_direto_pra_assinado():
     assert "ASSINADO" not in _TRANSICOES["PENDENTE_GERACAO"]
+
+
+# ============================================================
+# Validação de transição (mesma regra do endpoint avancar_regularizacao)
+# ============================================================
+
+def _pode_transicionar(atual: str, novo: str) -> bool:
+    """Réplica da checagem do endpoint — manter em sincronia com a rota."""
+    return novo in _TRANSICOES.get(atual, set())
+
+
+def test_transicao_valida_pendente_para_aguardando():
+    assert _pode_transicionar("PENDENTE_GERACAO", "AGUARDANDO_ASSINATURA")
+
+
+def test_transicao_valida_aguardando_para_assinado():
+    assert _pode_transicionar("AGUARDANDO_ASSINATURA", "ASSINADO")
+
+
+def test_transicao_cancelado_permitido_antes_de_assinado():
+    assert _pode_transicionar("PENDENTE_GERACAO", "CANCELADO")
+    assert _pode_transicionar("AGUARDANDO_ASSINATURA", "CANCELADO")
+
+
+def test_transicao_nao_permitida_retroceder():
+    assert not _pode_transicionar("AGUARDANDO_ASSINATURA", "PENDENTE_GERACAO")
+    assert not _pode_transicionar("ASSINADO", "AGUARDANDO_ASSINATURA")
+
+
+def test_transicao_estado_final_nao_aceita_nada():
+    assert not _pode_transicionar("ASSINADO", "CANCELADO")
+    assert not _pode_transicionar("CANCELADO", "PENDENTE_GERACAO")
+
+
+def test_transicao_estado_desconhecido_rejeitada():
+    assert not _pode_transicionar("INVENTADO", "ASSINADO")

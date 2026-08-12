@@ -79,6 +79,99 @@ async def iniciar_conciliacao(
     }
 
 
+@router.post("/api/v1/projetos/{projeto_id}/importar-pasta", status_code=202)
+async def iniciar_importacao_pasta(
+    projeto_id: str,
+    background_tasks: BackgroundTasks,
+    extrato: UploadFile | None = File(None),
+    comprovantes: list[UploadFile] = File(...),
+    dep=Depends(get_conn),
+):
+    conn, user_id = dep
+    projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
+    if not projeto:
+        raise HTTPException(404, "Projeto não encontrado.")
+
+    extrato_bytes = await extrato.read() if extrato else None
+    extrato_nome = extrato.filename if extrato else None
+
+    comprovantes_dados = []
+    for c in comprovantes:
+        if not c.filename:
+            continue
+        c_bytes = await c.read()
+        comprovantes_dados.append((c.filename, c_bytes))
+
+    if not comprovantes_dados:
+        raise HTTPException(400, "Envie ao menos um documento de comprovante.")
+
+    conciliacao_id = conciliacao_service.criar_execucao(user_id)
+    background_tasks.add_task(
+        conciliacao_service.executar_importacao_pasta_bg,
+        projeto_id,
+        conciliacao_id,
+        user_id,
+        extrato_bytes,
+        extrato_nome,
+        comprovantes_dados,
+    )
+
+    return {
+        "conciliacao_id": conciliacao_id,
+        "status": "iniciando",
+        "progresso": 0,
+    }
+
+
+@router.post("/api/v1/projetos/{projeto_id}/importar-autonomo", status_code=202)
+async def iniciar_importacao_autonoma(
+    projeto_id: str,
+    background_tasks: BackgroundTasks,
+    dep=Depends(get_conn),
+):
+    import os
+    conn, user_id = dep
+    projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
+    if not projeto:
+        raise HTTPException(404, "Projeto não encontrado.")
+
+    pasta_local = Path("/app/3. 1961")
+    if not pasta_local.exists():
+        pasta_local = Path("./3. 1961")
+
+    if not pasta_local.exists():
+        raise HTTPException(404, "Pasta do projeto 1961 não encontrada no servidor.")
+
+    comprovantes_dados = []
+
+    for root, dirs, files in os.walk(pasta_local):
+        for f in files:
+            p = Path(root) / f
+            if f.startswith(".") or f.startswith("__MACOSX"):
+                continue
+            if p.suffix.lower() in [".pdf", ".png", ".jpg", ".jpeg"]:
+                b = p.read_bytes()
+                rel_path = os.path.relpath(str(p), str(pasta_local))
+                comprovantes_dados.append((rel_path, b))
+
+    conciliacao_id = conciliacao_service.criar_execucao(user_id)
+    background_tasks.add_task(
+        conciliacao_service.executar_importacao_pasta_bg,
+        projeto_id,
+        conciliacao_id,
+        user_id,
+        None,
+        None,
+        comprovantes_dados,
+    )
+
+    return {
+        "conciliacao_id": conciliacao_id,
+        "status": "iniciando",
+        "progresso": 0,
+    }
+
+
 @router.get("/api/v1/conciliacao/{conciliacao_id}")
 async def status_conciliacao(conciliacao_id: str, dep=Depends(get_conn)):
     """Status por polling (o frontend consulta a cada 2s enquanto não termina)."""
@@ -202,9 +295,21 @@ async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
     )
     transacoes = await conn.fetch(
         """
-        select id, fornecedor, data_pagamento, valor_bruto, status
-        from transacoes where projeto_id = $1
-        order by data_pagamento nulls last, created_at
+        select t.id, t.fornecedor, t.cnpj_fornecedor, t.data_pagamento, t.valor_bruto, t.status,
+               r.codigo as rubrica_codigo,
+               (
+                   select id from documentos_transacao doc
+                   where doc.transacao_id = t.id order by created_at desc limit 1
+               ) as documento_id,
+               (
+                   select arquivo_ref from documentos_transacao doc
+                   where doc.transacao_id = t.id order by created_at desc limit 1
+               ) as documento
+        from transacoes t
+        left join despesas d on d.transacao_id = t.id
+        left join rubricas r on r.id = d.rubrica_id
+        where t.projeto_id = $1
+        order by t.data_pagamento nulls last, t.created_at
         """,
         projeto_id,
     )
@@ -225,9 +330,13 @@ async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
             {
                 "id": str(t["id"]),
                 "fornecedor": t["fornecedor"],
+                "cnpj_fornecedor": t["cnpj_fornecedor"],
                 "data_pagamento": t["data_pagamento"].isoformat() if t["data_pagamento"] else None,
                 "valor_bruto": float(t["valor_bruto"]) if t["valor_bruto"] is not None else None,
                 "status": t["status"],
+                "rubrica_codigo": t["rubrica_codigo"],
+                "documento_id": str(t["documento_id"]) if t["documento_id"] else None,
+                "documento": t["documento"],
             }
             for t in transacoes
         ],
