@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Decimal
+from pydantic import BaseModel
+from decimal import Decimal
 from typing import List, Optional
 from datetime import datetime
 import asyncpg
