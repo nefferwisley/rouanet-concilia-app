@@ -2,7 +2,7 @@ import json
 import logging
 
 import yaml
-from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Query, UploadFile, status
 
 from backend.database import get_conn, get_pool
 from backend.services.importacao import executar_importacao_bg
@@ -73,6 +73,58 @@ async def iniciar_importacao(
         "status": "iniciando",
         "progresso": 0,
         "ws_url": f"/ws/importacao/{importacao_id}",
+    }
+
+
+@router.get("")
+async def listar_importacoes(
+    projeto_id: str = Query(...),
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    status: str | None = Query(None),
+    dep=Depends(get_conn),
+):
+    """Lista importações de um projeto (paginação + filtro opcional por status) —
+    mesmo contrato que o frontend espera em useImportacoes.ts."""
+    conn, _ = dep
+    where = "where i.projeto_id = $1"
+    params: list = [projeto_id]
+    if status:
+        params.append(status)
+        where += f" and i.status = ${len(params)}"
+
+    total = await conn.fetchval(f"select count(*) from importacoes i {where}", *params)
+    limit_idx = len(params) + 1
+    offset_idx = len(params) + 2
+    rows = await conn.fetch(
+        f"""
+        select i.* from importacoes i {where}
+        order by i.created_at desc
+        limit ${limit_idx} offset ${offset_idx}
+        """,
+        *params, limit, (page - 1) * limit,
+    )
+
+    def _shape(row):
+        total_linhas = row["linhas_total"] or 0
+        pct = int(100 * row["linhas_processadas"] / total_linhas) if total_linhas else 0
+        return {
+            "importacao_id": str(row["id"]),
+            "projeto_id": str(row["projeto_id"]),
+            "status": row["status"],
+            "progresso": pct,
+            "linhas_processadas": row["linhas_processadas"],
+            "linhas_total": total_linhas,
+            "linhas_ok": row["linhas_ok"],
+            "linhas_erro": row["linhas_erro"],
+            "linhas_alerta": row["linhas_alerta"],
+            "mensagem": row["mensagem"],
+        }
+
+    return {
+        "total": total,
+        "page": page,
+        "importacoes": [_shape(r) for r in rows],
     }
 
 

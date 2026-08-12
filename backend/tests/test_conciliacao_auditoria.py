@@ -89,6 +89,14 @@ def test_iniciar_importacao_requires_auth():
     assert response.status_code == 401
 
 
+def test_listar_importacoes_requires_auth():
+    """GET /importacoes?projeto_id=... - sem auth deve retornar 401"""
+    response = client.get(
+        "/api/v1/importacoes", params={"projeto_id": "fake-uuid"}
+    )
+    assert response.status_code == 401
+
+
 # ============================================================
 # Auditoria — lógica pura de filtro (sem DB)
 # ============================================================

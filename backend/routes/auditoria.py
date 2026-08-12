@@ -6,6 +6,7 @@ transacoes/rubricas/documentos_transacao de verdade, filtrados por RLS.
 """
 import csv
 import io
+import json
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -61,13 +62,18 @@ async def auditoria_projeto(
     # foram materializadas por algum lançamento importado, e pode ficar bem
     # menor que o valor real captado se o orçamento por rubrica no config
     # de importação estiver incompleto.
-    if projeto["valor_captado"] is not None:
+    if projeto["valor_captado"] is not None and float(projeto["valor_captado"]) > 0:
         orcado = float(projeto["valor_captado"])
     else:
         orcado = await conn.fetchval(
             "select coalesce(sum(valor_orcado), 0)::float from rubricas where projeto_id = $1",
             projeto_id,
         )
+        if not orcado:
+            orcado = await conn.fetchval(
+                "select coalesce(sum(valor_bruto), 0)::float from transacoes where projeto_id = $1",
+                projeto_id,
+            )
     total = await conn.fetchval(
         "select count(*) from transacoes where projeto_id = $1", projeto_id
     )
@@ -100,20 +106,41 @@ async def auditoria_projeto(
             from transacoes
             where projeto_id = $1
         )
-        select t.id, t.fornecedor, t.cnpj_fornecedor, t.data_pagamento, t.valor_bruto,
+        select t.id, t.fornecedor, t.razao_social, t.cnpj_fornecedor, t.data_pagamento, t.valor_bruto,
                t.tem_nf, t.tem_comprovante, t.status, t.score_conciliacao,
                r.codigo as rubrica_codigo, r.descricao as rubrica_descricao,
                d.descricao as item_descricao,
-               dt.id as documento_id, dt.arquivo_ref as documento, dt.confianca_ocr,
-               sa.debitado_acumulado
+               sa.debitado_acumulado,
+               coalesce(
+                   (
+                       select json_agg(json_build_object(
+                           'id', doc.id,
+                           'tipo', doc.tipo,
+                           'arquivo_ref', doc.arquivo_ref,
+                           'confianca_ocr', doc.confianca_ocr
+                       ))
+                       from documentos_transacao doc
+                       where doc.transacao_id = t.id
+                   ),
+                   '[]'::json
+               ) as documentos,
+               (
+                   select json_build_object(
+                       'id', m.id,
+                       'data', m.data,
+                       'historico', m.historico,
+                       'documento', m.documento,
+                       'valor', m.valor
+                   )
+                   from conciliacao_extrato ce
+                   join extrato_movimentos m on m.id = ce.movimento_id
+                   where ce.transacao_id = t.id
+                   limit 1
+               ) as movimento_extrato
         from transacoes t
         left join despesas d on d.transacao_id = t.id
         left join rubricas r on r.id = d.rubrica_id
         left join saldo_acumulado sa on sa.id = t.id
-        left join lateral (
-            select id, arquivo_ref, confianca_ocr from documentos_transacao doc
-            where doc.transacao_id = t.id order by created_at desc limit 1
-        ) dt on true
         {where}
         order by t.data_pagamento nulls last, t.created_at
         limit ${limit_idx} offset ${offset_idx}
@@ -134,30 +161,39 @@ async def auditoria_projeto(
         "filtro_status": status,
         "total_filtrado": total_filtrado,
     }
-    transacoes = [
-        {
-            "id": str(r["id"]),
-            "fornecedor": r["fornecedor"],
-            "cnpj_fornecedor": r["cnpj_fornecedor"],
-            "data_pagamento": r["data_pagamento"].isoformat() if r["data_pagamento"] else None,
-            "valor_bruto": r["valor_bruto"],
-            "tem_nf": r["tem_nf"],
-            "tem_comprovante": r["tem_comprovante"],
-            "status": r["status"],
-            "score_conciliacao": r["score_conciliacao"],
-            "rubrica_codigo": r["rubrica_codigo"],
-            "rubrica_descricao": r["rubrica_descricao"],
-            "item_descricao": r["item_descricao"],
-            "documento_id": str(r["documento_id"]) if r["documento_id"] else None,
-            "documento": r["documento"],
-            "confianca_ocr": r["confianca_ocr"],
-            "saldo_restante": (
-                float(orcado) - float(r["debitado_acumulado"])
-                if r["debitado_acumulado"] is not None else None
-            ),
-        }
-        for r in rows
-    ]
+    transacoes = []
+    for r in rows:
+        documentos = json.loads(r["documentos"]) if isinstance(r["documentos"], str) else (r["documentos"] or [])
+        primeiro_doc = documentos[0] if documentos else {}
+        transacoes.append(
+            {
+                "id": str(r["id"]),
+                "fornecedor": r["fornecedor"],
+                "razao_social": r["razao_social"],
+                "cnpj_fornecedor": r["cnpj_fornecedor"],
+                "data_pagamento": r["data_pagamento"].isoformat() if r["data_pagamento"] else None,
+                "valor_bruto": r["valor_bruto"],
+                "tem_nf": r["tem_nf"],
+                "tem_comprovante": r["tem_comprovante"],
+                "status": r["status"],
+                "score_conciliacao": r["score_conciliacao"],
+                "rubrica_codigo": r["rubrica_codigo"],
+                "rubrica_descricao": r["rubrica_descricao"],
+                "item_descricao": r["item_descricao"],
+                "saldo_restante": (
+                    float(orcado) - float(r["debitado_acumulado"])
+                    if r["debitado_acumulado"] is not None else None
+                ),
+                "documentos": documentos,
+                "movimento_extrato": (
+                    json.loads(r["movimento_extrato"])
+                    if isinstance(r["movimento_extrato"], str)
+                    else r["movimento_extrato"]
+                ),
+                "documento": primeiro_doc.get("arquivo_ref") or "",
+                "confianca_ocr": primeiro_doc.get("confianca_ocr"),
+            }
+        )
 
     if format == "csv":
         buf = io.StringIO()
