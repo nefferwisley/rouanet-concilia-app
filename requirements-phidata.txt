@@ -1,0 +1,15 @@
+# Phi (Phidata) - Framework para Multi-Agent Systems
+phidata>=2.0.0
+
+# Modelos LLM
+anthropic>=0.20.0
+google-generativeai>=0.3.0
+
+# Conhecimento e Memória
+psycopg2-binary>=2.9.0
+
+# Ferramentas
+python-dotenv>=1.0.0
+
+# Opcional: para suporte adicional
+requests>=2.31.0

@@ -46,6 +46,10 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     networks:
       - rouanet_network
+    # Permite o container enxergar o Ollama rodando no host (Orquestrador
+    # Phidata usa ele como fallback grátis quando não há GOOGLE_API_KEY).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5)"]
       interval: 10s

@@ -11,4 +11,10 @@ google-api-python-client==2.149.0
 google-auth==2.35.0
 python-multipart==0.0.9
 pytest==7.4.3
-httpx==0.25.2
+httpx>=0.27.0,<0.28.0
+
+# Orquestrador Phidata (multi-agent) — versão fixa: ranges abertos fazem o
+# pip fazer backtracking até uma phidata antiga que pinia pydantic==2.3.0,
+# conflitando com o pydantic==2.9.2 usado pelo resto do projeto.
+phidata==2.7.10
+ollama>=0.3.0
