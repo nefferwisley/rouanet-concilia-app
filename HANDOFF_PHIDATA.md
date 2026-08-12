@@ -17,14 +17,22 @@ travamento (relatada abaixo, seção "Bug resolvido") foi encontrada e
 corrigida. Testado com sucesso:
 
 ```bash
+# projeto_id é UUID (tabela projetos), não int — pegue um real com:
+# docker exec rouanet_db psql -U rouanet -d rouanet_concilia -c "select id, nome from projetos limit 5;"
+
 curl -X POST http://localhost:8000/api/v1/orquestrador/auditoria/auditar-projeto \
-  -H "Content-Type: application/json" -d '{"projeto_id": 1, "rapida": true}'
-# HTTP 200 em ~2min
+  -H "Content-Type: application/json" -d '{"projeto_id": "e2b88dad-29fa-442b-ae16-1b918e943034", "rapida": true}'
+# HTTP 200 em ~1min, com dados REAIS do projeto no prompt (ver Causa 6)
 
 curl -X POST http://localhost:8000/api/v1/orquestrador/conciliacao/reconciliar \
-  -H "Content-Type: application/json" -d '{"projeto_id": 1, "estrategia": "hibrida"}'
+  -H "Content-Type: application/json" -d '{"projeto_id": "e2b88dad-29fa-442b-ae16-1b918e943034", "estrategia": "hibrida"}'
 # HTTP 200 em ~1min
 ```
+
+Se o banco de dev estiver vazio (só a tabela `schema_migrations`), rode
+`python -m backend.scripts.seed_db` dentro do container pra popular com
+5 projetos + 20 transações de teste (precisa de 1 linha em `auth.users`
+antes — ver Causa 6).
 
 **Atenção**: as respostas demoram 30s–2min por chamada nesse hardware
 (CPU-only, ver "Bug resolvido" pra entender por quê). Um "fluxo completo"
@@ -207,6 +215,59 @@ inclusive o próprio healthcheck do Docker.
 `await run_in_threadpool(orquestrador.agente_auditoria.auditar_projeto,
 projeto_id)`). Libera o event loop pra atender outras requisições
 (healthcheck incluso) enquanto o agente processa em background.
+
+### Causa 6 — agentes sem acesso real ao banco (respondiam "chutando")
+
+Depois de tudo estável, reparamos que as respostas eram genéricas/inventadas
+("me forneça a planilha...") porque os agentes eram só prompts pro LLM, sem
+nenhuma ferramenta conectada ao banco. Duas descobertas junto disso:
+
+1. **`db/migrations` nunca era montado no container** (mesma classe de bug
+   do `phidata_config.py` original) — `apply_migrations.py` procurava em
+   `/app/db/migrations`, achava a pasta vazia (glob silencioso, sem erro),
+   e o banco de dev só tinha a tabela `schema_migrations`, vazia. Fix:
+   `- ./db:/app/db:ro` no `docker-compose.yml` + `COPY db/ ./db/` no
+   `backend/Dockerfile`. Depois disso as 6 migrations aplicaram e populei
+   com `python -m backend.scripts.seed_db` (precisa de 1 linha em
+   `auth.users` antes, senão a FK de `membros_projeto`/`importacoes` falha).
+
+2. **`tools=[...]` do phidata NÃO funciona de forma confiável** com
+   `qwen2.5-coder:1.5b` via Ollama — confirmado interceptando o payload:
+   as tools chegam certinho (nome, schema JSON corretos) no `/api/chat`,
+   mas a resposta vem com `message.tool_calls: None` — o modelo só
+   escreve TEXTO parecido com uma chamada de função
+   (`{"name": "validar_dados", ...}`), sem invocar de verdade. Limitação
+   conhecida de modelos pequenos com function calling.
+
+   **Fix**: abandonar `tools=[...]` nos `Agent(...)`. Em vez disso, cada
+   método (`auditar_projeto`, `reconciliar_projeto`,
+   `reconciliar_automatico`) chama as funções `buscar_*` **direto em
+   Python antes** de montar o prompt, e injeta o JSON resultante como
+   texto no próprio prompt. Determinístico — não depende do modelo
+   "decidir" usar uma ferramenta.
+
+   `projeto_id` também foi corrigido de `int` pra `str` em toda a cadeia
+   (é `uuid` na tabela `projetos`, não integer) — `phidata_config.py` e
+   `routes/orquestrador.py` (todos os `BaseModel` de request).
+
+**Tools disponíveis hoje** (`backend/phidata_config.py`, seção "TOOLS"):
+`buscar_projeto`, `buscar_transacoes`, `buscar_rubricas`,
+`buscar_extrato_movimentos`, `buscar_campos_revisao` — todas usam
+`psycopg2` (sync, já era dependência) direto contra `DATABASE_URL`,
+limitadas a 20 linhas por chamada (`_LIMITE_LINHAS_TOOL`).
+
+**Resultado confirmado**: testando com um projeto real
+(`e2b88dad-29fa-442b-ae16-1b918e943034`, criado pelo seed), o prompt que
+chega no modelo agora contém as transações de verdade (fornecedor "Acme
+Corp", CNPJ real, valores reais, status `ALERTA_DIVERGENCIA_VALOR`) em
+vez de texto genérico.
+
+**Limitação que sobra**: `qwen2.5-coder` tende a desviar pra escrever
+código Python (ex.: função de validação de CPF) em vez de um relatório
+direto — comportamento do modelo (especializado em código), não bug de
+encanamento. Mitigável com instrução mais explícita tipo "responda em
+texto corrido, não escreva código" nas `instructions` do agente — não
+implementado ainda.
 
 ### Técnica usada pra diagnosticar (útil pra bugs parecidos no futuro)
 

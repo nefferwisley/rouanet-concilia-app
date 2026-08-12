@@ -42,6 +42,12 @@ services:
     volumes:
       - ./backend:/app/backend
       - ./motor:/app/motor
+      # backend/scripts/apply_migrations.py lê db/migrations no startup —
+      # sem montar aqui, o glob não acha nada e fica em silêncio, sem
+      # aplicar nenhuma migration nem dar erro (achado ao investigar por
+      # que o banco de dev não tinha nenhuma tabela real, só
+      # schema_migrations vazia).
+      - ./db:/app/db:ro
       - uploads:/app/uploads
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     networks:

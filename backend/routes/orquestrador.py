@@ -39,23 +39,23 @@ def obter_orquestrador():
 
 
 class FluxoCompletoRequest(BaseModel):
-    projeto_id: int
+    projeto_id: str
     arquivo: Optional[str] = None
     executar_async: bool = False
 
 
 class ConciliacaoRequest(BaseModel):
-    projeto_id: int
+    projeto_id: str
     estrategia: str = "hibrida"  # deterministica, rag, hibrida
 
 
 class AuditoriaRequest(BaseModel):
-    projeto_id: int
+    projeto_id: str
     rapida: bool = False
 
 
 class CampoIncertoRequest(BaseModel):
-    campo_id: int
+    campo_id: str
     contexto: Dict[str, Any]
 
 
@@ -65,13 +65,13 @@ class ImportacaoRequest(BaseModel):
 
 
 class ReconciliacaoAutomaticaRequest(BaseModel):
-    projeto_id: int
+    projeto_id: str
     confianca_minima: float = 0.85
 
 
 class ResultadoFluxo(BaseModel):
     status: str  # sucesso, erro, em_progresso
-    projeto_id: int
+    projeto_id: str
     fases: Dict[str, Any]
     timestamp: str
 
@@ -231,7 +231,7 @@ async def auditar_projeto(request: AuditoriaRequest):
 
 
 @router.post("/auditoria/revisar-documento")
-async def revisar_documento(documento_id: int):
+async def revisar_documento(documento_id: str):
     """
     Revisa um documento anexado
 

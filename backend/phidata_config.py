@@ -11,7 +11,10 @@ host em localhost:11434 — sem custo, sem chave).
 from phi.agent import Agent
 from phi.model.google import Gemini
 from phi.model.ollama import Ollama
+import json
 import os
+import psycopg2
+import psycopg2.extras
 
 
 # Host do Ollama visto de DENTRO do container Docker. No Windows/Mac com
@@ -73,6 +76,92 @@ def criar_modelo():
 
 
 # ============================================================================
+# TOOLS — acesso real ao banco (schema em db/migrations/0001_schema.sql)
+#
+# Sem isso os agentes só "conversam" sobre o assunto — o Agent.run() não
+# tem nenhuma forma de ver dados reais do projeto, então o LLM inventa uma
+# resposta plausível a partir só do texto da instrução. Cada função vira
+# uma tool que o phidata expõe ao modelo (docstring + type hints viram o
+# schema da tool automaticamente); o modelo decide quando chamar.
+#
+# projeto_id é uuid (texto) na tabela `projetos`, não int — corrigido aqui
+# e em toda a cadeia de chamada (routes/orquestrador.py incluído).
+# ============================================================================
+
+_LIMITE_LINHAS_TOOL = 20  # nº de linhas por consulta — prompt pequeno, hardware fraco
+
+
+def _conectar_db():
+    return psycopg2.connect(os.environ["DATABASE_URL"])
+
+
+def _query_json(sql: str, params: tuple) -> str:
+    """Roda a query e devolve os resultados como JSON (texto) pro agente ler."""
+    try:
+        with _conectar_db() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(sql, params)
+            linhas = cur.fetchall()
+    except Exception as e:  # noqa: BLE001 — erro de DB vira texto pro agente, não crash
+        return json.dumps({"erro": str(e)}, ensure_ascii=False)
+
+    resultado = [dict(r) for r in linhas]
+    # Decimal/date/datetime não serializam direto em JSON — normaliza pra string.
+    resultado = json.loads(json.dumps(resultado, default=str, ensure_ascii=False))
+    if not resultado:
+        return json.dumps({"aviso": "Nenhum registro encontrado para esse projeto_id."}, ensure_ascii=False)
+    return json.dumps(resultado, ensure_ascii=False)
+
+
+def buscar_projeto(projeto_id: str) -> str:
+    """Busca os dados básicos do projeto Lei Rouanet: PRONAC, nome, proponente, banco."""
+    return _query_json(
+        "select pronac, nome, proponente, controller, banco, data_inicio, data_fim "
+        "from projetos where id = %s",
+        (projeto_id,),
+    )
+
+
+def buscar_transacoes(projeto_id: str) -> str:
+    """Busca as transações (pagamentos) do projeto: fornecedor, CNPJ, valores, status de conciliação."""
+    return _query_json(
+        "select fornecedor, cnpj_fornecedor, data_pagamento, valor_bruto, valor_liquido, "
+        "tem_nf, tem_comprovante, status, score_conciliacao "
+        "from transacoes where projeto_id = %s order by data_pagamento desc limit %s",
+        (projeto_id, _LIMITE_LINHAS_TOOL),
+    )
+
+
+def buscar_rubricas(projeto_id: str) -> str:
+    """Busca as rubricas orçamentárias do projeto: código, descrição, valor orçado."""
+    return _query_json(
+        "select codigo, descricao, valor_orcado from rubricas where projeto_id = %s order by codigo limit %s",
+        (projeto_id, _LIMITE_LINHAS_TOOL),
+    )
+
+
+def buscar_extrato_movimentos(projeto_id: str) -> str:
+    """Busca os movimentos do extrato bancário do projeto (via conta captadora): data, histórico, valor, status."""
+    return _query_json(
+        "select m.data, m.historico, m.tipo, m.valor, m.status_conciliacao "
+        "from extrato_movimentos m "
+        "join contas_captadoras c on c.id = m.conta_id "
+        "where c.projeto_id = %s order by m.data desc limit %s",
+        (projeto_id, _LIMITE_LINHAS_TOOL),
+    )
+
+
+def buscar_campos_revisao(projeto_id: str) -> str:
+    """Busca campos incertos pendentes de revisão manual (baixa confiança de matching) do projeto."""
+    return _query_json(
+        "select cr.campo, cr.valor_extraido, cr.confianca, cr.status_revisao "
+        "from campos_revisao cr "
+        "join transacoes t on t.id = cr.transacao_id "
+        "where t.projeto_id = %s and cr.status_revisao = 'PENDENTE' limit %s",
+        (projeto_id, _LIMITE_LINHAS_TOOL),
+    )
+
+
+# ============================================================================
 # 1. CONHECIMENTO (Knowledge Bases)
 # ============================================================================
 
@@ -112,6 +201,13 @@ class AgenteConciliacao:
         self.db_url = db_url
         self.conhecimento = criar_conhecimento_lei_rouanet()
 
+        # NOTA: sem tools=[...] aqui de propósito. Testado e confirmado que
+        # qwen2.5-coder:1.5b não invoca function calling de verdade via
+        # Ollama (message.tool_calls vem None, o modelo só escreve texto
+        # parecido com JSON de chamada de função). Em vez de depender do
+        # modelo "decidir" chamar uma tool, os dados reais são buscados em
+        # Python e injetados direto no prompt — determinístico, não depende
+        # da confiabilidade de tool-calling de um modelo pequeno.
         self.agent = Agent(
             name="Agente Conciliação",
             role="Especialista em reconciliação de Lei Rouanet",
@@ -126,6 +222,7 @@ class AgenteConciliacao:
             """,
             instructions=[
                 "Sempre usar conhecimento Lei Rouanet",
+                "Os dados reais do projeto (transações, extrato, rubricas) já vêm no prompt — nunca invente valores além deles",
                 "Propor soluções específicas para cada divergência",
                 "Usar terminologia oficial Lei Rouanet",
                 "Validar CPF/CNPJ quando necessário",
@@ -133,18 +230,32 @@ class AgenteConciliacao:
             ],
         )
 
-    def reconciliar_projeto(self, projeto_id: int, estrategia="hibrida"):
+    def reconciliar_projeto(self, projeto_id: str, estrategia="hibrida"):
         """Executa reconciliação inteligente"""
+        transacoes = buscar_transacoes(projeto_id)
+        extrato = buscar_extrato_movimentos(projeto_id)
+        rubricas = buscar_rubricas(projeto_id)
         prompt = f"""
         Reconcilie o projeto {projeto_id} usando estratégia '{estrategia}':
-        1. Analise divergências entre planilha e extrato
+
+        TRANSAÇÕES DO PROJETO:
+        {transacoes}
+
+        MOVIMENTOS DO EXTRATO BANCÁRIO:
+        {extrato}
+
+        RUBRICAS ORÇAMENTÁRIAS:
+        {rubricas}
+
+        Com base SOMENTE nos dados acima:
+        1. Analise divergências entre transações e extrato
         2. Identifique rubricas problemáticas
         3. Proponha campos para revisão manual
         4. Gere relatório consolidado
         """
         return self.agent.run(prompt)
 
-    def analisar_campo_incerto(self, campo_id: int, contexto: dict):
+    def analisar_campo_incerto(self, campo_id: str, contexto: dict):
         """Análise inteligente de campos incertos"""
         prompt = f"""
         Analise este campo incerto:
@@ -166,6 +277,8 @@ class AgenteAuditoria:
         self.db_url = db_url
         self.conhecimento = criar_conhecimento_lei_rouanet()
 
+        # Ver nota em AgenteConciliacao sobre não usar tools=[...]: dados
+        # reais entram via prompt, não via function-calling do modelo.
         self.agent = Agent(
             name="Agente Auditoria",
             role="Auditor especializado em Lei Rouanet",
@@ -180,6 +293,7 @@ class AgenteAuditoria:
             """,
             instructions=[
                 "Aplicar regras de validação determinísticas",
+                "As transações reais do projeto já vêm no prompt — nunca invente valores, CPFs ou fornecedores além delas",
                 "Usar análise estatística para outliers",
                 "Documentar todas as anomalias encontradas",
                 "Recomendar ações corretivas",
@@ -187,10 +301,20 @@ class AgenteAuditoria:
             ],
         )
 
-    def auditar_projeto(self, projeto_id: int):
+    def auditar_projeto(self, projeto_id: str):
         """Executa auditoria completa"""
+        transacoes = buscar_transacoes(projeto_id)
+        campos_revisao = buscar_campos_revisao(projeto_id)
         prompt = f"""
         Audite completamente o projeto {projeto_id}:
+
+        TRANSAÇÕES DO PROJETO:
+        {transacoes}
+
+        CAMPOS PENDENTES DE REVISÃO MANUAL:
+        {campos_revisao}
+
+        Com base SOMENTE nos dados acima:
         1. Validação de dados (CPF, CNPJ, datas, valores)
         2. Conformidade com Lei Rouanet
         3. Análise de anomalias
@@ -198,7 +322,7 @@ class AgenteAuditoria:
         """
         return self.agent.run(prompt)
 
-    def revisar_documento(self, documento_id: int):
+    def revisar_documento(self, documento_id: str):
         """Análise de documentação anexada"""
         prompt = f"""
         Revise o documento {documento_id}:
@@ -258,6 +382,8 @@ class AgenteReconciliacao:
         self.db_url = db_url
         self.conhecimento = criar_conhecimento_lei_rouanet()
 
+        # Ver nota em AgenteConciliacao sobre não usar tools=[...]: dados
+        # reais entram via prompt, não via function-calling do modelo.
         self.agent = Agent(
             name="Agente Reconciliação",
             role="Especialista em reconciliação automática",
@@ -272,19 +398,32 @@ class AgenteReconciliacao:
             """,
             instructions=[
                 f"Conhecimento base: {self.conhecimento}",
+                "As transações e movimentos reais do projeto já vêm no prompt — nunca invente dados além deles",
                 "Priorizar matches determinísticos (100% confiança)",
                 "Usar matching semântico como fallback",
                 "Sempre validar com regras Lei Rouanet",
             ],
         )
 
-    def reconciliar_automatico(self, projeto_id: int, confianca_minima: float = 0.85):
+    def reconciliar_automatico(self, projeto_id: str, confianca_minima: float = 0.85):
         """Executa reconciliação automática"""
+        transacoes = buscar_transacoes(projeto_id)
+        extrato = buscar_extrato_movimentos(projeto_id)
+        rubricas = buscar_rubricas(projeto_id)
         prompt = f"""
         Reconcilie automaticamente o projeto {projeto_id}:
         - Confiança mínima: {confianca_minima}
 
-        Passos:
+        TRANSAÇÕES DO PROJETO:
+        {transacoes}
+
+        MOVIMENTOS DO EXTRATO BANCÁRIO:
+        {extrato}
+
+        RUBRICAS ORÇAMENTÁRIAS:
+        {rubricas}
+
+        Com base SOMENTE nos dados acima:
         1. Matching determinístico (CPF, CNPJ, valor exato)
         2. Matching semântico (RAG para rubricas)
         3. Validar resultados acima de confiança mínima
@@ -323,7 +462,7 @@ class OrquestradorConcilia:
             """,
         )
 
-    def fluxo_completo_projeto(self, projeto_id: int, arquivo: str = None):
+    def fluxo_completo_projeto(self, projeto_id: str, arquivo: str = None):
         """Executa fluxo completo: importação → validação → reconciliação → auditoria"""
         print(f"\n🎯 Iniciando fluxo completo para projeto {projeto_id}")
         print(f"{'='*60}")
@@ -352,12 +491,12 @@ class OrquestradorConcilia:
 
         return resultado
 
-    def revisar_campo_incerto(self, campo_id: int, contexto: dict):
+    def revisar_campo_incerto(self, campo_id: str, contexto: dict):
         """Revisão colaborativa de campos incertos"""
         print(f"\n🔬 Revisando campo incerto {campo_id}")
         return self.agente_conciliacao.analisar_campo_incerto(campo_id, contexto)
 
-    def executar_auditoria_rapida(self, projeto_id: int):
+    def executar_auditoria_rapida(self, projeto_id: str):
         """Auditoria rápida focada"""
         print(f"\n⚡ Auditoria rápida para projeto {projeto_id}")
         return self.agente_auditoria.auditar_projeto(projeto_id)
