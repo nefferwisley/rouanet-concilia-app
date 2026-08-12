@@ -22,6 +22,8 @@ interface TransacaoCandidata {
   rubrica_codigo?: string | null;
   rubrica_descricao?: string | null;
   item_descricao?: string | null;
+  documento_id?: string | null;
+  documento?: string | null;
 }
 
 interface ParesResponse {
@@ -43,11 +45,32 @@ function limparTextoExtrato(str?: string | null): string {
   return limpo || str.trim();
 }
 
+function extrairPrestador(fornecedor: string, documento: string | null | undefined): string {
+  if (!documento) {
+    return fornecedor;
+  }
+  const nomeDoc = documento.split(/[\\/]/).pop() || "";
+  
+  // Pattern 1: "005 - 10-11-2022 - Frico Guimarães - Diretor de Fotografia.pdf"
+  const matchDashes = nomeDoc.match(/^\d+\s*-\s*\d{2}-\d{2}-\d{4}\s*-\s*([^-(\n]+)/);
+  if (matchDashes && matchDashes[1]) {
+    return matchDashes[1].trim();
+  }
+  
+  // Pattern 2: "1. Mônica Guimarães - Produtora.pdf" ou "7. Luis Cipullo (1961).pdf"
+  const matchDot = nomeDoc.match(/^\d+\.\s+([^-(\n]+)/);
+  if (matchDot && matchDot[1]) {
+    return matchDot[1].trim();
+  }
+  
+  return fornecedor;
+}
+
 /** P3 — Conciliação com botões (extrato × lançamento):
  *  exibe os lançamentos do extrato bancário e permite associar manualmente
  *  cada movimento a um lançamento do projeto (usando POST /api/v1/projetos/{id}/conciliar/manual). */
 export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
-  const { get, postForm } = useAPI();
+  const { get, postForm, download } = useAPI();
   const [dados, setDados] = useState<ParesResponse | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
@@ -57,6 +80,11 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
   const [busca, setBusca] = useState("");
   const [importando, setImportando] = useState(false);
   const [mensagemImportacao, setMensagemImportacao] = useState<string | null>(null);
+
+  // States para upload e processamento de documentos
+  const [arquivosUpload, setArquivosUpload] = useState<Record<string, File | null>>({});
+  const [enviandoDoc, setEnviandoDoc] = useState<string | null>(null);
+  const [mensagensDoc, setMensagensDoc] = useState<Record<string, string>>({});
 
   const carregar = async () => {
     try {
@@ -103,6 +131,39 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
       alert(e instanceof Error ? e.message : "Falha ao criar lançamento.");
     } finally {
       setSalvando(null);
+    }
+  };
+
+  const enviarDocumento = async (movimentoId: string, transacaoId: string) => {
+    const arquivo = arquivosUpload[movimentoId];
+    if (!arquivo) return;
+
+    setEnviandoDoc(movimentoId);
+    setMensagensDoc((prev) => ({ ...prev, [movimentoId]: "Enviando e processando OCR..." }));
+
+    try {
+      const key = localStorage.getItem("gemini_api_key") || "";
+      const form = new FormData();
+      form.append("arquivo", arquivo);
+      if (key.trim()) {
+        form.append("api_key_gemini", key.trim());
+      }
+
+      await postForm(
+        `/api/v1/projetos/${projetoId}/transacoes/${transacaoId}/documento`,
+        form
+      );
+
+      setArquivosUpload((prev) => ({ ...prev, [movimentoId]: null }));
+      setMensagensDoc((prev) => ({ ...prev, [movimentoId]: "✓ Documento anexado com sucesso!" }));
+      await carregar();
+    } catch (e) {
+      setMensagensDoc((prev) => ({
+        ...prev,
+        [movimentoId]: e instanceof Error ? `Erro: ${e.message}` : "Erro ao enviar.",
+      }));
+    } finally {
+      setEnviandoDoc(null);
     }
   };
 
@@ -267,12 +328,19 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
                           <option value="">-- Selecione o lançamento correspondente da planilha --</option>
                           {dados.transacoes.map((t) => {
                             const mesmoValor = Math.abs((t.valor_bruto ?? 0) - Math.abs(m.valor)) < 0.01;
-                            const nomePrestador = limparTextoExtrato(t.cnpj_fornecedor || t.fornecedor);
+                            
+                            // Extrai PF (prestador) e PJ (fornecedor/razão social)
+                            const nomePF = extrairPrestador(t.fornecedor || "-", t.documento);
+                            const nomePJ = t.fornecedor || "-";
+                            const nomeCompleto = nomePF !== nomePJ 
+                              ? `${nomePF} (${nomePJ})` 
+                              : nomePF;
+
                             const rubricaTag = t.rubrica_codigo ? `[Rubrica ${t.rubrica_codigo}] ` : "";
 
                             return (
                               <option key={t.id} value={t.id}>
-                                {mesmoValor ? "✨ " : ""}{rubricaTag}{nomePrestador} — {brl(t.valor_bruto)} ({t.status === "CONCILIADO_OK" ? "OK" : t.status})
+                                {mesmoValor ? "✨ " : ""}{rubricaTag}{nomeCompleto} — {brl(t.valor_bruto)} ({t.status === "CONCILIADO_OK" ? "OK" : t.status})
                               </option>
                             );
                           })}
@@ -280,22 +348,91 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
 
                         {/* Detalhes do vínculo */}
                         {transacaoAtual ? (
-                          <div className="text-[11px] text-slate-300 flex flex-wrap items-center gap-2 mt-1">
-                            <span className="font-semibold text-emerald-400">
-                              {alterouSelecao ? "⚠️ Clique em Vincular para confirmar." : "✓ Vinculado:"}
-                            </span>
-                            {transacaoAtual.rubrica_codigo && (
-                              <span className="px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 font-mono font-bold">
-                                Rubrica {transacaoAtual.rubrica_codigo}
+                          <div className="space-y-2 mt-1.5 p-2 rounded bg-navy-900/50 border border-slate-700/40 text-[11px] text-slate-300">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="font-semibold text-emerald-400">
+                                {alterouSelecao ? "⚠️ Clique em Vincular para confirmar." : "✓ Vinculado:"}
                               </span>
-                            )}
-                            <span className="font-bold text-slate-200">
-                              {limparTextoExtrato(transacaoAtual.fornecedor)}
-                            </span>
-                            {transacaoAtual.item_descricao && (
-                              <span className="text-slate-400 italic">
-                                ({transacaoAtual.item_descricao})
+                              {transacaoAtual.rubrica_codigo && (
+                                <span className="px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 font-mono font-bold">
+                                  Rubrica {transacaoAtual.rubrica_codigo}
+                                </span>
+                              )}
+                              <span className="font-bold text-slate-200">
+                                {(() => {
+                                  const pf = extrairPrestador(transacaoAtual.fornecedor || "-", transacaoAtual.documento);
+                                  const pj = transacaoAtual.fornecedor || "-";
+                                  return pf !== pj ? `${pf} (${pj})` : pf;
+                                })()}
                               </span>
+                              {transacaoAtual.item_descricao && (
+                                <span className="text-slate-400 italic">
+                                  ({transacaoAtual.item_descricao})
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Documento atual da transação / upload widget */}
+                            <div className="flex items-center justify-between gap-2 border-t border-slate-800 pt-1.5 mt-1.5">
+                              <div className="min-w-0">
+                                <span className="text-slate-400 block text-[10px]">Documento da Transação:</span>
+                                {transacaoAtual.documento ? (
+                                  <button
+                                    onClick={async () => {
+                                      const nome = transacaoAtual.documento?.split(/[\\/]/).pop() || "documento.pdf";
+                                      try {
+                                        if (transacaoAtual.documento_id) {
+                                          await download(`/api/v1/documentos/${transacaoAtual.documento_id}/arquivo`, nome);
+                                        } else {
+                                          alert(`Documento: ${nome}`);
+                                        }
+                                      } catch (err: any) {
+                                        alert("Não foi possível baixar o arquivo.");
+                                      }
+                                    }}
+                                    className="text-emerald-400 hover:underline font-semibold text-[10px] text-left truncate max-w-xs block"
+                                    title={transacaoAtual.documento || ""}
+                                  >
+                                    📄 {transacaoAtual.documento.split(/[\\/]/).pop()}
+                                  </button>
+                                ) : (
+                                  <span className="text-slate-500 italic text-[10px]">Sem documento anexado</span>
+                                )}
+                              </div>
+
+                              {/* Upload Widget */}
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <label className="cursor-pointer px-2 py-1 rounded bg-navy-800 hover:bg-navy-700 border border-slate-700 text-slate-300 font-semibold text-[10px] transition-colors">
+                                  {arquivosUpload[m.id] ? "🔄 Alterar" : "📎 Anexar"}
+                                  <input
+                                    type="file"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0] || null;
+                                      setArquivosUpload((prev) => ({ ...prev, [m.id]: file }));
+                                      setMensagensDoc((prev) => ({ ...prev, [m.id]: "" }));
+                                    }}
+                                  />
+                                </label>
+                                {arquivosUpload[m.id] && (
+                                  <button
+                                    onClick={() => enviarDocumento(m.id, transacaoAtual.id)}
+                                    disabled={enviandoDoc === m.id}
+                                    className="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] transition-colors"
+                                  >
+                                    {enviandoDoc === m.id ? "⏳..." : "📤 Enviar"}
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Mensagem de upload */}
+                            {mensagensDoc[m.id] && (
+                              <p className={`text-[10px] mt-1 font-semibold ${
+                                mensagensDoc[m.id].startsWith("Erro") ? "text-rose-400" : "text-emerald-400"
+                              }`}>
+                                {mensagensDoc[m.id]}
+                              </p>
                             )}
                           </div>
                         ) : (

@@ -34,6 +34,7 @@ export function ProjetoDetalhes() {
   const [erro, setErro] = useState<string | null>(null);
   const [mostrarImportar, setMostrarImportar] = useState(false);
   const [mostrarEditar, setMostrarEditar] = useState(false);
+  const [importandoAutonomo, setImportandoAutonomo] = useState(false);
   const [aba, setAba] = useState<Aba>("geral");
 
   const recarregarProjeto = () => {
@@ -58,6 +59,34 @@ export function ProjetoDetalhes() {
   useEffect(() => {
     recarregarProjeto();
   }, [api, id]);
+
+  const executarImportacaoAutonoma = async () => {
+    if (!id) return;
+    setImportandoAutonomo(true);
+    try {
+      const res = await api.post<{ conciliacao_id: string }>(`/api/v1/projetos/${id}/importar-autonomo`, {});
+      const pollId = setInterval(async () => {
+        try {
+          const st = await api.get<{ status: string; erro?: string }>(`/api/v1/conciliacao/${res.conciliacao_id}`);
+          if (st.status === "concluido") {
+            clearInterval(pollId);
+            setImportandoAutonomo(false);
+            recarregarProjeto();
+          } else if (st.status === "erro") {
+            clearInterval(pollId);
+            setImportandoAutonomo(false);
+            alert(st.erro || "Erro no processamento autônomo.");
+          }
+        } catch {
+          clearInterval(pollId);
+          setImportandoAutonomo(false);
+        }
+      }, 2000);
+    } catch (err: any) {
+      setImportandoAutonomo(false);
+      alert(err.message || "Falha ao iniciar processamento autônomo.");
+    }
+  };
 
   if (erro) {
     return (
@@ -116,6 +145,13 @@ export function ProjetoDetalhes() {
         <div className="flex flex-wrap gap-2 mt-4">
           <button className="btn-primary" onClick={() => setMostrarImportar(true)}>
             + Nova Importação
+          </button>
+          <button
+            className="btn-primary bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center gap-1.5 shadow-md transition-all"
+            onClick={executarImportacaoAutonoma}
+            disabled={importandoAutonomo}
+          >
+            {importandoAutonomo ? "⚡ Conciliando Pasta do Servidor..." : "⚡ Importação Autônoma (Pasta 1961)"}
           </button>
           <button
             className="btn-secondary opacity-50 cursor-not-allowed"
@@ -182,7 +218,14 @@ export function ProjetoDetalhes() {
       </div>
 
       {mostrarImportar && (
-        <ImportarModal projetos={[projeto]} onClose={() => setMostrarImportar(false)} />
+        <ImportarModal
+          projetos={[projeto]}
+          onClose={() => setMostrarImportar(false)}
+          onImported={() => {
+            setMostrarImportar(false);
+            recarregarProjeto();
+          }}
+        />
       )}
 
       {mostrarEditar && projeto && (

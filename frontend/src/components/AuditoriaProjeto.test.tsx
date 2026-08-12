@@ -87,8 +87,11 @@ describe('AuditoriaProjeto', () => {
     render(<AuditoriaProjeto projetoId="projeto-123" />);
 
     await waitFor(() => {
-      const badge = screen.getByText('OK');
-      expect(badge.className).toMatch(/emerald|pill-sucesso/);
+      const badges = screen.getAllByText('OK');
+      expect(badges.length).toBeGreaterThanOrEqual(1);
+      expect(
+        badges.some((b) => /emerald|pill-sucesso/.test(b.className))
+      ).toBe(true);
     });
   });
 });

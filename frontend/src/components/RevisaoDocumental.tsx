@@ -45,7 +45,9 @@ export function RevisaoDocumental({ projetoId }: { projetoId: string }) {
   const [documentosPorTransacao, setDocumentosPorTransacao] = useState<Record<string, DocumentoTransacao[]>>({});
   const [enviando, setEnviando] = useState<string | null>(null);
   const [mensagens, setMensagens] = useState<Record<string, string>>({});
-  const [chaveGemini, setChaveGemini] = useState("");
+  const [chaveGemini, setChaveGemini] = useState(() => {
+    return localStorage.getItem("gemini_api_key") || "";
+  });
   const arquivos = useRef<Record<string, File | null>>({});
 
   const carregar = async () => {
@@ -129,7 +131,11 @@ export function RevisaoDocumental({ projetoId }: { projetoId: string }) {
               type="password"
               className="input w-72"
               value={chaveGemini}
-              onChange={(e) => setChaveGemini(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setChaveGemini(val);
+                localStorage.setItem("gemini_api_key", val);
+              }}
               placeholder="AIza…"
             />
           </label>
