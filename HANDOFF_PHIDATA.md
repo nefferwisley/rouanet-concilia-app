@@ -39,6 +39,12 @@ antes — ver Causa 6).
 que encadeia 4 agentes pode levar 5-8 minutos. Se for testar via curl,
 sempre use `--max-time 180` ou mais.
 
+**Fluxo completo async está usável** (sessão complementar 2): mande
+`{"projeto_id": "<uuid>", "executar_async": true}` → recebe `job_id` em
+~1s → faça polling em `GET /api/v1/orquestrador/fluxo-completo/status/{job_id}`
+até `status == "concluido"`. Resultado fica persistido em
+`orquestrador_jobs` (migration 0006).
+
 ---
 
 ## O que já está pronto e funcionando
@@ -268,6 +274,87 @@ direto — comportamento do modelo (especializado em código), não bug de
 encanamento. Mitigável com instrução mais explícita tipo "responda em
 texto corrido, não escreva código" nas `instructions` do agente — não
 implementado ainda.
+
+---
+
+## Sessão complementar 2 — validação completa, truncamento corrigido e jobs async
+
+Três frentes desta rodada (sessão que retomou o handoff):
+
+### 1. Todos os endpoints validados ponta a ponta (HTTP, tempos reais)
+
+Testes feitos com o projeto real `e2b88dad-29fa-442b-ae16-1b918e943034`
+(UUID — usar int como projeto_id agora dá 422, os models são `str`):
+
+| Endpoint | Resultado | Tempo |
+|---|---|---|
+| `GET /api/v1/orquestrador/health` | ok | ~0.5s |
+| `GET /api/v1/orquestrador/agentes` | 4 agentes | ~0s |
+| `POST /importacao/importar-arquivo` | sucesso | ~49s |
+| `POST /conciliacao/reconciliacao-automatica` | sucesso | ~60s |
+| `POST /conciliacao/campo-incerto` | sucesso | ~45s |
+| `POST /auditoria/revisar-documento` | sucesso | ~40s |
+| `POST /fluxo-completo` (sync) | sucesso, 3-4 fases | ~2min |
+| `POST /fluxo-completo` (async) | em_progresso + job_id | 0.8s |
+
+Quirks da API descobertos (útil pro frontend):
+- `revisar-documento` recebe `documento_id` como **query param**
+  (`/auditoria/revisar-documento?documento_id=...`), não no body.
+- `fluxo-completo` responde `{status, projeto_id, fases, timestamp}` com
+  `fases` = dict das etapas executadas (`importacao` só se `arquivo` for
+  dado, senão `reconciliacao`, `auditoria`, `conciliacao`).
+
+### 2. Truncamento de relatórios corrigido (`num_predict` 400 → 1024)
+
+Com `num_predict=400`, relatórios de auditoria/conciliação cortavam no meio
+da frase (done_reason="length"). Subi o default pra **1024** em
+`backend/phidata_config.py` (`OLLAMA_NUM_PREDICT`). Resultado real medido:
+relatório de auditoria passou de ~cortado pra **3.282 caracteres** (~2000+
+tokens) completos. Custo: cada fase agora pode levar até ~2min em CPU
+(~8 tok/s), dentro do `timeout=300` do cliente. Se precisar de relatórios
+ainda maiores, aumentar pra 2048 (pior caso ~256s/fase — arriscado pro
+timeout, testar antes).
+
+### 3. Fluxo-completo async agora é usável: sistema de jobs com status
+
+Antes: `executar_async: true` retornava 202 em 0.3s mas o resultado ficava
+preso na memória do background task — sem como consultar depois. Sync era
+a única opção (2min, estoura timeout de qualquer cliente HTTP).
+
+**O que foi adicionado:**
+- **`db/migrations/0006_orquestrador_jobs.sql`** — tabela `orquestrador_jobs`
+  (`id uuid pk`, `tipo`, `projeto_id`, `payload jsonb`, `status`, `resultado
+  jsonb`, `erro`, timestamps). **Sem RLS de propósito**: o background task
+  roda fora do contexto JWT da request e escreve por psycopg2 (não pelo
+  pool asyncpg), então policies de RLS não se aplicam.
+- **`backend/services/orquestrador_jobs.py`** — `criar_job`, `atualizar_job`,
+  `buscar_job`, `serializar_run_response` (converte `RunResponse`/dict de
+  `RunResponse` em JSON via `model_dump_json`). psycopg2 sync, mesma
+  convenção do `phidata_config.py`.
+- **`backend/routes/orquestrador.py`**:
+  - `POST /fluxo-completo` com `executar_async: true` agora **cria o job**,
+    agenda `_executar_fluxo_em_background` (roda o fluxo, grava
+    `concluido`/`erro`) e retorna `job_id`.
+  - `GET /fluxo-completo/status/{job_id}` — polling: retorna `status`
+    (`em_progresso`/`concluido`/`erro`), `fases` (resultado quando
+    concluido), `erro`. 404 se o job não existe.
+
+**Padrão de uso**: POST async → pega `job_id` → GET status a cada ~20s até
+`status != em_progresso`. Job concluído fica persistido em
+`orquestrador_jobs` (dá pra reconsultar depois de horas).
+
+**Bug corrigido no caminho**: `ResultadoFluxo.projeto_id` estava `int`
+enquanto todo o resto da cadeia é uuid/string — a resposta do
+fluxo-completo quebrava com `ResponseValidationError: ('response',
+'projeto_id') int_parsing` (confirmado nos logs do backend). Corrigido pra
+`str`.
+
+**Tempos reais observados** (projeto e2b88..., modelo 1.5b, CPU):
+- Fase individual: ~40-60s (importação/campo-incerto/documento) e ~60-120s
+  (auditoria/reconciliação).
+- Fluxo completo async (3 fases): **~5,5min** de `em_progresso` até
+  `concluido` (era ~2min com num_predict 400). Planejar o polling de
+  acordo — 15-18 polls de 20s.
 
 ### Técnica usada pra diagnosticar (útil pra bugs parecidos no futuro)
 

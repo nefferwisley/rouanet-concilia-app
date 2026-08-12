@@ -32,14 +32,17 @@ GEMINI_MODEL_ID = os.getenv("GEMINI_MODEL_ID", "gemini-2.0-flash-exp")
 # a chamada terminou em 9.6s com done_reason="length" (bateu o teto, não
 # parou natural). 400 tokens é um teto razoável pro tamanho de relatório
 # que os agentes geram aqui, a ~8 tok/s nesse hardware (~50s no pior caso).
-OLLAMA_NUM_PREDICT = int(os.getenv("OLLAMA_NUM_PREDICT", "400"))
-# A GPU disponível (930M) processa mais rápido quando funciona, mas
-# travou o processo do Ollama (RemoteProtocolError: "Server disconnected
-# without sending a response") duas vezes em geração sustentada durante os
-# testes. Rodando 100% CPU confirmado estável (mesmo prompt, sem crash,
-# ~72s). Prioriza confiabilidade sobre velocidade por padrão — troque
-# OLLAMA_NUM_GPU=999 no ambiente pra usar GPU de novo, por sua conta e risco.
-OLLAMA_NUM_GPU = int(os.getenv("OLLAMA_NUM_GPU", "0"))
+OLLAMA_NUM_PREDICT = int(os.getenv("OLLAMA_NUM_PREDICT", "512"))
+# O padrão de OLLAMA_NUM_GPU agora é None (auto-detecção do Ollama). 
+# Caso queira forçar CPU ou GPU específica, configure no ambiente (ex: OLLAMA_NUM_GPU=0 para CPU).
+OLLAMA_NUM_GPU_ENV = os.getenv("OLLAMA_NUM_GPU")
+if OLLAMA_NUM_GPU_ENV is not None:
+    try:
+        OLLAMA_NUM_GPU = int(OLLAMA_NUM_GPU_ENV)
+    except ValueError:
+        OLLAMA_NUM_GPU = None
+else:
+    OLLAMA_NUM_GPU = None
 
 
 def _gemini_key_valida(chave: str) -> bool:
@@ -58,6 +61,10 @@ def criar_modelo():
     # keep_alive alto: recarregar o modelo do zero custa dezenas de
     # segundos neste hardware — vale manter residente em memória por
     # mais tempo entre chamadas em vez do default (~5min).
+    options = {"num_predict": OLLAMA_NUM_PREDICT}
+    if OLLAMA_NUM_GPU is not None:
+        options["num_gpu"] = OLLAMA_NUM_GPU
+
     return Ollama(
         id=OLLAMA_MODEL_ID,
         host=OLLAMA_HOST,
@@ -71,7 +78,7 @@ def criar_modelo():
         # folgado pra este hardware (~72s por chamada em CPU), mas trava o
         # hang infinito.
         timeout=300,
-        options={"num_predict": OLLAMA_NUM_PREDICT, "num_gpu": OLLAMA_NUM_GPU},
+        options=options,
     )
 
 
@@ -226,6 +233,7 @@ class AgenteConciliacao:
                 "Propor soluções específicas para cada divergência",
                 "Usar terminologia oficial Lei Rouanet",
                 "Validar CPF/CNPJ quando necessário",
+                "Seja extremamente objetivo e conciso. Responda apenas com tabelas ou pontos de ação diretos, limitando o relatório a no máximo 150 palavras. Não inclua introduções, explicações longas ou conclusões.",
                 f"Conhecimento base: {self.conhecimento}"
             ],
         )
@@ -247,25 +255,25 @@ class AgenteConciliacao:
         RUBRICAS ORÇAMENTÁRIAS:
         {rubricas}
 
-        Com base SOMENTE nos dados acima:
-        1. Analise divergências entre transações e extrato
-        2. Identifique rubricas problemáticas
-        3. Proponha campos para revisão manual
-        4. Gere relatório consolidado
+        Com base SOMENTE nos dados acima, gere um relatório ultra-curto (máximo 150 palavras) e focado:
+        1. Identifique divergências críticas entre transações e extrato (com valores/datas)
+        2. Liste rubricas problemáticas
+        3. Ações recomendadas de revisão manual
+        Seja conciso, direto ao ponto e não adicione introduções ou resumos.
         """
         return self.agent.run(prompt)
 
     def analisar_campo_incerto(self, campo_id: str, contexto: dict):
         """Análise inteligente de campos incertos"""
         prompt = f"""
-        Analise este campo incerto:
+        Analise este campo incerto de forma direta e curta (máximo 60 palavras):
         - Campo ID: {campo_id}
         - Contexto: {contexto}
 
-        Proponha:
-        1. Valor mais provável
+        Responda apenas com:
+        1. Valor proposto
         2. Confiança (%)
-        3. Ações recomendadas
+        3. Breve justificativa
         """
         return self.agent.run(prompt)
 
@@ -297,6 +305,7 @@ class AgenteAuditoria:
                 "Usar análise estatística para outliers",
                 "Documentar todas as anomalias encontradas",
                 "Recomendar ações corretivas",
+                "Seja extremamente objetivo e conciso. Apresente as irregularidades encontradas e as recomendações de forma direta em listas simples. Limite a resposta a no máximo 150 palavras, sem introduções ou conclusões.",
                 f"Conhecimento base: {self.conhecimento}"
             ],
         )
@@ -306,7 +315,8 @@ class AgenteAuditoria:
         transacoes = buscar_transacoes(projeto_id)
         campos_revisao = buscar_campos_revisao(projeto_id)
         prompt = f"""
-        Audite completamente o projeto {projeto_id}:
+        Audite o projeto {projeto_id} com base SOMENTE nos dados abaixo.
+        Apresente um relatório de auditoria resumido (máximo 150 palavras) focando estritamente em:
 
         TRANSAÇÕES DO PROJETO:
         {transacoes}
@@ -314,21 +324,21 @@ class AgenteAuditoria:
         CAMPOS PENDENTES DE REVISÃO MANUAL:
         {campos_revisao}
 
-        Com base SOMENTE nos dados acima:
-        1. Validação de dados (CPF, CNPJ, datas, valores)
-        2. Conformidade com Lei Rouanet
-        3. Análise de anomalias
-        4. Gere relatório com recomendações
+        Pontos obrigatórios da resposta curta:
+        1. Inconsistências críticas encontradas (CPF/CNPJ, datas, valores)
+        2. Irregularidades contra regras da Lei Rouanet
+        3. Recomendações diretas de correção
+        Não escreva preâmbulos ou considerações finais.
         """
         return self.agent.run(prompt)
 
     def revisar_documento(self, documento_id: str):
         """Análise de documentação anexada"""
         prompt = f"""
-        Revise o documento {documento_id}:
-        1. Validade da documentação
-        2. Conformidade com Lei Rouanet
-        3. Sugestões de melhoria
+        Revise o documento {documento_id} de forma ultra-concisa (máximo 60 palavras):
+        1. Status de Validade
+        2. Status de Conformidade Lei Rouanet
+        3. Recomendação principal
         """
         return self.agent.run(prompt)
 
@@ -356,21 +366,20 @@ class AgenteImportacao:
                 "Normalizar strings (maiúscula, espaços, acentuação)",
                 "Validar campos obrigatórios",
                 "Reportar erros de forma estruturada",
+                "Seja extremamente conciso. Responda em formato de lista simples ou JSON indicando o status e principais avisos. Limite a resposta a no máximo 80 palavras.",
             ],
         )
 
     def importar_arquivo(self, caminho_arquivo: str, tipo_projeto: str = "rouanet"):
         """Importa e processa arquivo"""
         prompt = f"""
-        Importe o arquivo: {caminho_arquivo}
+        Importe e processe o arquivo: {caminho_arquivo}
         Tipo de projeto: {tipo_projeto}
 
-        Tarefas:
-        1. Detectar formato e estrutura
-        2. Validar dados
-        3. Normalizar campos
-        4. Gerar relatório de importação
-        5. Identificar problemas/avisos
+        Apresente um resumo curto (máximo 80 palavras) indicando:
+        1. Formato detectado
+        2. Status da validação e normalização
+        3. Lista de problemas ou avisos principais
         """
         return self.agent.run(prompt)
 
@@ -402,6 +411,7 @@ class AgenteReconciliacao:
                 "Priorizar matches determinísticos (100% confiança)",
                 "Usar matching semântico como fallback",
                 "Sempre validar com regras Lei Rouanet",
+                "Seja extremamente objetivo. Liste apenas os matches propostos e a respectiva confiança de forma resumida, sem textos introdutórios ou conclusivos. Limite a resposta a no máximo 150 palavras.",
             ],
         )
 
@@ -411,8 +421,8 @@ class AgenteReconciliacao:
         extrato = buscar_extrato_movimentos(projeto_id)
         rubricas = buscar_rubricas(projeto_id)
         prompt = f"""
-        Reconcilie automaticamente o projeto {projeto_id}:
-        - Confiança mínima: {confianca_minima}
+        Reconcilie o projeto {projeto_id} com base nos dados fornecidos abaixo (confiança mínima: {confianca_minima}).
+        Gere um relatório de matching curto (máximo 150 palavras):
 
         TRANSAÇÕES DO PROJETO:
         {transacoes}
@@ -423,12 +433,11 @@ class AgenteReconciliacao:
         RUBRICAS ORÇAMENTÁRIAS:
         {rubricas}
 
-        Com base SOMENTE nos dados acima:
-        1. Matching determinístico (CPF, CNPJ, valor exato)
-        2. Matching semântico (RAG para rubricas)
-        3. Validar resultados acima de confiança mínima
-        4. Sugerir casos para revisão manual
-        5. Gerar estatísticas
+        Responda objetivamente com:
+        1. Lista de matches confirmados (valores e confiança)
+        2. Transações pendentes de revisão manual
+        3. Estatísticas rápidas de reconciliação
+        Sem preâmbulos.
         """
         return self.agent.run(prompt)
 

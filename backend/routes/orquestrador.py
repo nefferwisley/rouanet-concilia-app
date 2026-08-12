@@ -9,6 +9,14 @@ from typing import Optional, Dict, Any
 from starlette.concurrency import run_in_threadpool
 
 from backend.phidata_config import criar_orquestrador
+from backend.services.orquestrador_jobs import (
+    STATUS_CONCLUIDO,
+    STATUS_ERRO,
+    atualizar_job,
+    buscar_job,
+    criar_job,
+    serializar_run_response,
+)
 
 router = APIRouter(prefix="/api/v1/orquestrador", tags=["Orquestrador Phidata"])
 
@@ -31,6 +39,25 @@ def obter_orquestrador():
 
         _orquestrador = criar_orquestrador(settings.database_url)
     return _orquestrador
+
+
+def _executar_fluxo_em_background(job_id, orquestrador, projeto_id, arquivo):
+    """Executa o fluxo completo e registra o resultado no job. Roda numa
+    thread do FastAPI (via BackgroundTasks), fora do contexto da request —
+    por isso o acesso ao banco vai pelo serviço de jobs, não pela pool
+    asyncpg com RLS."""
+    try:
+        resultado = orquestrador.fluxo_completo_projeto(projeto_id, arquivo)
+        atualizar_job(
+            job_id,
+            STATUS_CONCLUIDO,
+            resultado=serializar_run_response(resultado),
+        )
+    except Exception as e:  # noqa: BLE001 — erro vira status do job, não crash
+        try:
+            atualizar_job(job_id, STATUS_ERRO, erro=str(e))
+        except Exception:
+            pass
 
 
 # ============================================================================
@@ -71,9 +98,12 @@ class ReconciliacaoAutomaticaRequest(BaseModel):
 
 class ResultadoFluxo(BaseModel):
     status: str  # sucesso, erro, em_progresso
-    projeto_id: str
+    projeto_id: str  # uuid (texto) — ver nota em phidata_config.py
     fases: Dict[str, Any]
     timestamp: str
+    # Preenchido no modo async — id do job pra consultar em
+    # GET /fluxo-completo/status/{job_id}
+    job_id: Optional[str] = None
 
 
 # ============================================================================
@@ -103,15 +133,27 @@ async def fluxo_completo(request: FluxoCompletoRequest, background_tasks: Backgr
         orquestrador = obter_orquestrador()
 
         if request.executar_async:
-            # Executa em background
+            # Executa em background + registra no orquestrador_jobs pra
+            # permitir consulta de status/resultado depois (a request
+            # original já retornou — não dá pra pegar o resultado dela).
+            job_id = criar_job(
+                "fluxo_completo",
+                projeto_id=str(request.projeto_id),
+                payload={"projeto_id": request.projeto_id, "arquivo": request.arquivo},
+            )
             background_tasks.add_task(
-                orquestrador.fluxo_completo_projeto, request.projeto_id, request.arquivo
+                _executar_fluxo_em_background,
+                job_id,
+                orquestrador,
+                request.projeto_id,
+                request.arquivo,
             )
             return {
                 "status": "em_progresso",
                 "projeto_id": request.projeto_id,
                 "fases": {},
                 "timestamp": datetime.now().isoformat(),
+                "job_id": job_id,
             }
         else:
             # Executa síncronamente
@@ -127,6 +169,38 @@ async def fluxo_completo(request: FluxoCompletoRequest, background_tasks: Backgr
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/fluxo-completo/status/{job_id}")
+async def status_fluxo_completo(job_id: str):
+    """
+    Consulta o status/resultado de um fluxo-completo async.
+
+    Padrão de uso (polling):
+    1. POST /fluxo-completo {executar_async: true} → devolve `job_id`
+    2. GET /fluxo-completo/status/{job_id} a cada Ns até status != em_progresso
+    3. status == concluido → `fases` traz o resultado; status == erro → `erro`
+
+    O job fica em `orquestrador_jobs` (DB local dev, sem RLS — ver migration
+    0006). O resultado apara os metadados internos do RunResponse: cada fase
+    tem `content` (texto do relatório) + `messages`, `metrics`, `created_at`.
+    """
+    from datetime import datetime
+
+    job = buscar_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail=f"Job {job_id} não encontrado.")
+    return {
+        "status": job["status"],
+        "job_id": job["id"],
+        "tipo": job["tipo"],
+        "projeto_id": job["projeto_id"],
+        "criado_em": job["criado_em"],
+        "atualizado_em": job["atualizado_em"],
+        "fases": job["resultado"] if job["status"] == STATUS_CONCLUIDO else {},
+        "erro": job["erro"],
+        "timestamp": datetime.now().isoformat(),
+    }
 
 
 # ============================================================================

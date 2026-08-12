@@ -9,6 +9,7 @@ from backend.config import settings
 from backend.database import close_pool, get_pool
 from backend.routes import (
     auditoria,
+    conciliacao,
     documentos,
     importacoes,
     organizacao,
@@ -20,12 +21,10 @@ from backend.routes import (
     salic,
     websocket,
 )
-# NOTA: backend/routes/conciliacao.py está desativado — código auto-gerado
-# (commit b131d08) que não bate com o schema real de conciliacao_extrato
-# (colunas inventadas: data/favorecido/valor/tipo/nf, quando a tabela real
-# tem movimento_id/transacao_id/despesa_id/metodo/score) e importava um
-# módulo backend.dependencies que nunca existiu. Precisa ser reescrito
-# contra o schema real antes de voltar a ser incluído aqui.
+# NOTA: backend/routes/conciliacao.py foi restaurado do commit c274379 — o
+# fluxo "Conciliar Pasta 1961" (001→006, POST /api/v1/conciliar, polling,
+# downloads e ponte extrato×lançamento P3). Foi sobrescrito por código
+# auto-gerado quebrado no b131d08 e precisa continuar importável.
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 log = logging.getLogger("rouanet-api")
@@ -58,6 +57,7 @@ app.add_middleware(
 
 app.include_router(projetos.router)
 app.include_router(importacoes.router)
+app.include_router(conciliacao.router)
 app.include_router(relatorios.router)
 app.include_router(websocket.router)
 app.include_router(documentos.router)
