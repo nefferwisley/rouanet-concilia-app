@@ -420,16 +420,25 @@ async def backfill_storage(projeto_id: str, commit: bool = False, dep=Depends(ge
             detalhes.append({"arquivo": doc["nome_arquivo"], "status": "reporia"})
             continue
 
-        conteudo = await run_in_threadpool(baixar_arquivo, file_id)
-        if conteudo is None:
-            falhas += 1
-            detalhes.append({"arquivo": doc["nome_arquivo"], "status": "falha_download_drive"})
-            continue
+        # Isolado em try/except: um arquivo com problema (nome com caractere
+        # que a Storage API rejeita, timeout pontual do Drive, etc.) não pode
+        # derrubar o lote inteiro sem nem reportar qual foi -- já aconteceu
+        # (500 genérico, sem indicar qual arquivo nem por quê).
+        try:
+            conteudo = await run_in_threadpool(baixar_arquivo, file_id)
+            if conteudo is None:
+                falhas += 1
+                detalhes.append({"arquivo": doc["nome_arquivo"], "status": "falha_download_drive"})
+                continue
 
-        novo_ref = await run_in_threadpool(storage_service.upload_arquivo, caminho_logico, conteudo)
-        await conn.execute("update documentos_projeto set arquivo_ref = $1 where id = $2", novo_ref, doc["id"])
-        repostos += 1
-        detalhes.append({"arquivo": doc["nome_arquivo"], "status": "reposto"})
+            novo_ref = await run_in_threadpool(storage_service.upload_arquivo, caminho_logico, conteudo)
+            await conn.execute("update documentos_projeto set arquivo_ref = $1 where id = $2", novo_ref, doc["id"])
+            repostos += 1
+            detalhes.append({"arquivo": doc["nome_arquivo"], "status": "reposto"})
+        except Exception as e:
+            falhas += 1
+            logger.error("backfill-storage: falha em '%s': %s", doc["nome_arquivo"], e)
+            detalhes.append({"arquivo": doc["nome_arquivo"], "status": "erro", "erro": str(e)})
 
     logger.info(
         "Projeto %s: backfill-storage (commit=%s) — %d repostos, %d já no bucket, %d falhas.",
