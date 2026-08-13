@@ -56,8 +56,13 @@ O backend grava arquivos em `/app/uploads` dentro do container do Render. Esse d
 
 **⚠️ Importante — o que o backfill NÃO fez**: só restaurou os arquivos em `documentos_projeto` (registro bruto dos arquivos sincronizados do Drive) e no bucket físico. **Não** atualizou `documentos_transacao` (o que efetivamente aparece "anexado" a um lançamento na tela) — isso depende de `vincular_automatico`/`vincular_inteligente` (`routes/documentos.py`), que continuam retornando ~0 matches pelo mesmo motivo de sempre: a nomenclatura da pasta do Drive (`166. Fermata - Licenciamento.pdf`) não bate com o `arquivo_ref` gravado em `documentos_transacao` na importação original (`001 - 04-11-2022 - Nome - Item.pdf`). Ou seja: os arquivos existem e estão seguros no bucket agora, mas a tela de lançamentos ainda não vai mostrar "com documento" pra eles até esse matching ser resolvido (ver próximo item).
 
-### 🟡 Ainda em aberto
-- **Vincular os 209 arquivos restaurados aos lançamentos correspondentes** (`documentos_transacao`) — precisa de uma estratégia de matching melhor que comparação exata de nome (ex: por fornecedor + valor + data, já que o RAG do Phidata é só pra rubricas, não documentos — ver descoberta abaixo).
+### ✅ Vinculação — automática (112) + manual assistida (resto) — commit `c210df3`
+- `vincular_por_prestador` (commit `886eab9`): extrai nome do prestador do NOME DO ARQUIVO (não de `t.fornecedor`, genérico demais), vincula automaticamente só quando o candidato é único. Rodado em produção: **112/178 (63%) vinculados com segurança**.
+- Pros 62-63 ambíguos restantes (mesmo nome, múltiplos candidatos — nunca resolvidos às cegas, risco de anexar comprovante errado a lançamento financeiro), virou funcionalidade de verdade em vez de lista estática:
+  - `GET /projeto/{id}/candidatos-ambiguos` — mesma lógica de matching, mas devolve os candidatos completos por lançamento em vez de só contar. Calculado ao vivo.
+  - `POST /projeto/{id}/vincular-manual` (form: `transacao_id`, `documento_projeto_id`) — aplica a escolha humana, valida que o arquivo existe no bucket antes de gravar.
+  - `frontend/src/components/RevisaoDocumentosAmbiguos.tsx` — tabela com dropdown de candidatos + botão de confirmar, na aba "Revisão Documental". Testado em produção: endpoint retorna candidatos reais (ex: "amir labaki" com 3 candidatos).
+- **Ainda pendente**: alguém (usuário) efetivamente passar pelos ~63 casos na tela e escolher o arquivo certo pra cada um — isso é trabalho humano de revisão, não uma tarefa de agente.
 
 ### 🎛️ Gerenciamento de agentes (Claude / Antigravity / opencode)
 
