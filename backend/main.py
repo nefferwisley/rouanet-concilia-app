@@ -51,6 +51,12 @@ app = FastAPI(title="RouanetConcilia API", version="1.0.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[o.strip() for o in settings.cors_origins.split(",")],
+    # Cloudflare Pages gera uma URL de preview por deploy
+    # (<hash>.rouanet-concilia.pages.dev) além do domínio fixo — sem isso,
+    # cada preview novo fica bloqueado por CORS até alguém lembrar de
+    # atualizar CORS_ORIGINS no Render (foi o que quebrou o carregamento
+    # dos lançamentos em produção).
+    allow_origin_regex=r"https://([a-z0-9-]+\.)?rouanet-concilia\.pages\.dev",
     allow_methods=["*"],
     allow_headers=["*"],
 )

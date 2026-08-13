@@ -16,7 +16,8 @@
 | Item | Valor |
 |---|---|
 | Backend (Render) | `https://rouanetconcilia-backend-y19v.onrender.com` |
-| Frontend (Netlify) | `https://taupe-shortbread-e4d403.netlify.app` |
+| Frontend (Cloudflare Pages) | `https://rouanet-concilia.pages.dev` |
+| Frontend (Netlify, legado) | `https://taupe-shortbread-e4d403.netlify.app` |
 | Projeto Supabase (ref) | `okszeaecgyrymoxwwhdm` |
 | URL Supabase | `https://okszeaecgyrymoxwwhdm.supabase.co` |
 | Pooler (connection) | `postgresql://postgres.okszeaecgyrymoxwwhdm@aws-0-sa-east-1.pooler.supabase.com:6543/postgres` |
