@@ -65,7 +65,7 @@ function formatarDetail(detail: unknown, fallback: string): string {
   return fallback;
 }
 
-async function fetchComAutoRefresh(url: string, init: RequestInit, tentouRefresh = false, tentouRetry = false): Promise<Response> {
+async function fetchComAutoRefresh(url: string, init: RequestInit, tentouRefresh = false, tentouRetry = 0): Promise<Response> {
   const token = localStorage.getItem("rc_token");
   const reqInit = {
     ...init,
@@ -94,10 +94,12 @@ async function fetchComAutoRefresh(url: string, init: RequestInit, tentouRefresh
 
     return resp;
   } catch (err: any) {
-    // Se for erro de rede (Render acordando do sono), tenta mais uma vez após 1.5s
-    if (!tentouRetry) {
-      await new Promise((r) => setTimeout(r, 1500));
-      return fetchComAutoRefresh(url, init, tentouRefresh, true);
+    // Render free tier dorme após ~15min sem tráfego; o cold start leva
+    // ~50s. Em vez de desistir logo, espera 8s entre tentativas (até ~48s
+    // no total) antes de reportar o erro de "servidor iniciando".
+    if (tentouRetry < 6) {
+      await new Promise((r) => setTimeout(r, 8000));
+      return fetchComAutoRefresh(url, init, tentouRefresh, tentouRetry + 1);
     }
     throw new ApiError(503, "O servidor backend está iniciando. Por favor, aguarde alguns segundos e atualize a página.");
   }
