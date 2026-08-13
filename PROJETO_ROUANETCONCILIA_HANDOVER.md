@@ -30,6 +30,8 @@ O backend grava arquivos em `/app/uploads` dentro do container do Render. Esse d
 
 ### 🤖 Tarefa delegada em andamento — migração pra Supabase Storage
 Disparada via `opencode run` com `google/gemini-3.5-flash`, rodando em background no processo local da máquina (não depende desta sessão do Claude Code continuar aberta). **Para checar o progresso real, não confie em paths de `/tmp` ou scratchpad de sessões anteriores — eles são efêmeros.** Em vez disso:
+
+**Histórico de execuções desta tarefa** (útil se travar de novo): 1ª tentativa (PID 559, iniciada ~05:46) progrediu até criar `backend/services/storage_service.py` (que já está pronto e correto, com `get_supabase_client`/`upload_arquivo`/`baixar_arquivo`) e então travou silenciosamente por 12+ minutos sem gerar nenhum arquivo novo nem log novo — matada e reiniciada. 2ª tentativa (PID 1986, iniciada ~06:10) usa um prompt mais enxuto que **não repete** a análise inicial nem a criação do storage_service.py — só continua a partir dos itens restantes (trocar as 3 escritas, trocar a leitura, script de backfill, testes). Se travar de novo: mate o processo, confira com `git status`/`find backend/ -newer <último-arquivo-criado>` o que já foi feito de verdade, e escreva um prompt de continuação ainda mais enxuto citando só o que falta.
 ```bash
 git status                    # arquivos novos/modificados em backend/
 git diff backend/routes/documentos.py backend/routes/revisao.py backend/config.py
