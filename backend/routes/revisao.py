@@ -146,25 +146,31 @@ async def listar_documentos_transacao(projeto_id: str, transacao_id: str, dep=De
         transacao_id,
     )
 
+    # Checagem em lote (1 query) contra storage.objects em vez de 1 chamada
+    # de rede por documento -- desde a migração pra Supabase Storage,
+    # "disponível" significa "está no bucket", não "está no disco do
+    # container" (que agora só existe como fallback de dev sem Supabase
+    # configurado, ver storage_service.py).
+    refs = [r["arquivo_ref"] for r in rows if r["arquivo_ref"]]
+    no_bucket: set[str] = set()
+    if refs:
+        existentes = await conn.fetch(
+            "select name from storage.objects where bucket_id = 'documentos' and name = any($1)",
+            refs,
+        )
+        no_bucket = {row["name"] for row in existentes}
+
     def _disponivel(arquivo_ref: str | None) -> bool:
-        """
-        Verifica se o arquivo está fisicamente disponível no disco.
-        Usa a mesma cascata de busca que baixar_documento_transacao para que
-        a flag na tela nunca discorde do que a rota de download consegue servir.
-        """
         if not arquivo_ref:
             return False
+        if arquivo_ref in no_bucket:
+            return True
+        # Fallback local -- só relevante em dev sem SUPABASE_SERVICE_ROLE_KEY
+        # configurada (storage_service cai em disco local nesse caso).
         p = Path(arquivo_ref)
         if p.is_file():
             return True
-        nome = p.name
-        for base in (UPLOAD_DIR / "transacoes" / transacao_id, UPLOAD_DIR / projeto_id, UPLOAD_DIR):
-            try:
-                if (base / nome).is_file():
-                    return True
-            except OSError:
-                continue
-        return False
+        return (storage_service.UPLOAD_DIR / arquivo_ref).is_file()
 
     return [
         {
