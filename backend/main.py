@@ -10,6 +10,7 @@ from backend.database import close_pool, get_pool
 from backend.routes import (
     auditoria,
     conciliacao,
+    dev_demo,
     documentos,
     importacoes,
     organizacao,
@@ -67,6 +68,8 @@ app.include_router(salic.router)
 app.include_router(organizacao.router)
 app.include_router(regularizacao.router)
 app.include_router(orquestrador.router)
+# Login de demonstração SEM autenticação (rota /api/v1/dev/demo-login).
+app.include_router(dev_demo.router)
 
 
 @app.exception_handler(HTTPException)

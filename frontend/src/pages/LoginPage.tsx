@@ -15,6 +15,33 @@ export function LoginPage() {
   const [erro, setErro] = useState<string | null>(null);
   const [sucesso, setSucesso] = useState<string | null>(null);
 
+  const entrarComDemo = async () => {
+    setErro(null);
+    setSucesso(null);
+    setCarregando(true);
+    try {
+      const base = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const resp = await fetch(`${base}/api/v1/dev/demo-login`, { method: "POST" });
+      if (!resp.ok) {
+        let detail = `Status ${resp.status}`;
+        try {
+          const b = await resp.json();
+          detail = b.detail ?? detail;
+        } catch {
+          /* corpo não era JSON */
+        }
+        throw new Error(detail);
+      }
+      const data = await resp.json();
+      setToken(data.access_token);
+      navigate("/");
+    } catch (err: any) {
+      setErro(`Falha no acesso de demonstração: ${err?.message || "backend indisponível."}`);
+    } finally {
+      setCarregando(false);
+    }
+  };
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setErro(null);
@@ -155,6 +182,14 @@ export function LoginPage() {
         </form>
 
         <div className="pt-4 border-t border-slate-200 dark:border-navy-700 flex flex-col gap-2 text-center text-xs">
+          <button
+            type="button"
+            onClick={entrarComDemo}
+            disabled={carregando}
+            className="btn-primary w-full py-2.5 text-sm font-semibold justify-center shadow-lg shadow-emerald-500/20"
+          >
+            {carregando ? "Entrando..." : "🎬 Entrar como Avaliadora (Demo)"}
+          </button>
           {modo === "login" && (
             <>
               <button
