@@ -11,6 +11,7 @@ from backend.routes import (
     auditoria,
     conciliacao,
     dev_demo,
+    divergencias,
     documentos,
     importacoes,
     organizacao,
@@ -93,6 +94,7 @@ app.include_router(relatorios.router)
 app.include_router(websocket.router)
 app.include_router(documentos.router)
 app.include_router(auditoria.router)
+app.include_router(divergencias.router)
 app.include_router(revisao.router)
 app.include_router(salic.router)
 app.include_router(organizacao.router)
