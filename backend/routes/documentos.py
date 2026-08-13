@@ -20,6 +20,7 @@ from starlette.concurrency import run_in_threadpool
 
 from backend.config import settings
 from backend.database import get_conn
+from backend.services import storage_service
 from motor.correcoes_manuais import carregar_correcoes
 from motor.drive_service import baixar_arquivo, extrair_folder_id, listar_arquivos
 from motor.importar import parse_tipo_doc
@@ -160,9 +161,6 @@ async def enviar_documentos_projeto(
         resultados.append({"id": str(row["id"]), "origem": "google_drive", "status": "pendente"})
 
     if arquivos and arquivos[0].filename:
-        pasta_projeto = UPLOAD_DIR / projeto_id
-        pasta_projeto.mkdir(parents=True, exist_ok=True)
-
         for arquivo in arquivos:
             conteudo = await arquivo.read()
             if len(conteudo) > settings.max_upload_mb * 1024 * 1024:
@@ -171,8 +169,10 @@ async def enviar_documentos_projeto(
                     f"Arquivo '{arquivo.filename}' excede {settings.max_upload_mb}MB.",
                 )
 
-            destino = pasta_projeto / Path(arquivo.filename).name
-            destino.write_bytes(conteudo)
+            nome_limpo = Path(arquivo.filename).name
+            caminho_bucket = await run_in_threadpool(
+                storage_service.upload_arquivo, f"{projeto_id}/{nome_limpo}", conteudo
+            )
 
             row = await conn.fetchrow(
                 """
@@ -181,7 +181,7 @@ async def enviar_documentos_projeto(
                 values ($1, 'upload', $2, $3, $4, 'pendente', $5)
                 returning id
                 """,
-                projeto_id, arquivo.filename, str(destino), len(conteudo), user_id,
+                projeto_id, arquivo.filename, caminho_bucket, len(conteudo), user_id,
             )
             resultados.append({
                 "id": str(row["id"]), "origem": "upload",
@@ -260,9 +260,6 @@ async def sincronizar_drive(projeto_id: str, dep=Depends(get_conn)):
             "confirme que a pasta foi compartilhada com a service account (ver SETUP.md).",
         )
 
-    pasta_projeto = UPLOAD_DIR / projeto_id
-    pasta_projeto.mkdir(parents=True, exist_ok=True)
-
     registrados = []
     for arq in arquivos_remotos:
         conteudo = await run_in_threadpool(baixar_arquivo, arq["id"])
@@ -270,8 +267,10 @@ async def sincronizar_drive(projeto_id: str, dep=Depends(get_conn)):
             logger.warning("Falha ao baixar '%s' (id=%s) do Drive — pulando.", arq.get("name"), arq["id"])
             continue
 
-        destino = pasta_projeto / Path(arq["name"]).name
-        destino.write_bytes(conteudo)
+        nome_limpo = Path(arq["name"]).name
+        caminho_bucket = await run_in_threadpool(
+            storage_service.upload_arquivo, f"{projeto_id}/{nome_limpo}", conteudo
+        )
 
         row = await conn.fetchrow(
             """
@@ -280,7 +279,7 @@ async def sincronizar_drive(projeto_id: str, dep=Depends(get_conn)):
             values ($1, 'google_drive', $2, $3, $4, 'pendente', $5)
             returning id
             """,
-            projeto_id, arq["name"], str(destino), len(conteudo), user_id,
+            projeto_id, arq["name"], caminho_bucket, len(conteudo), user_id,
         )
         registrados.append({"id": str(row["id"]), "nome_arquivo": arq["name"]})
 

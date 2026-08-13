@@ -21,6 +21,7 @@ from starlette.concurrency import run_in_threadpool
 
 from backend.config import settings
 from backend.database import get_conn
+from backend.services import storage_service
 from motor.aprendizado import carregar_regras, exportar_regras
 from motor.importar import parse_tipo_doc
 from motor.ocr_service import extract_documento
@@ -66,10 +67,10 @@ async def enviar_documento_transacao(
     if len(conteudo) > settings.max_upload_mb * 1024 * 1024:
         raise HTTPException(413, f"Arquivo excede o máximo de {settings.max_upload_mb}MB.")
 
-    pasta = UPLOAD_DIR / "transacoes" / transacao_id
-    pasta.mkdir(parents=True, exist_ok=True)
-    destino = pasta / Path(arquivo.filename).name
-    destino.write_bytes(conteudo)
+    nome_limpo = Path(arquivo.filename).name
+    caminho_bucket = await run_in_threadpool(
+        storage_service.upload_arquivo, f"{projeto_id}/transacoes/{transacao_id}/{nome_limpo}", conteudo
+    )
 
     sha = hashlib.sha256(conteudo).hexdigest()
     mime_type = arquivo.content_type or "application/pdf"
@@ -97,7 +98,7 @@ async def enviar_documento_transacao(
         returning id
         """,
         transacao_id, parse_tipo_doc(arquivo.filename) or "OUTRO",
-        str(destino), sha, ocr_dados, confianca,
+        caminho_bucket, sha, ocr_dados, confianca,
     )
     documento_id = str(row["id"])
 
@@ -144,6 +145,27 @@ async def listar_documentos_transacao(projeto_id: str, transacao_id: str, dep=De
         """,
         transacao_id,
     )
+
+    def _disponivel(arquivo_ref: str | None) -> bool:
+        """
+        Verifica se o arquivo está fisicamente disponível no disco.
+        Usa a mesma cascata de busca que baixar_documento_transacao para que
+        a flag na tela nunca discorde do que a rota de download consegue servir.
+        """
+        if not arquivo_ref:
+            return False
+        p = Path(arquivo_ref)
+        if p.is_file():
+            return True
+        nome = p.name
+        for base in (UPLOAD_DIR / "transacoes" / transacao_id, UPLOAD_DIR / projeto_id, UPLOAD_DIR):
+            try:
+                if (base / nome).is_file():
+                    return True
+            except OSError:
+                continue
+        return False
+
     return [
         {
             "id": str(r["id"]),
@@ -151,9 +173,12 @@ async def listar_documentos_transacao(projeto_id: str, transacao_id: str, dep=De
             "arquivo_ref": r["arquivo_ref"],
             "confianca_ocr": r["confianca_ocr"],
             "criado_em": r["created_at"].isoformat(),
+            # Flag calculada em tempo real — true = arquivo presente no disco
+            "disponivel": _disponivel(r["arquivo_ref"]),
         }
         for r in rows
     ]
+
 
 
 @router.get("/documentos/{documento_id}/arquivo")
@@ -171,13 +196,13 @@ async def baixar_documento_transacao(documento_id: str, dep=Depends(get_conn)):
         raise HTTPException(404, "Documento não encontrado (ou sem permissão via RLS).")
 
     arquivo_ref = row["arquivo_ref"]
-    caminho = Path(arquivo_ref)
+    conteudo = await run_in_threadpool(storage_service.baixar_arquivo, arquivo_ref)
 
-    if not caminho.is_file():
+    if conteudo is None:
+        # Fallback: documentos_transacao.arquivo_ref pode não ter sido vinculado
+        # ainda (ver vincular_automatico/vincular_inteligente em routes/documentos.py)
+        # -- tenta achar o mesmo arquivo pelo nome em documentos_projeto.
         nome_base = Path(arquivo_ref).name
-        projeto_id = str(row["projeto_id"])
-
-        # 1. Busca em documentos_projeto (onde o Google Drive salvou o arquivo com caminho real no servidor)
         doc_proj = await conn.fetchrow(
             """
             select arquivo_ref from documentos_projeto
@@ -185,41 +210,20 @@ async def baixar_documento_transacao(documento_id: str, dep=Depends(get_conn)):
               and arquivo_ref is not null
             limit 1
             """,
-            projeto_id, arquivo_ref, nome_base,
+            str(row["projeto_id"]), arquivo_ref, nome_base,
         )
-        if doc_proj and doc_proj["arquivo_ref"] and Path(doc_proj["arquivo_ref"]).is_file():
-            caminho = Path(doc_proj["arquivo_ref"])
-        else:
-            # 2. Busca na pasta de uploads do projeto
-            possivel = UPLOAD_DIR / projeto_id / nome_base
-            if possivel.is_file():
-                caminho = possivel
-            else:
-                # 3. Busca recursiva por nome do arquivo em UPLOAD_DIR
-                if UPLOAD_DIR.exists():
-                    for f in UPLOAD_DIR.glob(f"**/{nome_base}"):
-                        if f.is_file():
-                            caminho = f
-                            break
-                            
-            if not caminho.is_file():
-                for pasta_base in [Path("/app/3. 1961"), Path("./3. 1961"), Path("/tmp"), Path(".")]:
-                    if pasta_base.exists():
-                        for f in pasta_base.glob(f"**/{nome_base}"):
-                            if f.is_file():
-                                caminho = f
-                                break
-                    if caminho.is_file():
-                        break
+        if doc_proj and doc_proj["arquivo_ref"]:
+            conteudo = await run_in_threadpool(storage_service.baixar_arquivo, doc_proj["arquivo_ref"])
 
-    if not caminho.is_file():
-        raise HTTPException(404, f"Arquivo '{Path(arquivo_ref).name}' não foi encontrado no disco do servidor.")
+    if conteudo is None:
+        raise HTTPException(404, f"Arquivo '{Path(arquivo_ref).name}' não foi encontrado no storage.")
 
+    nome = Path(arquivo_ref).name
     media = {
         ".pdf": "application/pdf", ".xml": "application/xml",
         ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
-    }.get(caminho.suffix.lower(), "application/octet-stream")
-    return FileResponse(caminho, media_type=media, headers={"Content-Disposition": f'inline; filename="{caminho.name}"'})
+    }.get(Path(nome).suffix.lower(), "application/octet-stream")
+    return Response(content=conteudo, media_type=media, headers={"Content-Disposition": f'inline; filename="{nome}"'})
 
 
 @router.get("/extratos/arquivo")

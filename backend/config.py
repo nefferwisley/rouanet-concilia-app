@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     database_url: str          # postgres://... — conexão DIRETA (não a URL REST do Supabase)
     supabase_jwt_secret: str   # Legacy JWT Secret (Project Settings > JWT Keys) — fallback pra tokens HS256 antigos
     supabase_url: str = ""     # https://xxxx.supabase.co — usado só pra buscar o JWKS (chaves ES256 novas)
+    supabase_service_role_key: str = ""  # Service role key pra bypassar RLS no Storage
     google_api_key: str = ""
     # Ambiente: "dev" habilita o login de demonstração SEM autenticação
     # (routes/dev_demo.py); qualquer outro valor desabilita a rota.
