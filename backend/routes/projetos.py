@@ -233,3 +233,60 @@ async def update_projeto(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erro ao atualizar projeto"
         )
+
+
+# ============================================================
+# Marcar lançamento como revisado (REVISAO_PENDENTE → PENDENTE)
+# ============================================================
+@router.patch("/{projeto_id}/transacoes/{transacao_id}/revisar", status_code=200)
+async def marcar_transacao_revisada(
+    projeto_id: str,
+    transacao_id: str,
+    novo_status: str = "PENDENTE",
+    dep=Depends(get_conn),
+):
+    """
+    Marca um lançamento com status REVISAO_PENDENTE como revisado e muda para PENDENTE (ou outro status).
+    Isso confirma que o auditor revisou e aprovou o lançamento.
+    """
+    conn, user_id = dep
+
+    # Validar status
+    status_permitidos = ["PENDENTE", "CONCILIADO_OK", "ALERTA_DOCUMENTO_FALTANTE", "ALERTA_DIVERGENCIA_VALOR"]
+    if novo_status not in status_permitidos:
+        raise HTTPException(400, f"Status inválido. Permitidos: {', '.join(status_permitidos)}")
+
+    # Verificar acesso ao projeto via RLS
+    projeto = await conn.fetchval("SELECT id FROM projetos WHERE id = $1", projeto_id)
+    if not projeto:
+        raise HTTPException(404, "Projeto não encontrado (ou sem permissão).")
+
+    # Verificar se transação existe e pertence ao projeto
+    transacao = await conn.fetchrow(
+        "SELECT id, status FROM transacoes WHERE id = $1 AND projeto_id = $2",
+        transacao_id, projeto_id
+    )
+    if not transacao:
+        raise HTTPException(404, "Transação não encontrada neste projeto.")
+
+    # Atualizar status
+    result = await conn.fetchrow(
+        """
+        UPDATE transacoes
+        SET status = $1, updated_at = now()
+        WHERE id = $2 AND projeto_id = $3
+        RETURNING id, status, fornecedor, valor_bruto, data_pagamento
+        """,
+        novo_status, transacao_id, projeto_id
+    )
+
+    logger.info(f"Transação {transacao_id} marcada como revisada (novo status: {novo_status}) pelo user {user_id}")
+
+    return {
+        "transacao_id": str(result["id"]),
+        "status_anterior": transacao["status"],
+        "novo_status": result["status"],
+        "fornecedor": result["fornecedor"],
+        "valor": float(result["valor_bruto"]),
+        "data_pagamento": result["data_pagamento"].isoformat() if result["data_pagamento"] else None,
+    }

@@ -23,6 +23,7 @@ WHERE_STATUS = {
     # enum inválido assim que alguém clicava em "OK / Conciliadas".
     "pendente": "t.status = 'PENDENTE'",
     "ok": "t.status = 'CONCILIADO_OK'",
+    "revisao_pendente": "t.status = 'REVISAO_PENDENTE'",
     "com_docs": "t.tem_nf and t.tem_comprovante",
     "sem_docs": "not (t.tem_nf and t.tem_comprovante)",
 }
@@ -37,7 +38,7 @@ async def auditoria_projeto(
     projeto_id: str,
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
-    status: str | None = Query(None, description="pendente|ok|com_docs|sem_docs"),
+    status: str | None = Query(None, description="pendente|ok|revisao_pendente|com_docs|sem_docs"),
     busca: str | None = Query(None, description="filtra por fornecedor/razão social"),
     format: str = Query("json", pattern="^(json|csv)$"),
     dep=Depends(get_conn),
