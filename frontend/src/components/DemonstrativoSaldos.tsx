@@ -1,16 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useAPI } from "../hooks/useAPI";
-
-interface ResumoAuditoria {
-  total: number;
-  orcado: number;
-  debitado: number;
-  saldo: number;
-  com_docs: number;
-  sem_docs: number;
-  por_status: { status: string; total: number }[];
-}
+import { LIMITE_PADRAO, PAGINA_PADRAO, ResumoAuditoria, buscarAuditoria } from "../lib/auditoria";
 
 const brl = (v: number | undefined) =>
   (v ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -20,15 +11,20 @@ const brl = (v: number | undefined) =>
  *  Antes ficava dentro da aba "Visão Geral" e sumia ao trocar de aba --
  *  exatamente o que o usuário reportou como "menos funcional". */
 export function DemonstrativoSaldos({ projetoId }: { projetoId: string }) {
-  const { get, download } = useAPI();
+  const api = useAPI();
+  const { download } = api;
   const [resumo, setResumo] = useState<ResumoAuditoria | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    get<{ resumo: ResumoAuditoria }>(`/api/v1/projetos/${projetoId}/auditoria?page=1&limit=1`)
+    // Pede a MESMA página/limite que a tabela de auditoria pede: as duas
+    // chamadas colapsam em uma só requisição (ver lib/auditoria.ts). Este
+    // componente fica fora das abas, então continua sendo capaz de buscar
+    // sozinho quando o usuário abre o projeto direto em outra aba.
+    buscarAuditoria(api, projetoId, { page: PAGINA_PADRAO, limit: LIMITE_PADRAO })
       .then((d) => setResumo(d.resumo))
       .catch((e) => setErro(e instanceof Error ? e.message : "Erro ao carregar resumo."));
-  }, [projetoId]);
+  }, [api, projetoId]);
 
   if (erro) return <div className="card text-sm text-red-600">{erro}</div>;
   if (!resumo) return <div className="card text-sm text-slate-500">Carregando resumo...</div>;
@@ -58,7 +54,7 @@ export function DemonstrativoSaldos({ projetoId }: { projetoId: string }) {
         <div className="p-3 rounded-xl bg-slate-50 dark:bg-navy-900/60 border border-transparent dark:border-navy-700">
           <div className="eyebrow">Saldo</div>
           <div
-            className={`stat-value mt-0.5 ${resumo.saldo >= 0 ? "!text-emerald-600 dark:!text-emerald-400" : "!text-red-600 dark:!text-red-400"}`}
+            className={`stat-value mt-0.5 ${(resumo.saldo ?? 0) >= 0 ? "!text-emerald-600 dark:!text-emerald-400" : "!text-red-600 dark:!text-red-400"}`}
           >
             {brl(resumo.saldo)}
           </div>

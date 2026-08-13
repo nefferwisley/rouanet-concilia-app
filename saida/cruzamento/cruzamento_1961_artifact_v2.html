@@ -1,0 +1,2687 @@
+<title>Cruzamento 1961 — Banco x Planilha Revisada (v2)</title>
+<style>
+  @font-face { font-family: 'SysUI'; src: local('Segoe UI'), local('Inter'), local('Helvetica Neue'), local('Arial'); }
+  :root {
+    --bg: #f6f5f2; --surface: #ffffff; --surface-2: #edece7; --border: #ddd9d0;
+    --ink: #1e1c18; --ink-dim: #6b6558; --accent: #8a5a2b; --accent-soft: #f1e4d3;
+    --ok-bg: #e3f3e6; --ok-ink: #1f6e3a; --ok-border: #b9dfc2;
+    --sem-bg: #fbe7e4; --sem-ink: #a13a2a; --sem-border: #efc2ba;
+    --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: 'SysUI', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; padding: clamp(16px, 4vw, 40px); }
+  .wrap { max-width: 1400px; margin: 0 auto; }
+  header { margin-bottom: 28px; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin: 0 0 6px; }
+  h1 { font-size: clamp(22px, 3vw, 30px); margin: 0 0 8px; letter-spacing: -0.01em; text-wrap: balance; }
+  .sub { color: var(--ink-dim); font-size: 14px; max-width: 72ch; line-height: 1.5; margin: 0; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 24px 0; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .stat-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-dim); margin-bottom: 6px; }
+  .stat-card .value { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 22px; font-weight: 700; }
+  .stat-card.accent .value { color: var(--accent); }
+  .stat-card.ok .value { color: var(--ok-ink); }
+  .stat-card.sem .value { color: var(--sem-ink); }
+  .callout { background: var(--accent-soft); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px;
+    font-size: 13px; line-height: 1.6; color: var(--ink); margin: 20px 0 28px; }
+  .callout strong { color: var(--accent); }
+  .callout ul { margin: 6px 0 0; padding-left: 18px; }
+  section { margin-bottom: 40px; }
+  h2 { font-size: 18px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .section-note { color: var(--ink-dim); font-size: 13px; margin: 0 0 14px; }
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 1100px; font-size: 12.5px; }
+  thead th { position: sticky; top: 0; background: var(--surface-2); text-align: left; font-size: 10.5px;
+    text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-dim); font-weight: 700;
+    padding: 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  tbody td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .mono { font-family: var(--mono); font-size: 12px; white-space: nowrap; }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .rubrica { font-family: var(--mono); font-size: 11.5px; }
+  .doc { font-size: 12px; }
+  .nota { font-size: 12px; color: var(--ink-dim); }
+  .status-cell { white-space: nowrap; }
+  .badge { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.03em;
+    border: 1px solid; border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+  .badge-ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .badge-sem { background: var(--sem-bg); color: var(--sem-ink); border-color: var(--sem-border); }
+  .row-sem { background: color-mix(in srgb, var(--sem-bg) 35%, transparent); }
+  footer { color: var(--ink-dim); font-size: 12px; text-align: center; padding-top: 20px;
+    border-top: 1px solid var(--border); margin-top: 8px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Projeto 1961 · PRONAC 20-7453 · cruzamento em 2026-08-12</p>
+    <h1>Cruzamento — Banco de dados atual × Planilha revisada (v2)</h1>
+    <p class="sub">Comparação linha a linha entre os 185 lançamentos hoje em produção e as 179 linhas da planilha <em>1961_Revisao_Financeira_ATUALIZADA.xlsx</em>. Nenhuma alteração foi feita em produção — esta página é só para conferência.</p>
+  </header>
+
+  <div class="stat-grid">
+    <div class="stat-card accent"><div class="label">Linhas na planilha</div><div class="value">179</div></div>
+    <div class="stat-card ok"><div class="label">Casadas (data + valor)</div><div class="value">175</div></div>
+    <div class="stat-card sem"><div class="label">Sem match no banco</div><div class="value">4</div></div>
+    <div class="stat-card sem"><div class="label">Só no banco atual</div><div class="value">10</div></div>
+    <div class="stat-card accent"><div class="label">Soma — planilha</div><div class="value">R$ 898.235,43</div></div>
+    <div class="stat-card accent"><div class="label">Soma — banco</div><div class="value">R$ 918.855,74</div></div>
+  </div>
+
+  <div class="callout">
+    <strong>Como ler esta página:</strong> cada linha verde é uma linha da planilha revisada que casou exatamente (mesma data + mesmo valor) com um lançamento hoje em produção. As linhas vermelhas não têm correspondência — em geral são os pagamentos duplicados nos controles 59 e 122 (um único Pix dividido em duas rubricas na planilha) ou o boleto ANCINE novo.
+    <ul>
+      <li>Coluna <em>Rubrica SALIC</em> vem da planilha — hoje nenhum lançamento em produção tem rubrica vinculada.</li>
+      <li>Coluna <em>Nota/correção</em> traz a explicação do revisor quando data ou valor foram corrigidos contra o extrato real.</li>
+    </ul>
+  </div>
+
+  <section>
+    <h2>Comparação linha a linha</h2>
+    <p class="section-note">Planilha revisada (esquerda) × banco de produção (direita). Ordenado como na planilha original.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Status</th><th>Data (planilha)</th><th>Favorecido (planilha)</th><th>Valor (planilha)</th>
+            <th>Rubrica SALIC</th><th>Revisão</th><th>Documento fiscal</th><th>Nota / correção</th>
+            <th>Data (banco)</th><th>Fornecedor (banco)</th><th>Valor (banco)</th><th>Diferença</th>
+          </tr>
+        </thead>
+        <tbody>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2022-11-04</td>
+        <td>CIRCUNSTANCIA CINEMATOGRAF.</td>
+        <td class="num">R$ 11.000,00</td>
+        <td class="rubrica">1.5.1</td>
+        <td>OK</td>
+        <td class="doc">1. Mônica Guimarães - Produtora Executiva.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2022-11-04</td>
+        <td>Circunstancia Cinematografica e Prod</td>
+        <td class="num">R$ 11.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2022-11-04</td>
+        <td>CIRCUNSTANCIA CINEMATOGRAF.</td>
+        <td class="num">R$ 5.000,00</td>
+        <td class="rubrica">1.2.1</td>
+        <td>OK</td>
+        <td class="doc">4. Amir Labaki - Roteirista.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2022-11-04</td>
+        <td>Circunstancia Cinematografica e Prod</td>
+        <td class="num">R$ 5.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2022-11-04</td>
+        <td>CIRCUNSTANCIA CINEMATOGRAF.</td>
+        <td class="num">R$ 20.000,00</td>
+        <td class="rubrica">1.4.1</td>
+        <td>OK</td>
+        <td class="doc">3. Amir Labaki - Diretor.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2022-11-04</td>
+        <td>Circunstancia Cinematografica e Prod</td>
+        <td class="num">R$ 20.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2022-11-04</td>
+        <td>CIRCUNSTANCIA CINEMATOGRAF.</td>
+        <td class="num">R$ 30.000,00</td>
+        <td class="rubrica">1.1.1</td>
+        <td>OK</td>
+        <td class="doc">2. Amir Labaki - Obras pré-existentes.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2022-11-04</td>
+        <td>Circunstancia Cinematografica e Prod</td>
+        <td class="num">R$ 30.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2022-11-10</td>
+        <td>FELIPE GUIMARÃES ROSA</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="rubrica">3.5.1</td>
+        <td>OK</td>
+        <td class="doc">5. Frico Guimarães - Diretor de Fotografia.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2022-11-10</td>
+        <td>Luis Felipe Labaki</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2022-11-10</td>
+        <td>LUIS FELIPE LABAKI</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="rubrica">3.6.1</td>
+        <td>OK</td>
+        <td class="doc">6. Luis Felipe Labaki - Som Direto.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2022-11-10</td>
+        <td>Felipe G Rosa</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2022-11-21</td>
+        <td>LUIS FELIPE MONTE CIPULLO</td>
+        <td class="num">R$ 800,00</td>
+        <td class="rubrica">3.6.2</td>
+        <td>OK</td>
+        <td class="doc">7. Luis Cipullo (1961).pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2022-11-21</td>
+        <td>Luis F Monte Cipullo</td>
+        <td class="num">R$ 800,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2022-11-28</td>
+        <td>CIRCUNSTANCIA CINEMATOGRAF.</td>
+        <td class="num">R$ 20.000,00</td>
+        <td class="rubrica">2.1.1</td>
+        <td>OK</td>
+        <td class="doc">8. Amir Labaki - Diretor.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2022-11-28</td>
+        <td>Circunstancia Cinematografica e Prod</td>
+        <td class="num">R$ 20.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2022-12-12</td>
+        <td>CIRCUNSTANCIA CINEMATOGRAF.</td>
+        <td class="num">R$ 30.000,00</td>
+        <td class="rubrica">3.1.1</td>
+        <td>OK</td>
+        <td class="doc">9. Amir Labaki - Diretor.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2022-12-12</td>
+        <td>Circunstancia Cinematografica e Prod</td>
+        <td class="num">R$ 30.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2022-12-14</td>
+        <td>JULIA BARBARA MELO DE SOUSA.</td>
+        <td class="num">R$ 6.000,00</td>
+        <td class="rubrica">5.4.1</td>
+        <td>OK</td>
+        <td class="doc">10. Júlia Sousa - Controller.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2022-12-14</td>
+        <td>Julia Barbara Melo de Sousa 40926175</td>
+        <td class="num">R$ 6.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2022-12-14</td>
+        <td>PLANIFILMES LTDA.</td>
+        <td class="num">R$ 2.000,00</td>
+        <td class="rubrica">1.6.1</td>
+        <td>OK</td>
+        <td class="doc">11. Lia Pini - Coordenador de Produção.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2022-12-14</td>
+        <td>Planifilmes Ltda</td>
+        <td class="num">R$ 2.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2022-12-20</td>
+        <td>CIRCUNSTÂNCIA CINEMATOGRÁFICA</td>
+        <td class="num">R$ 20.000,00</td>
+        <td class="rubrica">6.1.1</td>
+        <td>OK</td>
+        <td class="doc">12. Circunstância - Gerenciamento.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2022-12-20</td>
+        <td>Circunstancia Cinematografica e Prod</td>
+        <td class="num">R$ 20.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-01-23</td>
+        <td>CIRCUNSTANCIA CINEMATOGRAF.</td>
+        <td class="num">R$ 30.000,00</td>
+        <td class="rubrica">6.1.1</td>
+        <td>OK</td>
+        <td class="doc">13. Circunstância - Gerenciamento.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-01-23</td>
+        <td>Circunstancia Cinematografica e Prod</td>
+        <td class="num">R$ 30.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-01-23</td>
+        <td>CIRCUNSTANCIA CINEMATOGRAF.</td>
+        <td class="num">R$ 4.500,00</td>
+        <td class="rubrica">6.1.1</td>
+        <td>OK</td>
+        <td class="doc">14. Circunstância - Gerenciamento.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-01-23</td>
+        <td>Circunstancia Cinematografica e Prod</td>
+        <td class="num">R$ 4.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-02-22</td>
+        <td>Amir Labaki</td>
+        <td class="num">R$ 19.550,00</td>
+        <td class="rubrica">6.1.1</td>
+        <td>VALOR CORRIGIDO — aplicado nesta versão</td>
+        <td class="doc">15. Circunstância - Gerenciamento.pdf</td>
+        <td class="nota">Planilha: R$ 19,500.00 em 22/02/2023 × Extrato: R$ 19,550.00 em 22/02/2023. Divergência de valor — prevalece o extrato.</td>
+        <td class="mono">2023-02-22</td>
+        <td>Circunstancia Cinematografica e Prod</td>
+        <td class="num">R$ 19.550,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-07-03</td>
+        <td>CIRCUNSTANCIA CINEMATOGRAF.</td>
+        <td class="num">R$ 25.000,00</td>
+        <td class="rubrica">4.1.1</td>
+        <td>OK</td>
+        <td class="doc">16. Circunstância_diretor.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-07-03</td>
+        <td>Circunstancia Cinematografica e Prod</td>
+        <td class="num">R$ 25.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-07-03</td>
+        <td>MOG PRODUTORA</td>
+        <td class="num">R$ 25.000,00</td>
+        <td class="rubrica">2.2.1 / 3.3.1</td>
+        <td>OK</td>
+        <td class="doc">17. MoG Produtora - Produtora Executiva.pdf</td>
+        <td class="nota">Favorecido no extrato: MOG PRODUTORA.</td>
+        <td class="mono">2023-07-03</td>
+        <td>Mog Produtora</td>
+        <td class="num">R$ 25.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-08-18</td>
+        <td>RADIO E TELEVISAO BANDEIRANTES</td>
+        <td class="num">R$ 380,00</td>
+        <td class="rubrica">1.3</td>
+        <td>OK</td>
+        <td class="doc">18. Bandeirantes - Pesquisa.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-08-18</td>
+        <td>Radio e Televisao Bandeirantes S.a.</td>
+        <td class="num">R$ 380,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-08-25</td>
+        <td>MEMORIA COLETIVA IMAGENS</td>
+        <td class="num">R$ 10.500,00</td>
+        <td class="rubrica">1.3</td>
+        <td>OK</td>
+        <td class="doc">19. Eloa Chouzal (primeira parcela) - Pesquisa.pdf</td>
+        <td class="nota">Favorecido no extrato: MEMORIA COLETIVA IMAGENS.</td>
+        <td class="mono">2023-08-25</td>
+        <td>Memoria Coletiva Imagens e Textos Lt</td>
+        <td class="num">R$ 10.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-04</td>
+        <td>PORVIROSCOPIO PROJETOS</td>
+        <td class="num">R$ 700,00</td>
+        <td class="rubrica">1.3</td>
+        <td>OK</td>
+        <td class="doc">20. Porviroscopio Projetos - Pesquisa.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-09-04</td>
+        <td>Porviroscopio Projetos C. C. Ltda</td>
+        <td class="num">R$ 700,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-05</td>
+        <td>FOGO FILMES LTDA</td>
+        <td class="num">R$ 33.000,00</td>
+        <td class="rubrica">4.4.1</td>
+        <td>OK</td>
+        <td class="doc">21. Fogo Filmes - Finalização.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-09-05</td>
+        <td>favorecido</td>
+        <td class="num">R$ 33.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-05</td>
+        <td>GA - ITCD/TXS GOV RS (Impostos)</td>
+        <td class="num">R$ 120,00</td>
+        <td class="rubrica">1.3</td>
+        <td>OK</td>
+        <td class="doc">22. Guia de Arrecadação - Pesquisa.pdf</td>
+        <td class="nota">Favorecido no extrato: GA - ITCD/TXS GOV RS (Impostos).</td>
+        <td class="mono">2023-09-05</td>
+        <td>:</td>
+        <td class="num">R$ 120,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-06</td>
+        <td>Júlia Sousa</td>
+        <td class="num">R$ 4.900,00</td>
+        <td class="rubrica">5.4.1</td>
+        <td>VALOR CORRIGIDO — aplicado nesta versão</td>
+        <td class="doc">23. Júlia Sousa - Controller.pdf</td>
+        <td class="nota">Planilha: R$ 4,950.00 em 08/09/2023 × Extrato: R$ 4,900.00 em 06/09/2023. Divergência de valor e de data — prevalece o extrato.</td>
+        <td class="mono">2023-09-06</td>
+        <td>Julia Barbara Melo de Sousa 40926175</td>
+        <td class="num">R$ 4.900,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-11</td>
+        <td>ANA BEATRIZ HERMANSON POMAR</td>
+        <td class="num">R$ 3.000,00</td>
+        <td class="rubrica">3.4.2</td>
+        <td>OK</td>
+        <td class="doc">24. Beatriz Pomar - Assistente de Produção.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-09-11</td>
+        <td>Ana Beatriz Hermanson Pomar Servicos</td>
+        <td class="num">R$ 3.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-20</td>
+        <td>GOL Linhas Aéreas</td>
+        <td class="num">R$ 2.870,87</td>
+        <td class="rubrica">3.11.2</td>
+        <td>OK</td>
+        <td class="doc">25. André Manfrim - Passagem Aérea.pdf</td>
+        <td class="nota">Favorecido no extrato: GOL Linhas Aéreas.</td>
+        <td class="mono">2023-09-20</td>
+        <td>Gol Linhas Aéreas</td>
+        <td class="num">R$ 2.870,87</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-20</td>
+        <td>GOL Linhas Aéreas</td>
+        <td class="num">R$ 2.870,87</td>
+        <td class="rubrica">3.11.2</td>
+        <td>OK</td>
+        <td class="doc">26. Luis Cipullo - Passagem Aérea.pdf</td>
+        <td class="nota">Favorecido no extrato: GOL Linhas Aéreas.</td>
+        <td class="mono">2023-09-20</td>
+        <td>Gol Linhas Aéreas</td>
+        <td class="num">R$ 2.870,87</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-20</td>
+        <td>GOL Linhas Aéreas</td>
+        <td class="num">R$ 2.870,87</td>
+        <td class="rubrica">3.11.2</td>
+        <td>OK</td>
+        <td class="doc">27. Thiago Cunha - Passagem Aérea.pdf</td>
+        <td class="nota">Favorecido no extrato: GOL Linhas Aéreas.</td>
+        <td class="mono">2023-09-20</td>
+        <td>Gol Linhas Aéreas</td>
+        <td class="num">R$ 2.870,87</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-20</td>
+        <td>GOL Linhas Aéreas</td>
+        <td class="num">R$ 2.870,87</td>
+        <td class="rubrica">3.11.2</td>
+        <td>OK</td>
+        <td class="doc">28. Frico Guimarães - Passagem Aérea.pdf</td>
+        <td class="nota">Favorecido no extrato: GOL Linhas Aéreas.</td>
+        <td class="mono">2023-09-20</td>
+        <td>Gol Linhas Aéreas</td>
+        <td class="num">R$ 2.870,87</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-20</td>
+        <td>GOL Linhas Aéreas</td>
+        <td class="num">R$ 1.524,64</td>
+        <td class="rubrica">3.11.2</td>
+        <td>OK</td>
+        <td class="doc">29. André Manfrim RJ - Passagem Aérea.pdf</td>
+        <td class="nota">Favorecido no extrato: GOL Linhas Aéreas.</td>
+        <td class="mono">2023-09-20</td>
+        <td>Gol Linhas Aéreas</td>
+        <td class="num">R$ 1.524,64</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-20</td>
+        <td>GOL Linhas Aéreas</td>
+        <td class="num">R$ 1.524,64</td>
+        <td class="rubrica">3.11.2</td>
+        <td>OK</td>
+        <td class="doc">30. Luis Cipullo RJ - Passagem Aérea.pdf</td>
+        <td class="nota">Favorecido no extrato: GOL Linhas Aéreas.</td>
+        <td class="mono">2023-09-20</td>
+        <td>Gol Linhas Aéreas</td>
+        <td class="num">R$ 1.524,64</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-20</td>
+        <td>GOL Linhas Aéreas</td>
+        <td class="num">R$ 1.524,64</td>
+        <td class="rubrica">3.11.2</td>
+        <td>OK</td>
+        <td class="doc">31. Frico Guimarães RJ - Passagem Aérea.pdf</td>
+        <td class="nota">Favorecido no extrato: GOL Linhas Aéreas.</td>
+        <td class="mono">2023-09-20</td>
+        <td>Gol Linhas Aéreas</td>
+        <td class="num">R$ 1.524,64</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-20</td>
+        <td>GOL Linhas Aéreas</td>
+        <td class="num">R$ 1.524,64</td>
+        <td class="rubrica">3.11.2</td>
+        <td>OK</td>
+        <td class="doc">32. Thiago Cunha RJ - Passagem Aérea.pdf</td>
+        <td class="nota">Favorecido no extrato: GOL Linhas Aéreas.</td>
+        <td class="mono">2023-09-20</td>
+        <td>Gol Linhas Aéreas</td>
+        <td class="num">R$ 1.524,64</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-26</td>
+        <td>Mônica Guimarães</td>
+        <td class="num">R$ 10.000,00</td>
+        <td class="rubrica">2.2.1 / 3.3.1</td>
+        <td>DATA CORRIGIDA — aplicado nesta versão</td>
+        <td class="doc">96. Mônica Guimarães - Produtora Executiva.pdf</td>
+        <td class="nota">Planilha: 25/10/2023 × Extrato: 26/09/2023. Corrigir para a data do extrato.</td>
+        <td class="mono">2023-09-26</td>
+        <td>LUIS FELIPE LABAKI</td>
+        <td class="num">R$ 10.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-26</td>
+        <td>André Manfrim</td>
+        <td class="num">R$ 11.250,00</td>
+        <td class="rubrica">3.11.2</td>
+        <td>DATA CORRIGIDA — aplicado nesta versão</td>
+        <td class="doc">107. André Manfrin - Coordenador de Produção.pdf</td>
+        <td class="nota">Planilha: 26/10/2023 × Extrato: 26/09/2023. Corrigir para a data do extrato.</td>
+        <td class="mono">2023-09-26</td>
+        <td>Filmes de Taipa Prod</td>
+        <td class="num">R$ 11.250,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-26</td>
+        <td>Camila Braune</td>
+        <td class="num">R$ 3.000,00</td>
+        <td class="rubrica">3.6.1</td>
+        <td>DATA CORRIGIDA — aplicado nesta versão</td>
+        <td class="doc">87. Camila Braune - Tecnica de som SP.pdf</td>
+        <td class="nota">Planilha: 16/10/2023 × Extrato: 26/09/2023. Corrigir para a data do extrato.</td>
+        <td class="mono">2023-09-26</td>
+        <td>ANA BEATRIZ HERMANSON POMA</td>
+        <td class="num">R$ 3.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-28</td>
+        <td>CASA DO ROADIE</td>
+        <td class="num">R$ 350,00</td>
+        <td class="rubrica">2.6.1</td>
+        <td>OK</td>
+        <td class="doc">36. Casa do Rodie - Material de Consumo.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-09-28</td>
+        <td>Casa do Roadie</td>
+        <td class="num">R$ 350,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-28</td>
+        <td>SOFIA VONTOBEL BACCARINI</td>
+        <td class="num">R$ 1.000,00</td>
+        <td class="rubrica">3.12</td>
+        <td>OK</td>
+        <td class="doc">37. Sofia Vontobel - Verba de Produção.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-09-28</td>
+        <td>Sofia V Baccarini</td>
+        <td class="num">R$ 1.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-28</td>
+        <td>ANDRÉ LIMA MANFRIM</td>
+        <td class="num">R$ 1.000,00</td>
+        <td class="rubrica">3.12</td>
+        <td>OK</td>
+        <td class="doc">38. André Manfrin - Verba de Produção.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-09-28</td>
+        <td>Andre Lima Manfrim</td>
+        <td class="num">R$ 1.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-28</td>
+        <td>CASA DO ROADIE</td>
+        <td class="num">R$ 15,30</td>
+        <td class="rubrica">2.6.1</td>
+        <td>OK</td>
+        <td class="doc">39. Casa do Rodie (complemento) - Material de consumo.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-09-28</td>
+        <td>Casa do Roadie</td>
+        <td class="num">R$ 15,30</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-28</td>
+        <td>CITYHOME SERVICOS IMOBILIARIOS</td>
+        <td class="num">R$ 8.800,00</td>
+        <td class="rubrica">3.11.1</td>
+        <td>OK</td>
+        <td class="doc">40. Cityhome - Hospedagem sem alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: CITYHOME SERVICOS IMOBILIARIOS.</td>
+        <td class="mono">2023-09-28</td>
+        <td>Cityhome Servicos Imobiliarios Ltda</td>
+        <td class="num">R$ 8.800,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-29</td>
+        <td>PATEO MOINHOS DE VENTO ADM</td>
+        <td class="num">R$ 5.768,40</td>
+        <td class="rubrica">3.11.1</td>
+        <td>OK</td>
+        <td class="doc">41. Hospedagem Amir Labaki - Hospedagem sem alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: PATEO MOINHOS DE VENTO ADM.</td>
+        <td class="mono">2023-09-29</td>
+        <td>Pateo Moinhos de Vento Adm e Part Lt</td>
+        <td class="num">R$ 5.768,40</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-29</td>
+        <td>CITYHOME SERVICOS IMOBILIARIOS</td>
+        <td class="num">R$ 500,00</td>
+        <td class="rubrica">3.11.1</td>
+        <td>OK</td>
+        <td class="doc">42. Cityhome Amir Labaki - Hospedagem sem alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: CITYHOME SERVICOS IMOBILIARIOS.</td>
+        <td class="mono">2023-09-29</td>
+        <td>Cityhome Servicos Imobiliarios Ltda</td>
+        <td class="num">R$ 500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-29</td>
+        <td>MARTINA MILLA RAFFAELLI ME (MR5)</td>
+        <td class="num">R$ 35.000,00</td>
+        <td class="rubrica">3.7</td>
+        <td>OK</td>
+        <td class="doc">43. MR5 - Locação de equipamentos.pdf</td>
+        <td class="nota">Favorecido no extrato: MARTINA MILLA RAFFAELLI ME (MR5).</td>
+        <td class="mono">2023-09-29</td>
+        <td>Martina Milla Raffaelli Me</td>
+        <td class="num">R$ 35.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-29</td>
+        <td>MATRON INFORMATICA</td>
+        <td class="num">R$ 3.116,00</td>
+        <td class="rubrica">3.7</td>
+        <td>OK</td>
+        <td class="doc">44. HDS  - Hds externos.pdf</td>
+        <td class="nota">Favorecido no extrato: MATRON INFORMATICA.</td>
+        <td class="mono">2023-09-29</td>
+        <td>Matron Informatica</td>
+        <td class="num">R$ 3.116,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-29</td>
+        <td>LUIS FELIPE MONTE CIPULLO</td>
+        <td class="num">R$ 1.050,00</td>
+        <td class="rubrica">3.10.1</td>
+        <td>OK</td>
+        <td class="doc">45. Luis Cipullo - verba de alimentação.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-09-29</td>
+        <td>Thiago A Gomas Cunha</td>
+        <td class="num">R$ 1.050,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-29</td>
+        <td>Felipe Guimarães Rosa</td>
+        <td class="num">R$ 1.050,00</td>
+        <td class="rubrica">3.10.1</td>
+        <td>OK</td>
+        <td class="doc">46. Frico Guimarães - verba de alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: Felipe Guimarães Rosa.</td>
+        <td class="mono">2023-09-29</td>
+        <td>Luis F Monte Cipullo</td>
+        <td class="num">R$ 1.050,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-29</td>
+        <td>FELIPE GUIMARÃES ROSA</td>
+        <td class="num">R$ 1.050,00</td>
+        <td class="rubrica">3.10.1</td>
+        <td>OK</td>
+        <td class="doc">47. Thiago Cunha - verba de alimentação.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-09-29</td>
+        <td>Felipe G Rosa</td>
+        <td class="num">R$ 1.050,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-29</td>
+        <td>SOFIA VONTOBEL BACCARINI</td>
+        <td class="num">R$ 560,00</td>
+        <td class="rubrica">3.10.1</td>
+        <td>OK</td>
+        <td class="doc">48. Sofia Vontobel - verba de alimentação.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-09-29</td>
+        <td>Fabio Baltar Duarte</td>
+        <td class="num">R$ 560,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-29</td>
+        <td>Fábio Baltar Duarte</td>
+        <td class="num">R$ 560,00</td>
+        <td class="rubrica">3.10.1</td>
+        <td>OK</td>
+        <td class="doc">49. Fabio Baltar - verba de alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: Fábio Baltar Duarte.</td>
+        <td class="mono">2023-09-29</td>
+        <td>Sofia V Baccarini</td>
+        <td class="num">R$ 560,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-29</td>
+        <td>Andre Lima Monfrini</td>
+        <td class="num">R$ 1.050,00</td>
+        <td class="rubrica">3.10.1</td>
+        <td>OK</td>
+        <td class="doc">50. André Manfrin - verba de alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: Andre Lima Monfrini.</td>
+        <td class="mono">2023-09-29</td>
+        <td>Andre Lima Monfrini</td>
+        <td class="num">R$ 1.050,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-29</td>
+        <td>CITYHOME SERVICOS IMOBILIARIOS</td>
+        <td class="num">R$ 150,00</td>
+        <td class="rubrica">3.11.1</td>
+        <td>OK</td>
+        <td class="doc">51. Cityhome Amir Labaki complemento - Hospedagem sem alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: CITYHOME SERVICOS IMOBILIARIOS.</td>
+        <td class="mono">2023-09-29</td>
+        <td>Cityhome Servicos Imobiliarios Ltda</td>
+        <td class="num">R$ 150,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-09-29</td>
+        <td>SCM PREST SERV POSTAIS</td>
+        <td class="num">R$ 35,10</td>
+        <td class="rubrica">Gerenciamento (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">52. Correios - envio de livros.pdf</td>
+        <td class="nota">Favorecido no extrato: SCM PREST SERV POSTAIS.</td>
+        <td class="mono">2023-09-29</td>
+        <td>Scm Prest Serv Postais Ltda</td>
+        <td class="num">R$ 35,10</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-02</td>
+        <td>PATEO MOINHOS DE VENTO ADM</td>
+        <td class="num">R$ 1.610,00</td>
+        <td class="rubrica">3.11.1</td>
+        <td>OK</td>
+        <td class="doc">53. Hospedagem Amir Labaki - Hospedagem sem alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: PATEO MOINHOS DE VENTO ADM.</td>
+        <td class="mono">2023-10-02</td>
+        <td>Pateo Moinhos de Vento Adm e Part Lt</td>
+        <td class="num">R$ 1.610,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-03</td>
+        <td>Glademir Martins Machado</td>
+        <td class="num">R$ 200,00</td>
+        <td class="rubrica">3.10.1</td>
+        <td>OK</td>
+        <td class="doc">54.  Motorista POA - verba de alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: Glademir Martins Machado.</td>
+        <td class="mono">2023-10-03</td>
+        <td>Glademir M Machado</td>
+        <td class="num">R$ 200,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-03</td>
+        <td>Hds Externos</td>
+        <td class="num">R$ 3.020,00</td>
+        <td class="rubrica">3.7</td>
+        <td>DATA CORRIGIDA — aplicado nesta versão</td>
+        <td class="doc">55. HDS - Hds externos.pdf</td>
+        <td class="nota">Planilha: 02/10/2023 × Extrato: 03/10/2023. Corrigir para a data do extrato.</td>
+        <td class="mono">2023-10-03</td>
+        <td>Matron Informatica</td>
+        <td class="num">R$ 3.020,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-05</td>
+        <td>1º Pix rejeitado e reenviado no mesmo dia (líquido R$ 700,00) Favorecido no extrato: EDSON DE CAMARGO TRANSPORTES.</td>
+        <td class="num">R$ 700,00</td>
+        <td class="rubrica">3.9.1</td>
+        <td>OK</td>
+        <td class="doc">56. Motorista SP - transporte local.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-05</td>
+        <td>EDSON DE CAMARGO</td>
+        <td class="num">R$ 700,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-05</td>
+        <td>AMIR LABAKI</td>
+        <td class="num">R$ 500,00</td>
+        <td class="rubrica">3.9.4</td>
+        <td>OK</td>
+        <td class="doc">57. Amir Labaki - Verba de transporte.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-05</td>
+        <td>Amir Labaki</td>
+        <td class="num">R$ 500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-06</td>
+        <td>MEMORIA COLETIVA IMAGENS</td>
+        <td class="num">R$ 10.500,00</td>
+        <td class="rubrica">1.3</td>
+        <td>OK</td>
+        <td class="doc">58. Eloa Chouzal (parcela final) - Pesquisa.pdf</td>
+        <td class="nota">Favorecido no extrato: MEMORIA COLETIVA IMAGENS.</td>
+        <td class="mono">2023-10-06</td>
+        <td>Memoria Coletiva Imagens e Textos Lt</td>
+        <td class="num">R$ 10.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-sem">
+        <td class="status-cell"><span class="badge badge-sem">SEM CORRESPONDÊNCIA NO BANCO ATUAL</span></td>
+        <td class="mono">2023-10-09</td>
+        <td>Pago em um único Pix de R$ 945,49 junto com a outra linha do controle 59 (136,69 + 808,80). Pix único de R$ 945,49</td>
+        <td class="num">R$ 136,69</td>
+        <td class="rubrica">3.9.1</td>
+        <td>OK</td>
+        <td class="doc">59. Amir Labaki - Verba Transporte e AlimentaçÃo.pdf</td>
+        <td class="nota"></td>
+        <td class="mono"></td>
+        <td></td>
+        <td class="num"></td>
+        <td class="num"></td>
+      </tr>
+      <tr class="row-sem">
+        <td class="status-cell"><span class="badge badge-sem">SEM CORRESPONDÊNCIA NO BANCO ATUAL</span></td>
+        <td class="mono">2023-10-09</td>
+        <td>Pago em um único Pix de R$ 945,49 junto com a outra linha do controle 59 (136,69 + 808,80). Pix único de R$ 945,49</td>
+        <td class="num">R$ 808,80</td>
+        <td class="rubrica">3.10.1</td>
+        <td>OK</td>
+        <td class="doc">59. Amir Labaki - Verba Transporte e AlimentaçÃo.pdf</td>
+        <td class="nota"></td>
+        <td class="mono"></td>
+        <td></td>
+        <td class="num"></td>
+        <td class="num"></td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-09</td>
+        <td>MOG PRODUTORA</td>
+        <td class="num">R$ 13.500,00</td>
+        <td class="rubrica">3.5.1</td>
+        <td>OK</td>
+        <td class="doc">60. Frico Guimarães - Diretor de fotografia.pdf</td>
+        <td class="nota">Favorecido no extrato: MOG PRODUTORA.</td>
+        <td class="mono">2023-10-09</td>
+        <td>Mog Produtora</td>
+        <td class="num">R$ 13.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-09</td>
+        <td>LUIS FELIPE MONTE CIPULLO</td>
+        <td class="num">R$ 7.500,00</td>
+        <td class="rubrica">3.6.2</td>
+        <td>OK</td>
+        <td class="doc">61. Luis Cipullo - Assistente de Fotografia.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-09</td>
+        <td>Luis Felipe Monte Cipullo 4425612981</td>
+        <td class="num">R$ 7.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-09</td>
+        <td>THIAGO AUGUSTO GOMAS CUNHA</td>
+        <td class="num">R$ 4.800,00</td>
+        <td class="rubrica">3.6.3</td>
+        <td>OK</td>
+        <td class="doc">62. Thiago Cunha - Logger.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-09</td>
+        <td>Thiago Augusto Gomas Cunha 397893948</td>
+        <td class="num">R$ 4.800,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-09</td>
+        <td>FÁBIO BALTAR DUARTE</td>
+        <td class="num">R$ 1.800,00</td>
+        <td class="rubrica">3.6.1</td>
+        <td>OK</td>
+        <td class="doc">63. Fabio Baltar - som direto.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-09</td>
+        <td>Fabio Baltar Duarte</td>
+        <td class="num">R$ 1.800,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-09</td>
+        <td>FÁBIO BALTAR DUARTE</td>
+        <td class="num">R$ 1.800,01</td>
+        <td class="rubrica">3.7</td>
+        <td>OK</td>
+        <td class="doc">64. Fabio Baltar - equipamento de som.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-09</td>
+        <td>Fabio Baltar Duarte</td>
+        <td class="num">R$ 1.800,01</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-09</td>
+        <td>MANDALA TOURS</td>
+        <td class="num">R$ 9.502,77</td>
+        <td class="rubrica">3.11.1</td>
+        <td>OK</td>
+        <td class="doc">65. Mandala Tour - Hospedagem sem alimentação.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-09</td>
+        <td>Mandala Tours</td>
+        <td class="num">R$ 9.502,77</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-09</td>
+        <td>LUIS FELIPE MONTE CIPULLO</td>
+        <td class="num">R$ 240,00</td>
+        <td class="rubrica">3.10.1</td>
+        <td>OK</td>
+        <td class="doc">66. Luis Cipullo - verba de alimentação.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-09</td>
+        <td>Andre Lima Monfrini</td>
+        <td class="num">R$ 240,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-09</td>
+        <td>Andre Lima Monfrini</td>
+        <td class="num">R$ 240,00</td>
+        <td class="rubrica">3.10.1</td>
+        <td>OK</td>
+        <td class="doc">67. André Manfrin - verba de alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: Andre Lima Monfrini.</td>
+        <td class="mono">2023-10-09</td>
+        <td>Thiago A Gomas Cunha</td>
+        <td class="num">R$ 240,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-09</td>
+        <td>Felipe Guimarães Rosa</td>
+        <td class="num">R$ 240,00</td>
+        <td class="rubrica">3.10.1</td>
+        <td>OK</td>
+        <td class="doc">68. Frico Guimarães - verba de alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: Felipe Guimarães Rosa.</td>
+        <td class="mono">2023-10-09</td>
+        <td>Felipe G Rosa</td>
+        <td class="num">R$ 240,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-09</td>
+        <td>ANDRE LIMA MONFRINI</td>
+        <td class="num">R$ 240,00</td>
+        <td class="rubrica">3.10.1</td>
+        <td>OK</td>
+        <td class="doc">69. Thiago Cunha - verba de alimentação.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-09</td>
+        <td>Luis F Monte Cipullo</td>
+        <td class="num">R$ 240,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-10</td>
+        <td>Andre Lima Monfrini</td>
+        <td class="num">R$ 500,00</td>
+        <td class="rubrica">3.12</td>
+        <td>OK</td>
+        <td class="doc">70. FAU - Locação de Espaço.pdf</td>
+        <td class="nota">Favorecido no extrato: Andre Lima Monfrini.</td>
+        <td class="mono">2023-10-10</td>
+        <td>Andre Lima Monfrini</td>
+        <td class="num">R$ 500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-10</td>
+        <td>CONTA RECEITAS D F</td>
+        <td class="num">R$ 2.300,00</td>
+        <td class="rubrica">Locação de espaço (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">71. Beatriz Pomar - Assistente de produção.pdf</td>
+        <td class="nota">Favorecido no extrato: CONTA RECEITAS D F.</td>
+        <td class="mono">2023-10-10</td>
+        <td>Faculdade de Arquitetura e Urbanismo</td>
+        <td class="num">R$ 2.300,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-11</td>
+        <td>ANA BEATRIZ HERMANSON POMAR</td>
+        <td class="num">R$ 1.500,00</td>
+        <td class="rubrica">3.4.2</td>
+        <td>OK</td>
+        <td class="doc">72. MAC RS - locação de espaço.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-11</td>
+        <td>Ana Beatriz Hermanson Pomar Servicos</td>
+        <td class="num">R$ 1.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-11</td>
+        <td>AAMAC</td>
+        <td class="num">R$ 400,00</td>
+        <td class="rubrica">Locação de espaço (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">73. Motorista SP - transporte local.pdf</td>
+        <td class="nota">Favorecido no extrato: AAMAC.</td>
+        <td class="mono">2023-10-11</td>
+        <td>Aamac</td>
+        <td class="num">R$ 400,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-11</td>
+        <td>Malnes Transporte e Produções</td>
+        <td class="num">R$ 500,00</td>
+        <td class="rubrica">3.9.1</td>
+        <td>OK</td>
+        <td class="doc">74. Sofia Vontobel - Produtora Local POA.pdf</td>
+        <td class="nota">Favorecido no extrato: Malnes Transporte e Produções.</td>
+        <td class="mono">2023-10-11</td>
+        <td>Malnes Transporte e Produção</td>
+        <td class="num">R$ 500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-11</td>
+        <td>VONDOC FILMES LTDA</td>
+        <td class="num">R$ 4.000,00</td>
+        <td class="rubrica">3.4.2</td>
+        <td>OK</td>
+        <td class="doc">75. Verba de produção Rio de Janeiro.pdf</td>
+        <td class="nota">Favorecido no extrato: VONDOC FILMES LTDA.</td>
+        <td class="mono">2023-10-11</td>
+        <td>Vondoc Filmes Ltda</td>
+        <td class="num">R$ 4.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-11</td>
+        <td>IDALINA SOUZA RIBEIRO</td>
+        <td class="num">R$ 1.000,00</td>
+        <td class="rubrica">3.12</td>
+        <td>OK</td>
+        <td class="doc">76. Hospedagem Equipe RJ - Hospedagem sem alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: IDALINA SOUZA RIBEIRO.</td>
+        <td class="mono">2023-10-11</td>
+        <td>Idalina S R Silva</td>
+        <td class="num">R$ 1.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-11</td>
+        <td>MANDALA TOURS</td>
+        <td class="num">R$ 9.672,00</td>
+        <td class="rubrica">3.11.1</td>
+        <td>OK</td>
+        <td class="doc">⚠ Comprovante não localizado na pasta</td>
+        <td class="nota">Favorecido no extrato: MANDALA TOURS.</td>
+        <td class="mono">2023-10-11</td>
+        <td>Mandala Tours</td>
+        <td class="num">R$ 9.672,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-13</td>
+        <td>Andre Lima Monfrini</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="rubrica">3.11.3</td>
+        <td>OK</td>
+        <td class="doc">78. André Manfrim - verba de alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: Andre Lima Monfrini.</td>
+        <td class="mono">2023-10-13</td>
+        <td>Luis F Monte Cipullo</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-13</td>
+        <td>Felipe Guimarães Rosa</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="rubrica">3.11.3</td>
+        <td>OK</td>
+        <td class="doc">79. Frico Guimarães - verba de alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: Felipe Guimarães Rosa.</td>
+        <td class="mono">2023-10-13</td>
+        <td>Andre Lima Monfrini</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-13</td>
+        <td>ANDRE LIMA MONFRINI</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="rubrica">3.11.3</td>
+        <td>OK</td>
+        <td class="doc">80. Luis Cipullo - verba de alimentação.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-13</td>
+        <td>Felipe G Rosa</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-13</td>
+        <td>FELIPE GUIMARÃES ROSA</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="rubrica">3.11.3</td>
+        <td>OK</td>
+        <td class="doc">81. Thiago Cunha - verba de alimentação.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-13</td>
+        <td>Thiago A Gomas Cunha</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-13</td>
+        <td>ANDRÉ LIMA MANFRIM</td>
+        <td class="num">R$ 1.000,00</td>
+        <td class="rubrica">3.11.3</td>
+        <td>OK</td>
+        <td class="doc">82. André Manfrim - verba de produção RJ.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-13</td>
+        <td>Andre Lima Manfrim</td>
+        <td class="num">R$ 1.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-13</td>
+        <td>IDALINA SOUZA RIBEIRO</td>
+        <td class="num">R$ 480,00</td>
+        <td class="rubrica">3.11.3</td>
+        <td>OK</td>
+        <td class="doc">83. Ida Leal - verba de alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: IDALINA SOUZA RIBEIRO.</td>
+        <td class="mono">2023-10-13</td>
+        <td>Anne C Melo Santos</td>
+        <td class="num">R$ 480,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-13</td>
+        <td>IDALINA SOUZA RIBEIRO</td>
+        <td class="num">R$ 480,00</td>
+        <td class="rubrica">3.11.3</td>
+        <td>OK</td>
+        <td class="doc">84. Anne Santos - verba de alimentação.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-13</td>
+        <td>Idalina S R Silva</td>
+        <td class="num">R$ 480,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-13</td>
+        <td>RICARDO DIAS DOS SANTOS</td>
+        <td class="num">R$ 300,00</td>
+        <td class="rubrica">3.11.3</td>
+        <td>OK</td>
+        <td class="doc">85. Motorista Rio - verba de alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: RICARDO DIAS DOS SANTOS.</td>
+        <td class="mono">2023-10-13</td>
+        <td>Ricardo Dias Santos</td>
+        <td class="num">R$ 300,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-13</td>
+        <td>MAGA PROJETOS CULTURAIS</td>
+        <td class="num">R$ 2.000,00</td>
+        <td class="rubrica">3.4.2</td>
+        <td>OK</td>
+        <td class="doc">86. Ida Leal (primeira parcela) - Prod. local RJ.pdf</td>
+        <td class="nota">Favorecido no extrato: MAGA PROJETOS CULTURAIS.</td>
+        <td class="mono">2023-10-13</td>
+        <td>Maga Projetos Culturais</td>
+        <td class="num">R$ 2.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-16</td>
+        <td>Beatriz Pomar</td>
+        <td class="num">R$ 3.000,00</td>
+        <td class="rubrica">3.4.2</td>
+        <td>DATA CORRIGIDA — aplicado nesta versão</td>
+        <td class="doc">87. Camila Braune - Tecnica de som SP.pdf</td>
+        <td class="nota">Planilha: 26/10/2023 × Extrato: 16/10/2023. Corrigir para a data do extrato.</td>
+        <td class="mono">2023-10-16</td>
+        <td>Camila Licariao de Carvalho Braune 4</td>
+        <td class="num">R$ 3.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-16</td>
+        <td>LUZ RIO LOCACAO DE EQUIPAMENTOS</td>
+        <td class="num">R$ 1.100,00</td>
+        <td class="rubrica">3.7</td>
+        <td>OK</td>
+        <td class="doc">88. Equipamento de Luz - Rio de Janeiro.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-16</td>
+        <td>Luz Rio Locacao de Equipamentos Cine</td>
+        <td class="num">R$ 1.100,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-17</td>
+        <td>CRISTHIANO RODRIGUES DE JESUS</td>
+        <td class="num">R$ 4.375,00</td>
+        <td class="rubrica">3.9.3</td>
+        <td>OK</td>
+        <td class="doc">89. Van São Paulo - transporte local.pdf</td>
+        <td class="nota">Favorecido no extrato: CRISTHIANO RODRIGUES DE JESUS.</td>
+        <td class="mono">2023-10-17</td>
+        <td>Cristhiano Rodrigues de Jesus 041338</td>
+        <td class="num">R$ 4.375,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-17</td>
+        <td>CLAUDIA</td>
+        <td class="num">R$ 4.900,00</td>
+        <td class="rubrica">3.9.3</td>
+        <td>OK</td>
+        <td class="doc">90. Van porto Alegre - transporte local.pdf</td>
+        <td class="nota">Favorecido no extrato: CLAUDIA.</td>
+        <td class="mono">2023-10-17</td>
+        <td>Claudia</td>
+        <td class="num">R$ 4.900,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-18</td>
+        <td>FERNANDO MIGUEL EFRON</td>
+        <td class="num">R$ 550,00</td>
+        <td class="rubrica">3.7</td>
+        <td>OK</td>
+        <td class="doc">91. Fernando Miguel - Locação de equipamentop de som.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-18</td>
+        <td>Fernando M Efron</td>
+        <td class="num">R$ 550,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-24</td>
+        <td>MONICA GUIMARAES P MORAES</td>
+        <td class="num">R$ 9.427,38</td>
+        <td class="rubrica">3.11.2</td>
+        <td>OK</td>
+        <td class="doc">92. Reembolso MG - Passagens Aéreas.pdf</td>
+        <td class="nota">Favorecido no extrato: MONICA GUIMARAES P MORAES.</td>
+        <td class="mono">2023-10-24</td>
+        <td>Monica G P Moraes</td>
+        <td class="num">R$ 9.427,38</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-25</td>
+        <td>FOGO FILMES LTDA</td>
+        <td class="num">R$ 20.625,00</td>
+        <td class="rubrica">4.6</td>
+        <td>OK</td>
+        <td class="doc">93. André Finotti - Pacote de imagem.pdf</td>
+        <td class="nota">Favorecido no extrato: FOGO FILMES LTDA.</td>
+        <td class="mono">2023-10-25</td>
+        <td>Fogo Filmes Ltda</td>
+        <td class="num">R$ 20.625,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-25</td>
+        <td>ANNE SANTOS</td>
+        <td class="num">R$ 3.600,00</td>
+        <td class="rubrica">3.6.1</td>
+        <td>OK</td>
+        <td class="doc">94. Anne Santos - Som Direto RJ.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-25</td>
+        <td>Anne Santos</td>
+        <td class="num">R$ 3.600,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-25</td>
+        <td>MOG PRODUTORA</td>
+        <td class="num">R$ 13.500,00</td>
+        <td class="rubrica">3.5.1</td>
+        <td>OK</td>
+        <td class="doc">95. Frico Guimarães - Diretor de Fotografia.pdf</td>
+        <td class="nota">Favorecido no extrato: MOG PRODUTORA.</td>
+        <td class="mono">2023-10-25</td>
+        <td>Mog Produtora</td>
+        <td class="num">R$ 13.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-25</td>
+        <td>Luiz Felipe G Labaki</td>
+        <td class="num">R$ 10.000,00</td>
+        <td class="rubrica">2.2.1 / 3.3.1</td>
+        <td>DATA CORRIGIDA — aplicado nesta versão</td>
+        <td class="doc">96. Mônica Guimarães - Produtora Executiva.pdf</td>
+        <td class="nota">Planilha: 26/10/2023 × Extrato: 25/10/2023. Corrigir para a data do extrato.</td>
+        <td class="mono">2023-10-25</td>
+        <td>Mog Produtora</td>
+        <td class="num">R$ 10.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-25</td>
+        <td>MAGA PROJETOS CULTURAIS</td>
+        <td class="num">R$ 2.000,00</td>
+        <td class="rubrica">3.4.2</td>
+        <td>OK</td>
+        <td class="doc">97. Idalina - Produtora RJ.pdf</td>
+        <td class="nota">Favorecido no extrato: MAGA PROJETOS CULTURAIS.</td>
+        <td class="mono">2023-10-25</td>
+        <td>Maga Projetos Culturais</td>
+        <td class="num">R$ 2.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-25</td>
+        <td>THIAGO AUGUSTO GOMAS CUNHA</td>
+        <td class="num">R$ 1.800,00</td>
+        <td class="rubrica">3.7</td>
+        <td>OK</td>
+        <td class="doc">98. Thiago Cunha - Equipamento de luz.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-25</td>
+        <td>Thiago Augusto Gomas Cunha 397893948</td>
+        <td class="num">R$ 1.800,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-25</td>
+        <td>THIAGO AUGUSTO GOMAS CUNHA</td>
+        <td class="num">R$ 4.800,00</td>
+        <td class="rubrica">3.6.3</td>
+        <td>OK</td>
+        <td class="doc">99. Thiago Cunha - Logger.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-25</td>
+        <td>Thiago Augusto Gomas Cunha 397893948</td>
+        <td class="num">R$ 4.800,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-25</td>
+        <td>SOFIA VONTOBEL BACCARINI</td>
+        <td class="num">R$ 816,42</td>
+        <td class="rubrica">3.12</td>
+        <td>OK</td>
+        <td class="doc">100. Reembolso Sofia - Verba de Produção.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-25</td>
+        <td>Sofia V Baccarini</td>
+        <td class="num">R$ 816,42</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-25</td>
+        <td>CALEIDOSKOPICA PRODUCOES</td>
+        <td class="num">R$ 450,00</td>
+        <td class="rubrica">3.7</td>
+        <td>OK</td>
+        <td class="doc">101. Calendoscopia - Locação equip. som.pdf</td>
+        <td class="nota">Favorecido no extrato: CALEIDOSKOPICA PRODUCOES.</td>
+        <td class="mono">2023-10-25</td>
+        <td>Caleidoskopica Producoes</td>
+        <td class="num">R$ 450,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-25</td>
+        <td>FILMES DE TAIPA PROD</td>
+        <td class="num">R$ 4.500,00</td>
+        <td class="rubrica">3.7</td>
+        <td>OK</td>
+        <td class="doc">102. Filmes de Taipa - Equipamento de Câmera.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-25</td>
+        <td>Filmes de Taipa Prod</td>
+        <td class="num">R$ 4.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-25</td>
+        <td>ELECTRICA CINEMA E VIDEO (boleto)</td>
+        <td class="num">R$ 600,00</td>
+        <td class="rubrica">3.7</td>
+        <td>OK</td>
+        <td class="doc">103. Equipamento LUZ SP.pdf</td>
+        <td class="nota">Favorecido no extrato: ELECTRICA CINEMA E VIDEO (boleto).</td>
+        <td class="mono">2023-10-25</td>
+        <td>:</td>
+        <td class="num">R$ 600,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-26</td>
+        <td>GRIFE RIO LOCADORA LTDA (transferência)</td>
+        <td class="num">R$ 6.550,00</td>
+        <td class="rubrica">3.9.3</td>
+        <td>OK</td>
+        <td class="doc">106. Van Rio de Janeiro - Transporte local.pdf</td>
+        <td class="nota">Favorecido no extrato: GRIFE RIO LOCADORA LTDA (transferência).</td>
+        <td class="mono">2023-10-26</td>
+        <td>GRIFE RIO LOCADORA LTDA</td>
+        <td class="num">R$ 6.550,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-26</td>
+        <td>LOC ALL DE CINEMA E TELEVISAO</td>
+        <td class="num">R$ 995,00</td>
+        <td class="rubrica">3.7</td>
+        <td>OK</td>
+        <td class="doc">104. Locall - Locação de equipamentos.pdf</td>
+        <td class="nota">Favorecido no extrato: LOC ALL DE CINEMA E TELEVISAO.</td>
+        <td class="mono">2023-10-26</td>
+        <td>Loc All de Cinema e Televisao Limita</td>
+        <td class="num">R$ 995,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-26</td>
+        <td>LUIS FELIPE MONTE CIPULLO</td>
+        <td class="num">R$ 7.500,00</td>
+        <td class="rubrica">3.6.2</td>
+        <td>OK</td>
+        <td class="doc">105. Luis Cipullo - Assistente de Fotografia.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-26</td>
+        <td>Luis Felipe Monte Cipullo 4425612981</td>
+        <td class="num">R$ 7.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-26</td>
+        <td>FILMES DE TAIPA PROD</td>
+        <td class="num">R$ 11.250,00</td>
+        <td class="rubrica">2.3.1</td>
+        <td>OK</td>
+        <td class="doc">35. Manfrim_dir producao.pdf</td>
+        <td class="nota">Favorecido no extrato: FILMES DE TAIPA PROD.</td>
+        <td class="mono">2023-10-26</td>
+        <td>Filmes de Taipa Prod</td>
+        <td class="num">R$ 11.250,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-30</td>
+        <td>WINDSOR ADMINISTRACAO DE HOTEIS</td>
+        <td class="num">R$ 2.529,85</td>
+        <td class="rubrica">3.11.1</td>
+        <td>OK</td>
+        <td class="doc">108. Hotel Equipe - Hospedagem.pdf</td>
+        <td class="nota">Favorecido no extrato: WINDSOR ADMINISTRACAO DE HOTEIS.</td>
+        <td class="mono">2023-10-30</td>
+        <td>Windsor Administracao de Hoteis e Se</td>
+        <td class="num">R$ 2.529,85</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-30</td>
+        <td>WINDSOR ADMINISTRACAO DE HOTEIS</td>
+        <td class="num">R$ 1.559,33</td>
+        <td class="rubrica">3.11.1</td>
+        <td>OK</td>
+        <td class="doc">109. Hotel AL - Hospedagem.pdf</td>
+        <td class="nota">Favorecido no extrato: WINDSOR ADMINISTRACAO DE HOTEIS.</td>
+        <td class="mono">2023-10-30</td>
+        <td>Windsor Administracao de Hoteis e Se</td>
+        <td class="num">R$ 1.559,33</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-30</td>
+        <td>(favorecido não identificado no extrato)</td>
+        <td class="num">R$ 450,00</td>
+        <td class="rubrica">3.7</td>
+        <td>OK</td>
+        <td class="doc">110. Arthur Rodrigues - Locação de equipamento.pdf</td>
+        <td class="nota">Favorecido no extrato: (favorecido não identificado no extrato).</td>
+        <td class="mono">2023-10-30</td>
+        <td>-</td>
+        <td class="num">R$ 450,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-30</td>
+        <td>BRILHO</td>
+        <td class="num">R$ 211,50</td>
+        <td class="rubrica">3.7</td>
+        <td>OK</td>
+        <td class="doc">111. Brilho - Equipamento Luz (diária extra).pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-30</td>
+        <td>Brilho</td>
+        <td class="num">R$ 211,50</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-30</td>
+        <td>MARTINA MILLA RAFFAELLI ME (MR5)</td>
+        <td class="num">R$ 1.500,00</td>
+        <td class="rubrica">3.7</td>
+        <td>OK</td>
+        <td class="doc">112. MR5 - Equipamento de Câmera.pdf</td>
+        <td class="nota">Favorecido no extrato: MARTINA MILLA RAFFAELLI ME (MR5).</td>
+        <td class="mono">2023-10-30</td>
+        <td>Martina Milla Raffaelli Me</td>
+        <td class="num">R$ 1.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-31</td>
+        <td>JEFFERSON MARCOS SILVA</td>
+        <td class="num">R$ 320,00</td>
+        <td class="rubrica">3.11.3</td>
+        <td>OK</td>
+        <td class="doc">113. Alimentação motorista.pdf</td>
+        <td class="nota">Favorecido no extrato: JEFFERSON MARCOS SILVA.</td>
+        <td class="mono">2023-10-31</td>
+        <td>Jefferson S Oliveira</td>
+        <td class="num">R$ 320,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-31</td>
+        <td>Felipe Guimarães Rosa</td>
+        <td class="num">R$ 1.020,00</td>
+        <td class="rubrica">3.11.3</td>
+        <td>OK</td>
+        <td class="doc">114. Frico Guimarães - Ajuda de custo + Alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: Felipe Guimarães Rosa.</td>
+        <td class="mono">2023-10-31</td>
+        <td>Luis F Monte Cipullo</td>
+        <td class="num">R$ 1.020,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-31</td>
+        <td>FELIPE GUIMARÃES ROSA</td>
+        <td class="num">R$ 1.020,00</td>
+        <td class="rubrica">3.11.3</td>
+        <td>OK</td>
+        <td class="doc">115. Luis Cipullo - Ajuda de custo + Alimentação.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-10-31</td>
+        <td>Andre Lima Monfrini</td>
+        <td class="num">R$ 1.020,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-31</td>
+        <td>Andre Lima Monfrini</td>
+        <td class="num">R$ 1.020,00</td>
+        <td class="rubrica">3.11.3</td>
+        <td>OK</td>
+        <td class="doc">116. André Manfrin - Ajuda de custo + Alimentação.pdf</td>
+        <td class="nota">Favorecido no extrato: Andre Lima Monfrini.</td>
+        <td class="mono">2023-10-31</td>
+        <td>Felipe G Rosa</td>
+        <td class="num">R$ 1.020,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-10-31</td>
+        <td>André Lima Manfrim</td>
+        <td class="num">R$ 200,00</td>
+        <td class="rubrica">3.12</td>
+        <td>OK</td>
+        <td class="doc">117. Verba de produção RJ.pdf</td>
+        <td class="nota">Favorecido no extrato: André Lima Manfrim.</td>
+        <td class="mono">2023-10-31</td>
+        <td>Andre Lima Manfrim</td>
+        <td class="num">R$ 200,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-11-01</td>
+        <td>Late Check-out</td>
+        <td class="num">R$ 316,23</td>
+        <td class="rubrica">3.11.1</td>
+        <td>VALOR CORRIGIDO — aplicado nesta versão</td>
+        <td class="doc">118. Late Check out.pdf</td>
+        <td class="nota">Planilha: R$ 316.25 em 01/11/2023 × Extrato: R$ 316.23 em 01/11/2023. Divergência de valor — prevalece o extrato.</td>
+        <td class="mono">2023-11-01</td>
+        <td>Windsor Administracao de Hoteis e Se</td>
+        <td class="num">R$ 316,23</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-11-08</td>
+        <td>1º Pix rejeitado e reenviado (líquido R$ 300,00)</td>
+        <td class="num">R$ 300,00</td>
+        <td class="rubrica">1.3</td>
+        <td>OK</td>
+        <td class="doc">119. Bernardo Tavares - assistente de pesquisa.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-11-08</td>
+        <td>BERNARDO TAVARES ROSA</td>
+        <td class="num">R$ 300,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-11-08</td>
+        <td>CRISTHIANO RODRIGUES DE JESUS</td>
+        <td class="num">R$ 4.750,00</td>
+        <td class="rubrica">3.9.3</td>
+        <td>OK</td>
+        <td class="doc">120. VAN São Paulo x Rio - transporte local.pdf</td>
+        <td class="nota">Favorecido no extrato: CRISTHIANO RODRIGUES DE JESUS.</td>
+        <td class="mono">2023-11-08</td>
+        <td>Cristhiano Rodrigues de Jesus 041338</td>
+        <td class="num">R$ 4.750,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-11-14</td>
+        <td>Mônica Guimarães</td>
+        <td class="num">R$ 27.000,00</td>
+        <td class="rubrica">2.2.1 / 3.3.1</td>
+        <td>DATA CORRIGIDA — aplicado nesta versão</td>
+        <td class="doc">121. Mônica Guimarães - Produtora Executiva.pdf</td>
+        <td class="nota">Planilha: 16/11/2023 × Extrato: 14/11/2023. Corrigir para a data do extrato.</td>
+        <td class="mono">2023-11-14</td>
+        <td>Mog Produtora</td>
+        <td class="num">R$ 27.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-sem">
+        <td class="status-cell"><span class="badge badge-sem">SEM CORRESPONDÊNCIA NO BANCO ATUAL</span></td>
+        <td class="mono">2023-11-14</td>
+        <td>Reembolso Mônica Guimarães</td>
+        <td class="num">R$ 3.353,72</td>
+        <td class="rubrica">3.11.3</td>
+        <td>DATA CORRIGIDA — aplicado nesta versão</td>
+        <td class="doc">122. Reembolso MG (refeição e transporte).pdf</td>
+        <td class="nota">Pago em um único Pix de R$ 3.724,74 (3.353,72 + 371,02) em 14/11/2023 — planilha registra 16/11/2023. Corrigir a data e tratar as duas linhas como parcelas do mesmo Pix (122 / 122-B). Pix único de R$ 3.724,74</td>
+        <td class="mono"></td>
+        <td></td>
+        <td class="num"></td>
+        <td class="num"></td>
+      </tr>
+      <tr class="row-sem">
+        <td class="status-cell"><span class="badge badge-sem">SEM CORRESPONDÊNCIA NO BANCO ATUAL</span></td>
+        <td class="mono">2023-11-14</td>
+        <td>Reembolso Mônica Guimarães</td>
+        <td class="num">R$ 371,02</td>
+        <td class="rubrica">3.9.3</td>
+        <td>DATA CORRIGIDA — aplicado nesta versão</td>
+        <td class="doc">122. Reembolso MG (refeição e transporte).pdf</td>
+        <td class="nota">Pago em um único Pix de R$ 3.724,74 (3.353,72 + 371,02) em 14/11/2023 — planilha registra 16/11/2023. Corrigir a data e tratar as duas linhas como parcelas do mesmo Pix (122 / 122-B). Pix único de R$ 3.724,74</td>
+        <td class="mono"></td>
+        <td></td>
+        <td class="num"></td>
+        <td class="num"></td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-11-14</td>
+        <td>Bié Cinema e TV</td>
+        <td class="num">R$ 750,00</td>
+        <td class="rubrica">3.7</td>
+        <td>DATA CORRIGIDA — aplicado nesta versão</td>
+        <td class="doc">123. Equipamento de som SP.pdf</td>
+        <td class="nota">Planilha: 16/11/2023 × Extrato: 14/11/2023. Corrigir para a data do extrato.</td>
+        <td class="mono">2023-11-14</td>
+        <td>Bie Cinema e Tv Ltda Me</td>
+        <td class="num">R$ 750,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-11-14</td>
+        <td>Filmes de Taipa</td>
+        <td class="num">R$ 400,00</td>
+        <td class="rubrica">3.7</td>
+        <td>DATA CORRIGIDA — aplicado nesta versão</td>
+        <td class="doc">124. Locação de equipamento de camera.pdf</td>
+        <td class="nota">Planilha: 16/11/2023 × Extrato: 14/11/2023. Corrigir para a data do extrato.</td>
+        <td class="mono">2023-11-14</td>
+        <td>Filmes de Taipa Prod</td>
+        <td class="num">R$ 400,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-11-27</td>
+        <td>FOGO FILMES LTDA</td>
+        <td class="num">R$ 20.625,00</td>
+        <td class="rubrica">4.6</td>
+        <td>OK</td>
+        <td class="doc">125. André Finotti - Edicão e Finalização.pdf</td>
+        <td class="nota">Favorecido no extrato: FOGO FILMES LTDA.</td>
+        <td class="mono">2023-11-27</td>
+        <td>Fogo Filmes Ltda</td>
+        <td class="num">R$ 20.625,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-12-11</td>
+        <td>MEMORIA COLETIVA IMAGENS</td>
+        <td class="num">R$ 2.000,00</td>
+        <td class="rubrica">1.3</td>
+        <td>OK</td>
+        <td class="doc">126. Eloa Chouzal - Pesquisador.pdf</td>
+        <td class="nota">Favorecido no extrato: MEMORIA COLETIVA IMAGENS.</td>
+        <td class="mono">2023-12-11</td>
+        <td>Memoria Coletiva Imagens e Textos Lt</td>
+        <td class="num">R$ 2.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-12-20</td>
+        <td>RAQUEL DE OLIVEIRA LAZARO</td>
+        <td class="num">R$ 585,00</td>
+        <td class="rubrica">3.6.1</td>
+        <td>OK</td>
+        <td class="doc">128. Raquel (diária extra) - Som direto.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2023-12-20</td>
+        <td>Raquel de Oliveira Lazaro 0483723061</td>
+        <td class="num">R$ 585,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2023-12-20</td>
+        <td>FOGO FILMES LTDA</td>
+        <td class="num">R$ 20.625,00</td>
+        <td class="rubrica">4.6</td>
+        <td>OK</td>
+        <td class="doc">127. André Finotti - Edição e Finalização .pdf</td>
+        <td class="nota">Favorecido no extrato: FOGO FILMES LTDA.</td>
+        <td class="mono">2023-12-20</td>
+        <td>Fogo Filmes Ltda</td>
+        <td class="num">R$ 20.625,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-01-24</td>
+        <td>FOGO FILMES LTDA</td>
+        <td class="num">R$ 20.625,00</td>
+        <td class="rubrica">4.6</td>
+        <td>OK</td>
+        <td class="doc">129. André Finotti - Edição e Finalização .pdf</td>
+        <td class="nota">Favorecido no extrato: FOGO FILMES LTDA.</td>
+        <td class="mono">2024-01-24</td>
+        <td>Fogo Filmes Ltda</td>
+        <td class="num">R$ 20.625,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-01-31</td>
+        <td>IN SAMPA COURIER ENTREGAS</td>
+        <td class="num">R$ 487,20</td>
+        <td class="rubrica">3.9.3</td>
+        <td>OK</td>
+        <td class="doc">130. FP Courrier - Transporte Loca.pdf</td>
+        <td class="nota">Favorecido no extrato: IN SAMPA COURIER ENTREGAS.</td>
+        <td class="mono">2024-01-31</td>
+        <td>In Sampa Courier Entregas Eireli</td>
+        <td class="num">R$ 487,20</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-02-23</td>
+        <td>JUBA PRODUCOES</td>
+        <td class="num">R$ 6.000,00</td>
+        <td class="rubrica">5.4.1</td>
+        <td>OK</td>
+        <td class="doc">131. Júlia Sousa - controller.pdf</td>
+        <td class="nota">Favorecido no extrato: JUBA PRODUCOES.</td>
+        <td class="mono">2024-02-23</td>
+        <td>Juba Producoes</td>
+        <td class="num">R$ 6.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-02-23</td>
+        <td>FOGO FILMES</td>
+        <td class="num">R$ 22.500,00</td>
+        <td class="rubrica">4.6</td>
+        <td>OK</td>
+        <td class="doc">132. André Finotti - Edição e Finalização .pdf</td>
+        <td class="nota">Favorecido no extrato: FOGO FILMES.</td>
+        <td class="mono">2024-02-23</td>
+        <td>Fogo Filmes</td>
+        <td class="num">R$ 22.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-05-07</td>
+        <td>JULIA BARBARA MELO DE SOUSA</td>
+        <td class="num">R$ 4.000,00</td>
+        <td class="rubrica">5.4.1</td>
+        <td>OK</td>
+        <td class="doc">133. Júlia Sousa - controller.pdf</td>
+        <td class="nota">Favorecido no extrato: JULIA BARBARA MELO DE SOUSA.</td>
+        <td class="mono">2024-05-07</td>
+        <td>Julia Barbara Melo de Sousa 40926175</td>
+        <td class="num">R$ 4.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-05-31</td>
+        <td>GANZAH</td>
+        <td class="num">R$ 5.000,00</td>
+        <td class="rubrica">4.8.1</td>
+        <td>OK</td>
+        <td class="doc">134. Ganzah - Trilha Musical.pdf</td>
+        <td class="nota">Favorecido no extrato: GANZAH.</td>
+        <td class="mono">2024-05-31</td>
+        <td>Ganzah</td>
+        <td class="num">R$ 5.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-06-03</td>
+        <td>André Finotti</td>
+        <td class="num">R$ 13.500,00</td>
+        <td class="rubrica">4.6</td>
+        <td>DATA CORRIGIDA — aplicado nesta versão</td>
+        <td class="doc">135. André Finotti - Edição e Finalização.pdf</td>
+        <td class="nota">Planilha: 01/06/2024 × Extrato: 03/06/2024. Corrigir para a data do extrato.</td>
+        <td class="mono">2024-06-03</td>
+        <td>Fogo Filmes</td>
+        <td class="num">R$ 13.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-07-03</td>
+        <td>Giovana Amano</td>
+        <td class="num">R$ 5.000,00</td>
+        <td class="rubrica">Produtora de Licenciamento (cód. pendente)</td>
+        <td>DATA CORRIGIDA — aplicado nesta versão</td>
+        <td class="doc">136. Giovana Amano - Produtora de Licenciamento.pdf</td>
+        <td class="nota">Planilha: 05/07/2024 × Extrato: 03/07/2024. Corrigir para a data do extrato.</td>
+        <td class="mono">2024-07-03</td>
+        <td>Giovana Amano</td>
+        <td class="num">R$ 5.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-07-30</td>
+        <td>BRASIL IMAGEM</td>
+        <td class="num">R$ 8.000,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">137. Wagner Labs Anastacio ME _ Brasil Imagem - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: BRASIL IMAGEM.</td>
+        <td class="mono">2024-07-30</td>
+        <td>Brasil Imagem</td>
+        <td class="num">R$ 8.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-08-09</td>
+        <td>ANJO AZUL FILMES LTDA (transferência)</td>
+        <td class="num">R$ 2.815,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">140. Sylvio Back - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: ANJO AZUL FILMES LTDA (transferência).</td>
+        <td class="mono">2024-08-09</td>
+        <td>ANJO AZUL FILMES LTDA.</td>
+        <td class="num">R$ 2.815,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-08-09</td>
+        <td>Cinemateca</td>
+        <td class="num">R$ 2.873,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>VALOR CORRIGIDO — aplicado nesta versão</td>
+        <td class="doc">138. Cinemateca Brasileira - Licenciamento.pdf</td>
+        <td class="nota">Planilha: R$ 2,973.00 em 09/08/2024 × Extrato: R$ 2,873.00 em 09/08/2024. Divergência de valor — prevalece o extrato.</td>
+        <td class="mono">2024-08-09</td>
+        <td>Sociedade Amigos da Cinemateca - Sac</td>
+        <td class="num">R$ 2.873,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-08-09</td>
+        <td>F. WERNECK BARCINSKI LTDA</td>
+        <td class="num">R$ 4.000,00</td>
+        <td class="rubrica">Produtora de Licenciamento (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">139. Fabiana - Produtora de Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: F. WERNECK BARCINSKI LTDA.</td>
+        <td class="mono">2024-08-09</td>
+        <td>F. Werneck Barcinski Ltda</td>
+        <td class="num">R$ 4.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-08-09</td>
+        <td>GRU - GUIA RECOLHIMENTO UNIÃO</td>
+        <td class="num">R$ 550,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">141. Biblioteca Nacional - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.</td>
+        <td class="mono">2024-08-09</td>
+        <td>Biblioteca Nacional</td>
+        <td class="num">R$ 550,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-08-16</td>
+        <td>FUNDACAO GETULIO VARGAS (boleto)</td>
+        <td class="num">R$ 130,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">142. CPDOC - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: FUNDACAO GETULIO VARGAS (boleto).</td>
+        <td class="mono">2024-08-16</td>
+        <td>:</td>
+        <td class="num">R$ 130,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-08-19</td>
+        <td>SOCIEDADE AMIGOS DA CINEMATECA</td>
+        <td class="num">R$ 8.627,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">143. Cinemateca Brasileira - Licenciamento.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2024-08-19</td>
+        <td>Sociedade Amigos da Cinemateca - Sac</td>
+        <td class="num">R$ 8.627,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-09-03</td>
+        <td>CAMILA BRAUNE</td>
+        <td class="num">R$ 600,00</td>
+        <td class="rubrica">Som direto - SP (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">144. Som_SP_adicional.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2024-09-03</td>
+        <td>Camila Braune</td>
+        <td class="num">R$ 600,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-09-05</td>
+        <td>GLOBO COM E PART SA (boleto)</td>
+        <td class="num">R$ 938,50</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">145. Licenc_Globo.pdf</td>
+        <td class="nota">Favorecido no extrato: GLOBO COM E PART SA (boleto).</td>
+        <td class="mono">2024-09-05</td>
+        <td>GLOBO COMUNICACAO E PARTICIPACOES S.A. - CNPJ: 27.865.757/0001-02</td>
+        <td class="num">R$ 938,50</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-09-17</td>
+        <td>LAPFILME P C LTDA</td>
+        <td class="num">R$ 2.250,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">147. Lapfilme produções - Licenciamento.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2024-09-17</td>
+        <td>LAPFILME P C LTDA</td>
+        <td class="num">R$ 2.250,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-09-17</td>
+        <td>S A O ESTADO DE S PAULO</td>
+        <td class="num">R$ 2.632,45</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">146. Estadão - Licenciamento.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2024-09-17</td>
+        <td>S.A. O ESTADO DE S.PAULO CNPJ 61.533.949/0001-41</td>
+        <td class="num">R$ 2.632,45</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-09-23</td>
+        <td>Jornal de Brasil</td>
+        <td class="num">R$ 5.500,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>VALOR CORRIGIDO — aplicado nesta versão</td>
+        <td class="doc">148. JB - Licenciamento.pdf</td>
+        <td class="nota">Planilha: R$ 5,550.00 em 23/09/2024 × Extrato: R$ 5,500.00 em 23/09/2024. Divergência de valor — prevalece o extrato.</td>
+        <td class="mono">2024-09-23</td>
+        <td>:</td>
+        <td class="num">R$ 5.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-09-25</td>
+        <td>COTACAO D.T.V.M. S/A</td>
+        <td class="num">R$ 6.726,23</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">149. INA - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: COTACAO D.T.V.M. S/A.</td>
+        <td class="mono">2024-09-25</td>
+        <td>Cotacao D.t.v.m. S/a - Sefic</td>
+        <td class="num">R$ 6.726,23</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-09-30</td>
+        <td>GRU - GUIA RECOLHIMENTO UNIÃO</td>
+        <td class="num">R$ 700,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">150. Biblioteca Nacional - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.</td>
+        <td class="mono">2024-09-30</td>
+        <td>do Contribuinte</td>
+        <td class="num">R$ 700,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-09-30</td>
+        <td>GRU - GUIA RECOLHIMENTO UNIÃO</td>
+        <td class="num">R$ 2.400,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">151. Biblioteca Nacional - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.</td>
+        <td class="mono">2024-09-30</td>
+        <td>do Contribuinte</td>
+        <td class="num">R$ 2.400,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-10-10</td>
+        <td>COTACAO D.T.V.M. S/A</td>
+        <td class="num">R$ 1.836,22</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">152. Le Monde - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: COTACAO D.T.V.M. S/A.</td>
+        <td class="mono">2024-10-10</td>
+        <td>Cotacao D.t.v.m. S/a - Sefic</td>
+        <td class="num">R$ 1.836,22</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-10-10</td>
+        <td>SOCIEDADE AMIGOS DA CINEMATECA</td>
+        <td class="num">R$ 372,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">153. Cinemateca Brasileira - Licenciamento.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2024-10-10</td>
+        <td>Sociedade Amigos da Cinemateca - Sac</td>
+        <td class="num">R$ 372,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-10-31</td>
+        <td>PORVIROSCOPIO PROJETOS</td>
+        <td class="num">R$ 5.000,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">154. Iconografia - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: PORVIROSCOPIO PROJETOS.</td>
+        <td class="mono">2024-10-31</td>
+        <td>Porviroscopio Projetos C. C. Ltda</td>
+        <td class="num">R$ 5.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-10-31</td>
+        <td>CALIBAN PRODUCOES CINEMATOGRAFICAS</td>
+        <td class="num">R$ 5.500,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">155. Silvio Tendler - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: CALIBAN PRODUCOES CINEMATOGRAFICAS.</td>
+        <td class="mono">2024-10-31</td>
+        <td>Caliban Producoes Cinematograficas L</td>
+        <td class="num">R$ 5.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-11-01</td>
+        <td>GRU - GUIA RECOLHIMENTO UNIÃO</td>
+        <td class="num">R$ 140,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">156. Biblioteca Nacional - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.</td>
+        <td class="mono">2024-11-01</td>
+        <td>do Contribuinte</td>
+        <td class="num">R$ 140,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-11-04</td>
+        <td>GRU - GUIA RECOLHIMENTO UNIÃO</td>
+        <td class="num">R$ 400,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">157. Arquivo Nacional - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.</td>
+        <td class="mono">2024-11-04</td>
+        <td>do Contribuinte</td>
+        <td class="num">R$ 400,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-11-08</td>
+        <td>ECHO S COMUNICACAO SONORA</td>
+        <td class="num">R$ 600,00</td>
+        <td class="rubrica">Cópias Digitais (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">158. Echos Comunicação - Cópia Digital.pdf</td>
+        <td class="nota">Favorecido no extrato: ECHO S COMUNICACAO SONORA.</td>
+        <td class="mono">2024-11-08</td>
+        <td>Echo S Comunicacao Sonora e Visual</td>
+        <td class="num">R$ 600,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-11-08</td>
+        <td>ROBERTO FERRARETTO D AVILA</td>
+        <td class="num">R$ 1.000,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">159. Roberto Davilla - Licenciamento.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2024-11-08</td>
+        <td>Roberto F D Avila</td>
+        <td class="num">R$ 1.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-11-12</td>
+        <td>GRU - GUIA RECOLHIMENTO UNIÃO</td>
+        <td class="num">R$ 12,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">160. Biblioteca Nacional - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.</td>
+        <td class="mono">2024-11-12</td>
+        <td>do Contribuinte</td>
+        <td class="num">R$ 12,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-11-14</td>
+        <td>GRU - GUIA RECOLHIMENTO UNIÃO</td>
+        <td class="num">R$ 200,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">161. Arquivo Nacional - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.</td>
+        <td class="mono">2024-11-14</td>
+        <td>do Contribuinte</td>
+        <td class="num">R$ 200,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-11-28</td>
+        <td>MARACH SERVICOS AUDIOVISUAIS</td>
+        <td class="num">R$ 230,00</td>
+        <td class="rubrica">Cópias Digitais (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">162. Procimar - Cópias Digitais.pdf</td>
+        <td class="nota">Favorecido no extrato: MARACH SERVICOS AUDIOVISUAIS.</td>
+        <td class="mono">2024-11-28</td>
+        <td>Marach Servicos Audiovisuais Eireli</td>
+        <td class="num">R$ 230,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-12-05</td>
+        <td>LIRA PARTICIPACOES E FOMENTO (boleto)</td>
+        <td class="num">R$ 6.400,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">163. Correios Brasiliense - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: LIRA PARTICIPACOES E FOMENTO (boleto).</td>
+        <td class="mono">2024-12-05</td>
+        <td>:</td>
+        <td class="num">R$ 6.400,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-12-05</td>
+        <td>GEISA DA SILVA DE JESUS</td>
+        <td class="num">R$ 1.500,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">164. Geisa da Silva Jesus - Licenciamento.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2024-12-05</td>
+        <td>Geisa Silva Jesus</td>
+        <td class="num">R$ 1.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-12-10</td>
+        <td>FUNDACAO GETULIO VARGAS (boleto)</td>
+        <td class="num">R$ 100,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">165. FGV - Licenciamento.pdf</td>
+        <td class="nota">Favorecido no extrato: FUNDACAO GETULIO VARGAS (boleto).</td>
+        <td class="mono">2024-12-10</td>
+        <td>:</td>
+        <td class="num">R$ 100,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-12-17</td>
+        <td>EDITORA E IMPORTADORA MUSICAL (FERMATA)</td>
+        <td class="num">R$ 3.000,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">166. Fermata - Licenciamento.pdf</td>
+        <td class="nota"></td>
+        <td class="mono">2024-12-17</td>
+        <td>Editora e Importadora Musical Fermat</td>
+        <td class="num">R$ 3.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-12-17</td>
+        <td>SOM LIVRE</td>
+        <td class="num">R$ 2.000,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">Som Livre - Licenciamento (arquivo rotulado '168' na pasta)</td>
+        <td class="nota"></td>
+        <td class="mono">2024-12-17</td>
+        <td>Som Livre</td>
+        <td class="num">R$ 2.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-12-17</td>
+        <td>CARLOS LYRA EDICOES MUSICAIS</td>
+        <td class="num">R$ 3.500,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">Carlos Lyra Edições Musicais - Licenciamento (arquivo rotulado '169' na pasta)</td>
+        <td class="nota"></td>
+        <td class="mono">2024-12-17</td>
+        <td>Carlos Lyra Edicoes Musicais</td>
+        <td class="num">R$ 3.500,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-12-17</td>
+        <td>COTACAO D.T.V.M. S/A</td>
+        <td class="num">R$ 8.393,30</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">NYT - Licenciamento (arquivo rotulado '170' na pasta)</td>
+        <td class="nota">Favorecido no extrato: COTACAO D.T.V.M. S/A.</td>
+        <td class="mono">2024-12-17</td>
+        <td>Cotacao D.t.v.m. S/a - Sefic</td>
+        <td class="num">R$ 8.393,30</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2024-12-26</td>
+        <td>GIOVANA AMANO</td>
+        <td class="num">R$ 5.000,00</td>
+        <td class="rubrica">Produtora de Licenciamento (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">Giovana Amano - Produtora de Licenciamento (arquivo rotulado '171' na pasta)</td>
+        <td class="nota"></td>
+        <td class="mono">2024-12-26</td>
+        <td>Giovana Amano</td>
+        <td class="num">R$ 5.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2025-01-16</td>
+        <td>GRU - GUIA RECOLHIMENTO UNIÃO</td>
+        <td class="num">R$ 50,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">Arquivo Nacional - Licenciamento (arquivo rotulado '172' na pasta)</td>
+        <td class="nota">Favorecido no extrato: GRU - GUIA RECOLHIMENTO UNIÃO.</td>
+        <td class="mono">2025-01-16</td>
+        <td>Arquivo Nacional</td>
+        <td class="num">R$ 50,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2025-02-03</td>
+        <td>2 tentativas rejeitadas e estornadas no mesmo dia (líquido R$ 975,04) Favorecido no extrato: BANCO RENDIMENTO S/A.</td>
+        <td class="num">R$ 975,04</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">La Nacion - Licenciamento (arquivo rotulado '173' na pasta)</td>
+        <td class="nota"></td>
+        <td class="mono">2025-02-03</td>
+        <td>CIRCUNSTANC 1961 FSAMPJFN</td>
+        <td class="num">R$ 975,04</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2025-02-27</td>
+        <td>GANZAH</td>
+        <td class="num">R$ 7.000,00</td>
+        <td class="rubrica">Trilha Sonora (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">Marcos Azambuja / Ganzah - Trilha Sonora (arquivo rotulado '174' na pasta)</td>
+        <td class="nota">Favorecido no extrato: GANZAH.</td>
+        <td class="mono">2025-02-27</td>
+        <td>Ganzah</td>
+        <td class="num">R$ 7.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2025-03-25</td>
+        <td>Consta no extrato e não estava na conciliação.</td>
+        <td class="num">R$ 626,30</td>
+        <td class="rubrica"></td>
+        <td>INCLUÍDO — AUSENTE NA PLANILHA</td>
+        <td class="doc">ANCINE - Boleto (arquivo rotulado 'CRT GRU / 175' na pasta)</td>
+        <td class="nota"></td>
+        <td class="mono">2025-03-25</td>
+        <td>:</td>
+        <td class="num">R$ 626,30</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2025-04-30</td>
+        <td>GIOVANA AMANO</td>
+        <td class="num">R$ 3.000,00</td>
+        <td class="rubrica">Licenciamento de conteúdo (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">Giovana Amano - Produtora de Licenciamento (arquivo rotulado '176' na pasta)</td>
+        <td class="nota"></td>
+        <td class="mono">2025-04-30</td>
+        <td>Giovana Amano</td>
+        <td class="num">R$ 3.000,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2025-04-30</td>
+        <td>PLANIFILMES LTDA</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="rubrica">emissão CPB (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">Planifilmes Ltda (emissão CPB - Lia Pini) (arquivo rotulado '177' na pasta)</td>
+        <td class="nota">Favorecido no extrato: PLANIFILMES LTDA.</td>
+        <td class="mono">2025-04-30</td>
+        <td>Planifilmes Ltda</td>
+        <td class="num">R$ 1.200,00</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+      <tr class="row-ok">
+        <td class="status-cell"><span class="badge badge-ok">OK — data e valor conferem</span></td>
+        <td class="mono">2025-05-07</td>
+        <td>FOGO FILMES</td>
+        <td class="num">R$ 18.093,63</td>
+        <td class="rubrica">Edição e Finalização (cód. pendente)</td>
+        <td>OK</td>
+        <td class="doc">Fogo Filmes - Edição e Finalização (André Finotti) (arquivo rotulado '178' na pasta)</td>
+        <td class="nota">Favorecido no extrato: FOGO FILMES.</td>
+        <td class="mono">2025-05-07</td>
+        <td>Fogo Filmes</td>
+        <td class="num">R$ 18.093,63</td>
+        <td class="num">R$ 0,00</td>
+      </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Somente no banco atual</h2>
+    <p class="section-note">Lançamentos em produção que não casaram com nenhuma linha da planilha revisada (10).</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Fornecedor (banco)</th><th>Data</th><th>Valor</th><th>Status</th><th>Observação</th></tr>
+        </thead>
+        <tbody>
+      <tr class="row-sem">
+        <td>Edson de Camargo Transportes</td>
+        <td class="mono">2023-10-05</td>
+        <td class="num">R$ 700,00</td>
+        <td>CONCILIADO_OK</td>
+        <td class="nota">Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado).</td>
+      </tr>
+      <tr class="row-sem">
+        <td>Amir Labaki</td>
+        <td class="mono">2023-10-09</td>
+        <td class="num">R$ 945,49</td>
+        <td>CONCILIADO_OK</td>
+        <td class="nota">Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado).</td>
+      </tr>
+      <tr class="row-sem">
+        <td>Amir Labaki</td>
+        <td class="mono">2023-10-09</td>
+        <td class="num">R$ 945,49</td>
+        <td>CONCILIADO_OK</td>
+        <td class="nota">Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado).</td>
+      </tr>
+      <tr class="row-sem">
+        <td>Camila Licariao de Carvalho Braune 4</td>
+        <td class="mono">2023-10-16</td>
+        <td class="num">R$ 3.000,00</td>
+        <td>CONCILIADO_OK</td>
+        <td class="nota">Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado).</td>
+      </tr>
+      <tr class="row-sem">
+        <td>Mog Produtora</td>
+        <td class="mono">2023-10-25</td>
+        <td class="num">R$ 10.000,00</td>
+        <td>CONCILIADO_OK</td>
+        <td class="nota">Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado).</td>
+      </tr>
+      <tr class="row-sem">
+        <td>Bernardo T S Costa</td>
+        <td class="mono">2023-11-08</td>
+        <td class="num">R$ 300,00</td>
+        <td>CONCILIADO_OK</td>
+        <td class="nota">Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado).</td>
+      </tr>
+      <tr class="row-sem">
+        <td>Monica G P Moraes</td>
+        <td class="mono">2023-11-14</td>
+        <td class="num">R$ 3.724,74</td>
+        <td>CONCILIADO_OK</td>
+        <td class="nota">Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado).</td>
+      </tr>
+      <tr class="row-sem">
+        <td>Monica G P Moraes</td>
+        <td class="mono">2023-11-14</td>
+        <td class="num">R$ 3.724,74</td>
+        <td>CONCILIADO_OK</td>
+        <td class="nota">Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado).</td>
+      </tr>
+      <tr class="row-sem">
+        <td>BANCO RENDIMENTO S/A</td>
+        <td class="mono">2025-02-03</td>
+        <td class="num">R$ 975,04</td>
+        <td>CONCILIADO_OK</td>
+        <td class="nota">Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado).</td>
+      </tr>
+      <tr class="row-sem">
+        <td>Banco Rendimento S/a</td>
+        <td class="mono">2025-02-03</td>
+        <td class="num">R$ 975,04</td>
+        <td>CONCILIADO_OK</td>
+        <td class="nota">Sem correspondência exata de valor na planilha revisada — conferir manualmente (pode ser duplicata 59/122, item removido na revisão, ou pagamento fora do escopo revisado).</td>
+      </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>Cruzamento gerado em 2026-08-12 a partir do Postgres local (projeto "001", 185 transações CONCILIADO_OK) e da planilha revisada. Documento de conferência — nenhuma alteração em produção.</footer>
+</div>

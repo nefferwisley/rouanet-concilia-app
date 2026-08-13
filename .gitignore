@@ -33,3 +33,6 @@ agency-agents/
 
 # Dados brutos de entrada (extrações, PDFs originais) — fora do versionamento
 3. 1961/
+
+# Local Netlify folder
+.netlify

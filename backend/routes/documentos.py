@@ -341,6 +341,87 @@ async def vincular_automatico(projeto_id: str, dep=Depends(get_conn)):
     }
 
 
+@router.post("/projeto/{projeto_id}/vincular-inteligente")
+async def vincular_inteligente(projeto_id: str, dep=Depends(get_conn)):
+    """
+    Vinculação inteligente por data + valor + fornecedor.
+    Se o matching por nome falhar, tenta achar o documento pelo contexto da transação.
+
+    Heurística: para cada transação sem documento, procura documentos_projeto com
+    data próxima (±5 dias), valor no nome do arquivo, ou fornecedor similar.
+    """
+    conn, _ = dep
+    projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
+    if not projeto:
+        raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
+
+    # Primeiro tenta o matching por nome (o que já existe)
+    linkados_nome = await conn.fetch(
+        """
+        with reais as (
+            select id, arquivo_ref,
+                   regexp_replace(nome_arquivo, '^.*[/\\\\]', '') as nome_base
+            from documentos_projeto
+            where projeto_id = $1 and origem = 'google_drive' and nome_arquivo is not null
+        )
+        update documentos_transacao d
+        set arquivo_ref = r.arquivo_ref
+        from reais r, transacoes t
+        where d.transacao_id = t.id
+          and t.projeto_id = $1
+          and d.arquivo_ref = r.nome_base
+        returning d.id, r.nome_base
+        """,
+        projeto_id,
+    )
+
+    # Depois tenta por proximidade de data (se tiver data_pagamento)
+    linkados_data = await conn.fetch(
+        """
+        with docs_sem_vincular as (
+            select d.id as doc_id, d.transacao_id, t.data_pagamento, t.fornecedor, t.valor_bruto
+            from documentos_transacao d
+            join transacoes t on d.transacao_id = t.id
+            where t.projeto_id = $1 and d.arquivo_ref is null and t.data_pagamento is not null
+        ),
+        arquivos_disponiveis as (
+            select id, nome_arquivo,
+                   regexp_replace(nome_arquivo, '^.*[/\\\\]', '') as nome_base,
+                   arquivo_ref
+            from documentos_projeto
+            where projeto_id = $1 and nome_arquivo is not null
+        )
+        update documentos_transacao d
+        set arquivo_ref = a.arquivo_ref
+        from docs_sem_vincular dsv, arquivos_disponiveis a
+        where d.id = dsv.doc_id
+          and d.arquivo_ref is null
+          -- match por data próxima (±5 dias) + valor ou fornecedor no nome
+          and abs(extract(day from dsv.data_pagamento::date - now()::date)) <= 5
+          and (
+              a.nome_base ilike '%' || dsv.data_pagamento::text || '%'
+              or a.nome_base ilike replace(replace(dsv.fornecedor, ' ', '%'), '-', '%') || '%'
+          )
+        returning d.id, a.nome_base
+        """,
+        projeto_id,
+    )
+
+    total = len(linkados_nome) + len(linkados_data)
+    logger.info(
+        "Projeto %s: vincular-inteligente completado. Nome=%d, Data=%d, Total=%d",
+        projeto_id, len(linkados_nome), len(linkados_data), total
+    )
+
+    return {
+        "vinculados_total": total,
+        "vinculados_por_nome": len(linkados_nome),
+        "vinculados_por_data": len(linkados_data),
+        "arquivos_nome": [row["nome_base"] for row in linkados_nome],
+        "arquivos_data": [row["nome_base"] for row in linkados_data],
+    }
+
+
 @router.get("/projeto/{projeto_id}")
 async def listar_documentos_projeto(projeto_id: str, dep=Depends(get_conn)):
     conn, _ = dep

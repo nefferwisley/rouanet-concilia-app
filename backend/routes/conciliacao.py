@@ -27,6 +27,94 @@ from motor.extrato_importer import calcular_status_movimentos, tipo_por_sinal
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["conciliacao"])
 
+
+def _modalidade_extrato(historico: str | None) -> str:
+    """Lê o histórico do banco e devolve a modalidade de pagamento.
+
+    O campo `historico` do extrato traz a modalidade no texto (ex.: "Pix -
+    Enviado", "TED-Crédito em Conta", "Recebimento Fornecedor"). Retorna um
+    rótulo curto reutilizável na tela.
+    """
+    texto = (historico or "").lower()
+    if "pix" in texto:
+        return "PIX"
+    if "ted" in texto:
+        return "TED"
+    if "doc" in texto:
+        return "DOC"
+    if "boleto" in texto:
+        return "BOLETO"
+    if "tarifa" in texto or "tar. banc" in texto:
+        return "TARIFA"
+    if "devolu" in texto:
+        return "DEVOLUÇÃO"
+    return "OUTRO"
+
+
+def _confianca_candidato(movimento: dict, transacao: dict, hoje: date) -> float:
+    """Score simples (0..1) de quão provável é o vínculo movimento×transação.
+
+    Base: valor idêntico (2 casas). Bônus: proximidade de data, afinidade de
+    nome no histórico/documento. Usado para ordenar os candidatos e escrever
+    o motivo da pendência.
+    """
+    score = 0.0
+    valor_mov = abs(float(movimento["valor"]))
+    valor_trans = transacao.get("valor_bruto")
+    if valor_trans is None:
+        return score
+    if round(valor_mov, 2) == round(float(valor_trans), 2):
+        score = 0.6
+    else:
+        # proximidade de valor (≤ 1%) conta pouco, ajuda em fatura/boleto com junk?
+        diff = abs(valor_mov - float(valor_trans)) / max(valor_mov, 0.01)
+        if diff <= 0.01:
+            score = 0.4
+
+    data_mov = movimento.get("data")
+    data_trans = transacao.get("data_pagamento")
+    if score > 0 and data_mov and data_trans:
+        try:
+            d1 = date.fromisoformat(str(data_mov))
+            d2 = date.fromisoformat(str(data_trans))
+            dias = abs((d1 - d2).days)
+            if dias <= 3:
+                score += 0.3
+            elif dias <= 15:
+                score += 0.15
+        except ValueError:
+            pass
+
+    historico = (movimento.get("historico") or "").lower()
+    documento = (movimento.get("documento") or "").lower()
+    fornecedor = (transacao.get("fornecedor") or "").lower()
+    for parte in [historico, documento]:
+        tokens = [t for t in parte.replace("-", " ").split() if len(t) >= 4]
+        if tokens and any(t in fornecedor for t in tokens):
+            score += 0.15
+            break
+
+    return min(score, 1.0)
+
+
+def _motivo_pendencia(movimento: dict, candidatos: list[dict]) -> str:
+    """Explica por que o movimento segue pendente, orientando o auditor."""
+    for c in candidatos:
+        if c.get("score", 0) >= 0.9:
+            return f"Provável vínculo: {c['fornecedor']} (confiança {c['score']:.0%}) — confirme clicando em Vincular."
+        if c.get("score", 0) >= 0.6:
+            return (
+                f"Valor idêntico em {len(candidatos)} lançamento(s), mas data distante "
+                f"({c['fornecedor']}) — verifique se é realmente o pagamento."
+            )
+    if candidatos:
+        return "Valor bate, porém não bate com nenhum lançamento da planilha — crie o lançamento."
+    if movimento.get("tipo") == "CREDITO_CAPTACAO":
+        return "Crédito de captação no extrato sem lançamento correspondente na planilha."
+    if movimento.get("tipo") == "TARIFA":
+        return "Tarifa bancária — pode ser marcada como custo bancário da conta captadora."
+    return "Pagamento no extrato sem lançamento correspondente na planilha."
+
 _MEDIA = conciliacao_service._MEDIA_POR_SUFIXO
 _PARSED_DIR = conciliacao_service._REPO_RAIZ / "motor" / "_parsed"
 
@@ -285,7 +373,7 @@ async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
 
     movimentos = await conn.fetch(
         """
-        select m.id, m.data, m.historico, m.documento, m.valor, m.status_conciliacao
+        select m.id, m.data, m.historico, m.documento, m.valor, m.status_conciliacao, m.tipo
         from extrato_movimentos m
         join contas_captadoras c on c.id = m.conta_id
         where c.projeto_id = $1
@@ -296,7 +384,7 @@ async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
     transacoes = await conn.fetch(
         """
         select t.id, t.fornecedor, t.cnpj_fornecedor, t.data_pagamento, t.valor_bruto, t.status,
-               r.codigo as rubrica_codigo,
+               r.codigo as rubrica_codigo, r.descricao as rubrica_descricao,
                (
                    select id from documentos_transacao doc
                    where doc.transacao_id = t.id order by created_at desc limit 1
@@ -314,32 +402,63 @@ async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
         projeto_id,
     )
 
+    transacoes_serializadas = [
+        {
+            "id": str(t["id"]),
+            "fornecedor": t["fornecedor"],
+            "cnpj_fornecedor": t["cnpj_fornecedor"],
+            "data_pagamento": t["data_pagamento"].isoformat() if t["data_pagamento"] else None,
+            "valor_bruto": float(t["valor_bruto"]) if t["valor_bruto"] is not None else None,
+            "status": t["status"],
+            "rubrica_codigo": t["rubrica_codigo"],
+            "rubrica_descricao": t["rubrica_descricao"],
+            "documento_id": str(t["documento_id"]) if t["documento_id"] else None,
+            "documento": t["documento"],
+        }
+        for t in transacoes
+    ]
+
+    movimentos_serializados = []
+    for m in movimentos:
+        m_dict = {
+            "id": str(m["id"]),
+            "data": m["data"].isoformat(),
+            "historico": m["historico"],
+            "documento": m["documento"],
+            "valor": float(m["valor"]),
+            "status_conciliacao": m["status_conciliacao"],
+            "tipo": m["tipo"],
+            "modalidade": _modalidade_extrato(m["historico"]),
+        }
+        if m["status_conciliacao"] == "PENDENTE":
+            candidatos = []
+            for t in transacoes_serializadas:
+                score = _confianca_candidato(m_dict, t, m["data"])
+                if score > 0:
+                    candidatos.append(
+                        {
+                            "id": t["id"],
+                            "fornecedor": t["fornecedor"],
+                            "valor_bruto": t["valor_bruto"],
+                            "data_pagamento": t["data_pagamento"],
+                            "rubrica_codigo": t["rubrica_codigo"],
+                            "rubrica_descricao": t["rubrica_descricao"],
+                            "documento_id": t["documento_id"],
+                            "documento": t["documento"],
+                            "score": round(score, 2),
+                        }
+                    )
+            candidatos.sort(key=lambda c: c["score"], reverse=True)
+            m_dict["candidatos"] = candidatos[:5]
+            m_dict["motivo_pendencia"] = _motivo_pendencia(m_dict, m_dict["candidatos"])
+        else:
+            m_dict["candidatos"] = []
+            m_dict["motivo_pendencia"] = None
+        movimentos_serializados.append(m_dict)
+
     return {
-        "movimentos": [
-            {
-                "id": str(m["id"]),
-                "data": m["data"].isoformat(),
-                "historico": m["historico"],
-                "documento": m["documento"],
-                "valor": float(m["valor"]),
-                "status_conciliacao": m["status_conciliacao"],
-            }
-            for m in movimentos
-        ],
-        "transacoes": [
-            {
-                "id": str(t["id"]),
-                "fornecedor": t["fornecedor"],
-                "cnpj_fornecedor": t["cnpj_fornecedor"],
-                "data_pagamento": t["data_pagamento"].isoformat() if t["data_pagamento"] else None,
-                "valor_bruto": float(t["valor_bruto"]) if t["valor_bruto"] is not None else None,
-                "status": t["status"],
-                "rubrica_codigo": t["rubrica_codigo"],
-                "documento_id": str(t["documento_id"]) if t["documento_id"] else None,
-                "documento": t["documento"],
-            }
-            for t in transacoes
-        ],
+        "movimentos": movimentos_serializados,
+        "transacoes": transacoes_serializadas,
     }
 
 

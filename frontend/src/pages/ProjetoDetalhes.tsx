@@ -7,7 +7,6 @@ import { ConfrontoSalic } from "../components/ConfrontoSalic";
 import { DemonstrativoSaldos } from "../components/DemonstrativoSaldos";
 import { EditProjectModal } from "../components/EditProjectModal";
 import { DeleteProjectButton } from "../components/DeleteProjectButton";
-import { DocumentosProjeto } from "../components/DocumentosProjeto";
 import { RevisaoDocumental } from "../components/RevisaoDocumental";
 import { RevisaoManual } from "../components/RevisaoManual";
 import { RevisaoPendentes } from "../components/RevisaoPendentes";
@@ -199,7 +198,6 @@ export function ProjetoDetalhes() {
       </div>
 
       <div className={aba === "geral" ? "space-y-4" : "hidden"}>
-        <DocumentosProjeto projetoId={projeto.id} />
         <AuditoriaProjeto projetoId={projeto.id} />
       </div>
 

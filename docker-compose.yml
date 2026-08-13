@@ -30,6 +30,7 @@ services:
     environment:
       DATABASE_URL: postgresql://rouanet:rouanet_dev_password@postgres:5432/rouanet_concilia
       SUPABASE_JWT_SECRET: "dev-secret-key-min-32-chars-long-!!!"
+      APP_ENV: dev
       GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
       CORS_ORIGINS: "http://localhost:5173,http://localhost:3000"
       UPLOAD_DIR: /app/uploads

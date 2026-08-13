@@ -10,6 +10,22 @@ interface MovimentoExtrato {
   valor: number;
   status_conciliacao: string;
   transacao_id?: string | null;
+  tipo?: string | null;
+  modalidade?: string | null;
+  motivo_pendencia?: string | null;
+  candidatos?: CandidatoSugestao[];
+}
+
+interface CandidatoSugestao {
+  id: string;
+  fornecedor?: string;
+  valor_bruto?: number;
+  data_pagamento?: string | null;
+  rubrica_codigo?: string | null;
+  rubrica_descricao?: string | null;
+  documento_id?: string | null;
+  documento?: string | null;
+  score: number;
 }
 
 interface TransacaoCandidata {
@@ -307,13 +323,18 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
                     {/* STATUS */}
                     <td className="py-3 px-3 text-center whitespace-nowrap">
                       <span
-                        className={`inline-flex px-2.5 py-1 rounded-md text-[11px] font-bold ${
+                        className={`inline-flex flex-col items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold ${
                           m.status_conciliacao === "CONCILIADO"
                             ? "bg-emerald-950/80 text-emerald-300 border border-emerald-700/50"
                             : "bg-amber-950/80 text-amber-300 border border-amber-700/50"
                         }`}
                       >
                         {m.status_conciliacao}
+                        {m.modalidade && (
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-navy-950/70 text-slate-300">
+                            {m.modalidade}
+                          </span>
+                        )}
                       </span>
                     </td>
 
@@ -345,6 +366,41 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
                             );
                           })}
                         </select>
+
+                        {/* Motivo da pendência + sugestões de candidatos */}
+                        {m.status_conciliacao === "PENDENTE" && (
+                          <div className="space-y-1.5 mt-1.5 p-2 rounded bg-amber-950/25 border border-amber-700/30 text-[11px]">
+                            {m.motivo_pendencia && (
+                              <p className="text-amber-200 font-medium">
+                                ℹ️ {m.motivo_pendencia}
+                              </p>
+                            )}
+                            {m.candidatos && m.candidatos.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5">
+                                {m.candidatos.slice(0, 3).map((c) => {
+                                  const selecionado = valorSelecionado === c.id;
+                                  return (
+                                    <button
+                                      key={c.id}
+                                      onClick={() => setSelecoes({ ...selecoes, [m.id]: c.id })}
+                                      className={`px-2 py-1 rounded-md border text-[10px] font-semibold transition-colors ${
+                                        selecionado
+                                          ? "bg-emerald-600/40 border-emerald-500 text-emerald-200"
+                                          : "bg-navy-900/60 border-slate-700 text-slate-300 hover:bg-navy-700"
+                                      }`}
+                                      title={`Sugestão: ${c.fornecedor} — ${brl(c.valor_bruto)}${c.data_pagamento ? ` em ${new Date(c.data_pagamento + "T00:00:00").toLocaleDateString("pt-BR")}` : ""}`}
+                                    >
+                                      💡 {c.fornecedor}
+                                      <span className="ml-1 font-mono text-[9px]">
+                                        {Math.round(c.score * 100)}%
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        )}
 
                         {/* Detalhes do vínculo */}
                         {transacaoAtual ? (
