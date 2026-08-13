@@ -48,6 +48,30 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="RouanetConcilia API", version="1.0.0", lifespan=lifespan)
 
+@app.middleware("http")
+async def capturar_erros_com_cors(request: Request, call_next):
+    """
+    Converte exceção não tratada em JSONResponse AQUI DENTRO da stack, abaixo
+    do CORSMiddleware.
+
+    Por que: o @app.exception_handler(Exception) do Starlette roda no
+    ServerErrorMiddleware, que é a camada MAIS EXTERNA — acima do CORS. A
+    resposta 500 saía sem Access-Control-Allow-Origin e o navegador reportava
+    "No 'Access-Control-Allow-Origin' header is present", escondendo o 500 real
+    (custou horas de diagnóstico errado). Interceptando aqui, o CORSMiddleware
+    ainda envolve a resposta e injeta os headers.
+
+    Cuidado com a ordem: no Starlette o middleware adicionado por ÚLTIMO é o
+    mais externo. Este é declarado ANTES do add_middleware(CORSMiddleware)
+    justamente pra ficar por dentro dele.
+    """
+    try:
+        return await call_next(request)
+    except Exception:  # noqa: BLE001 — stacktrace fica no servidor, cliente só vê genérico
+        log.exception("Erro não tratado em %s %s", request.method, request.url)
+        return JSONResponse(status_code=500, content={"detail": "Erro interno."})
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[o.strip() for o in settings.cors_origins.split(",")],
@@ -85,7 +109,10 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception):
-    log.exception("Erro não tratado em %s %s", request.method, request.url)
+    # Rede de segurança: na prática capturar_erros_com_cors já pegou tudo que
+    # vem de rota. Isto só cobre falha em middleware mais externo — e aí a
+    # resposta sai sem headers CORS mesmo, não há stack abaixo pra injetá-los.
+    log.exception("Erro não tratado (fora da stack CORS) em %s %s", request.method, request.url)
     return JSONResponse(status_code=500, content={"detail": "Erro interno."})
 
 

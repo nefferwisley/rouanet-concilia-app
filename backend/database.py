@@ -42,12 +42,26 @@ async def get_pool() -> asyncpg.Pool:
 
 
 async def _criar_pool() -> asyncpg.Pool:
+    # statement_cache_size=0: o pooler do Supabase (Supavisor/PgBouncer) em
+    # transaction mode troca a conexão física do servidor a cada transação,
+    # então o prepared statement que o asyncpg criou e cacheou some — os logs
+    # do Postgres enchiam de `prepared statement "__asyncpg_stmt_NNN__" does
+    # not exist` e as rotas quebravam de forma intermitente. Zerar o cache faz
+    # o asyncpg usar statements anônimos, que não dependem de sessão.
+    #
+    # max_cacheable_statement_size=0: fecha a mesma armadilha no cache de
+    # introspecção de tipos, que sobrevive ao statement_cache_size=0.
+    #
+    # Nada disso atrapalha conexão direta (sem pooler): apenas abre mão de um
+    # cache, o que custa um round-trip a mais por query e nunca corretude.
     return await asyncpg.create_pool(
         settings.database_url,
         min_size=1,
         max_size=10,
         timeout=30,
         command_timeout=30,
+        statement_cache_size=0,
+        max_cacheable_statement_size=0,
     )
 
 
