@@ -22,6 +22,7 @@ from starlette.concurrency import run_in_threadpool
 
 from backend.config import settings
 from backend.database import get_conn
+from backend.routes.websocket import sincronia_manager
 from backend.services import storage_service
 from motor.correcoes_manuais import carregar_correcoes
 from motor.drive_service import baixar_arquivo, extrair_folder_id, listar_arquivos
@@ -89,6 +90,27 @@ def _normalizar_texto(s: str | None) -> str:
     nfkd = unicodedata.normalize("NFKD", s)
     sem_acento = nfkd.encode("ascii", "ignore").decode("ascii")
     return re.sub(r"\s+", " ", sem_acento).strip().lower()
+
+
+async def _notificar_sincronia(projeto_id: str, adicionados: list[str]) -> None:
+    """
+    Avisa clientes WebSocket conectados (/ws/projeto/{id}/sincronia) que
+    documentos mudaram, sem depender de um watcher varrendo disco -- desde a
+    migração pro Supabase Storage, o disco local (UPLOAD_DIR) não recebe mais
+    nada em produção, então um watcher de arquivo nunca detectaria essas
+    mudanças. Aqui o evento é disparado direto de onde a mudança acontece de
+    verdade (upload/vínculo), sem atraso de polling.
+    Best-effort: se não houver ninguém conectado, broadcast() é um no-op.
+    """
+    if not adicionados:
+        return
+    try:
+        await sincronia_manager.broadcast(
+            projeto_id,
+            {"tipo": "sincronia_arquivos", "projeto_id": projeto_id, "adicionados": adicionados, "removidos": []},
+        )
+    except Exception as e:  # noqa: BLE001 — notificação em tempo real nunca pode quebrar a operação principal
+        logger.debug("Falha ao notificar sincronia via WebSocket (projeto %s): %s", projeto_id, e)
 
 
 @router.post("/ocr")
@@ -510,6 +532,11 @@ async def backfill_storage(projeto_id: str, commit: bool = False, limite: int = 
         projeto_id, commit, repostos, ja_no_bucket, falhas,
     )
 
+    if commit:
+        await _notificar_sincronia(
+            projeto_id, [d["arquivo"] for d in detalhes if d["status"] == "reposto"]
+        )
+
     return {
         "dry_run": not commit,
         "repostos": repostos,
@@ -724,6 +751,11 @@ async def vincular_por_prestador(projeto_id: str, commit: bool = False, dep=Depe
         projeto_id, commit, vinculados, ja_ok, ambiguos, sem_match,
     )
 
+    if commit:
+        await _notificar_sincronia(
+            projeto_id, [d["arquivo_drive"] for d in detalhes if d["status"] == "vinculado"]
+        )
+
     return {
         "dry_run": not commit,
         "vinculados": vinculados,
@@ -871,6 +903,7 @@ async def vincular_manual_documento(
         transacao_id,
     )
     logger.info("vincular-manual: transação %s vinculada a %s por %s", transacao_id, doc_drive["arquivo_ref"], user_id)
+    await _notificar_sincronia(projeto_id, [doc_drive["arquivo_ref"]])
     return {"transacao_id": transacao_id, "arquivo_ref": doc_drive["arquivo_ref"], "status": "vinculado"}
 
 
