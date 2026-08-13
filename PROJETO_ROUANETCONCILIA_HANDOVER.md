@@ -45,6 +45,33 @@ Escopo completo da tarefa (o que checar se está tudo feito): adicionar client S
 - Reprocessar os 598 arquivos do Drive desse projeto (`a2fe2ae0-4041-47c9-bda1-e347982d0bc2`) — via o script de backfill acima.
 - Repensar a estratégia de matching automático de documentos (hoje 0% de acerto pela divergência de nomenclatura Drive vs. importação) — não vale a pena atacar antes do storage estabilizar, porque `arquivo_ref` muda de semântica (path de disco → path de bucket).
 
+### 🎛️ Gerenciamento de agentes (Claude / Antigravity / opencode)
+
+Você tem 3 ferramentas de agente disponíveis, cada uma libera tokens/uso aos poucos (rate limit ou cota). Regra de ouro: **antes de qualquer agente começar, ele deve ler esta seção 0 inteira + rodar `git status` e `git diff --stat` no repo** — nunca confiar em histórico de chat de outra sessão, porque o próximo agente não tem acesso a ele.
+
+**Perfil de cada um:**
+- **Claude Code** (esta ferramenta) — tem shell, browser real, `wrangler`/deploy, `git`. Use pra: debug ponta-a-ponta, verificação em produção, deploy, decisões que exigem julgamento (ex: revisar código gerado por outro agente antes de aceitar), coordenar os outros dois.
+- **opencode** (CLI local, `C:\Users\Dell\Desktop\meu_sistema_rouanet`) — **só modelos gratuitos disponíveis** (sem créditos pagos). Testados nesta sessão:
+  - ✅ `google/gemini-3.5-flash` — funcional, usado pra tarefa atual.
+  - ❌ `kimi-for-coding/k3` — credencial expirada (rodar `opencode providers login` se quiser reativar).
+  - ❌ `openrouter/*` (qualquer modelo) — sem créditos na conta.
+  - ❌ `google/gemini-2.5-pro` — descontinuado pelo Google.
+  - ❌ `google/gemini-3.1-pro-preview` — trava sem produzir output (esperei 8+min, zero progresso).
+  - ❌ `groq/*` — gratuito mas teto de 8.000 tokens/min; estoura em tarefas com bastante contexto de repo (uso só pra tarefas pequenas/pontuais).
+  - Comando pra rodar em background: `nohup opencode run "$(cat prompt.md)" --model google/gemini-3.5-flash --dir "<repo>" --auto > log.txt 2>&1 & disown`. **Não use `--format json`** — nesta sessão ficou sem imprimir nada visível mesmo funcionando; o formato default (texto) mostra a todo-list e as ações em tempo real, mais fácil de monitorar.
+  - Use pra: tarefas de implementação bem escopadas e mecânicas que rodam sozinhas, sem precisar de supervisão constante (ex: a migração de storage atual).
+- **Antigravity** (Google) — não usada nesta sessão, mas já foi usada antes (ver seção 3 abaixo, cache em `brain/<id>/implementation_plan.md`). Use como terceira opção quando Claude e opencode estiverem sem cota.
+
+**Fila de tarefas priorizada (pra qualquer agente pegar a próxima):**
+1. 🔵 **EM ANDAMENTO** (opencode/gemini-3.5-flash, PID pode já ter mudado — checar `opencode session list`) — migração de storage pra Supabase, checklist de 9 itens. Ver progresso real com `git status`/`git diff --stat backend/` (NÃO confiar em paths de log em `/tmp` ou scratchpad — são efêmeros por sessão).
+   - ⚠️ Ponto de atenção já encontrado em `backend/services/storage_service.py`: ele importa `UPLOAD_DIR` de dentro de `backend/routes/revisao.py` (linha ~75, dentro do fallback local) — um `services/` importando de `routes/` é invertido (deveria ser o contrário). Não é bug funcional, mas vale corrigir na revisão final antes de mergear.
+2. 🟡 **BLOQUEADO até #1 terminar** — script de backfill dos 598 arquivos do Drive perdidos neste projeto (`a2fe2ae0-4041-47c9-bda1-e347982d0bc2`).
+3. 🟡 **BLOQUEADO até #1 terminar** — repensar estratégia de matching automático de documento↔transação (hoje 0% de acerto). **Descoberta desta sessão**: o Agente Reconciliação do orquestrador Phidata (`/api/v1/orquestrador/conciliacao/reconciliacao-automatica`, confirmado vivo em produção) faz matching RAG só pra **rubricas** (categoria orçamentária), não pra documentos — não resolve este item diretamente, mas pode servir de referência de padrão de código se decidirem fazer RAG de documentos também.
+4. 🟢 **LIVRE, sem dependência** — revisão de segurança do `storage_service.py` antes do merge final (service-role key, política do bucket).
+5. 🟢 **LIVRE, sem dependência** — decidir se a feature de "WebSocket de sincronia" (ver seção 3 abaixo, WIP não commitado) deve ser finalizada ou descartada — hoje o frontend tenta conectar numa rota que dá 404 no backend.
+
+**Regra de não-conflito**: enquanto o item 1 estiver em andamento, nenhum outro agente deve editar `backend/routes/documentos.py`, `backend/routes/revisao.py`, `backend/config.py` ou `backend/requirements.txt` — são os arquivos que o opencode está mexendo.
+
 ### ⚠️ WIP não commitado de outra sessão (achado, não mexido)
 Havia (e ainda há, preservado intacto) trabalho não commitado de outra sessão: painel `DivergenciasPanel.tsx`, separação `prestador`/`razao_social`, e a feature de "WebSocket de sincronia" descrita na seção 3 mais abaixo neste documento. **A feature de WebSocket parece incompleta**: o frontend tenta conectar em `wss://.../ws/projeto/{id}/sincronia` mas o backend responde 404 pra essa rota (não foi commitada, ou o handler não existe). Se for continuar essa feature, comece checando se `backend/routes/websocket.py` (modificado, não commitado) realmente registra essa rota em `backend/main.py`.
 
