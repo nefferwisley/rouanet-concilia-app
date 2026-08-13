@@ -37,7 +37,7 @@ const brl = (v: number | undefined) =>
  *  cada transação e dispara o OCR (carregando a chave Gemini digitada na
  *  hora; se não houver, o documento é anexado mesmo assim). */
 export function RevisaoDocumental({ projetoId }: { projetoId: string }) {
-  const { get, postForm, download } = useAPI();
+  const { get, post, postForm, download } = useAPI();
   const [transacoes, setTransacoes] = useState<TransacaoAuditoria[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
@@ -45,6 +45,8 @@ export function RevisaoDocumental({ projetoId }: { projetoId: string }) {
   const [documentosPorTransacao, setDocumentosPorTransacao] = useState<Record<string, DocumentoTransacao[]>>({});
   const [enviando, setEnviando] = useState<string | null>(null);
   const [mensagens, setMensagens] = useState<Record<string, string>>({});
+  const [vinculando, setVinculando] = useState(false);
+  const [mensagemVinculo, setMensagemVinculo] = useState<string | null>(null);
   const [chaveGemini, setChaveGemini] = useState(() => {
     return localStorage.getItem("gemini_api_key") || "";
   });
@@ -117,6 +119,29 @@ export function RevisaoDocumental({ projetoId }: { projetoId: string }) {
   // por clareza no JSX (evita depender do estado fechado)
   const apiKey = chaveGemini;
 
+  const vincularAutomaticamente = async () => {
+    setVinculando(true);
+    setMensagemVinculo(null);
+    try {
+      const r = await post<{
+        vinculados_total: number;
+        vinculados_por_nome: number;
+        vinculados_por_data: number;
+      }>(`/api/v1/documentos/projeto/${projetoId}/vincular-inteligente`, {});
+      setMensagemVinculo(
+        r.vinculados_total > 0
+          ? `✓ ${r.vinculados_total} documento(s) vinculado(s) (${r.vinculados_por_nome} por nome, ${r.vinculados_por_data} por data/fornecedor).`
+          : "Nenhum documento novo pôde ser vinculado automaticamente. Verifique se a pasta do Drive foi sincronizada."
+      );
+      setDocumentosPorTransacao({});
+      await carregar();
+    } catch (e) {
+      setMensagemVinculo(e instanceof Error ? `Falhou: ${e.message}` : "Erro ao vincular documentos.");
+    } finally {
+      setVinculando(false);
+    }
+  };
+
   if (carregando) return <div className="text-sm text-slate-500">Carregando lançamentos...</div>;
   if (erro) return <div className="text-sm text-red-600">{erro}</div>;
 
@@ -144,6 +169,12 @@ export function RevisaoDocumental({ projetoId }: { projetoId: string }) {
           Anexe o comprovante/NF de cada lançamento. Se houver chave Gemini, o sistema extrai os campos e
           pede revisão quando a confiança ficar abaixo do limiar.
         </p>
+        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+          <button className="btn-secondary text-xs" onClick={vincularAutomaticamente} disabled={vinculando}>
+            {vinculando ? "🔗 Vinculando…" : "🔗 Vincular documentos já sincronizados do Drive"}
+          </button>
+          {mensagemVinculo && <span className="text-xs text-slate-500">{mensagemVinculo}</span>}
+        </div>
       </div>
 
       <div className="card p-0 overflow-hidden">
