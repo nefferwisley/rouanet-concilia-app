@@ -78,7 +78,10 @@ async def aplicar_migrations() -> None:
 
         contagem_ok, contagem_pulada, falhas = 0, 0, []
 
-        arquivos = sorted(MIGRATIONS_DIR.glob("000*.sql"))
+        # Quatro dígitos, não "000*": o glob antigo casava só até 0009 e teria
+        # PULADO 0010 em diante — em silêncio, sem erro nenhum, que é o pior
+        # modo de falhar (foi assim que 0009 não aplicou e derrubou produção).
+        arquivos = sorted(MIGRATIONS_DIR.glob("[0-9][0-9][0-9][0-9]_*.sql"))
         for arquivo in arquivos:
             if arquivo.name in aplicadas:
                 contagem_pulada += 1
