@@ -391,13 +391,22 @@ async def backfill_storage(projeto_id: str, commit: bool = False, dep=Depends(ge
         projeto_id,
     )
 
+    # Checagem de "já está no bucket" via UMA query em storage.objects (mesma
+    # base Postgres do resto do app) em vez de uma chamada de rede por
+    # arquivo -- com ~600 documentos, o loop anterior (download() por doc)
+    # estourava o timeout do worker antes de terminar até o dry-run.
+    existentes_rows = await conn.fetch(
+        "select name from storage.objects where bucket_id = 'documentos' and name like $1",
+        f"{projeto_id}/%",
+    )
+    nomes_existentes = {row["name"] for row in existentes_rows}
+
     repostos, falhas, ja_no_bucket = 0, 0, 0
     detalhes = []
     for doc in docs:
         caminho_logico = f"{projeto_id}/{doc['nome_arquivo']}"
 
-        existente = await run_in_threadpool(storage_service.baixar_arquivo, caminho_logico)
-        if existente is not None:
+        if caminho_logico in nomes_existentes:
             ja_no_bucket += 1
             continue
 
