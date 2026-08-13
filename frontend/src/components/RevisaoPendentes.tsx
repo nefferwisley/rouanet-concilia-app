@@ -5,7 +5,7 @@ interface TransacaoPendente {
   id: string;
   fornecedor?: string;
   razao_social?: string;
-  cnpj_fornecedor?: string;
+  documento?: string;
   data_pagamento?: string;
   valor_bruto: number;
   tem_nf: boolean;
@@ -17,9 +17,8 @@ interface TransacaoPendente {
 }
 
 interface PaginatedResponse {
-  total: number;
-  page: number;
   transacoes: TransacaoPendente[];
+  paginacao: { page: number; limit: number; total: number };
 }
 
 const brl = (v: number | undefined) =>
@@ -84,7 +83,7 @@ export function RevisaoPendentes({ projetoId }: { projetoId: string }) {
     );
   }
 
-  const total = dados.total || 0;
+  const total = dados.paginacao?.total || 0;
   const totalPages = Math.ceil(total / limit);
 
   return (
@@ -132,8 +131,8 @@ export function RevisaoPendentes({ projetoId }: { projetoId: string }) {
                       <div className="font-semibold text-slate-100">
                         {t.fornecedor || t.razao_social || "-"}
                       </div>
-                      {t.cnpj_fornecedor && (
-                        <div className="text-xs text-slate-400 font-mono">{t.cnpj_fornecedor}</div>
+                      {t.documento && (
+                        <div className="text-xs text-slate-400 font-mono">{t.documento}</div>
                       )}
                     </td>
                     <td className="py-3 px-3 text-right font-bold text-emerald-400">

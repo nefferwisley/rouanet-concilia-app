@@ -396,10 +396,11 @@ async def vincular_inteligente(projeto_id: str, dep=Depends(get_conn)):
         from docs_sem_vincular dsv, arquivos_disponiveis a
         where d.id = dsv.doc_id
           and d.arquivo_ref is null
-          -- match por data próxima (±5 dias) + valor ou fornecedor no nome
-          and abs(extract(day from dsv.data_pagamento::date - now()::date)) <= 5
+          -- match pela data da TRANSAÇÃO formatada como aparece no nome do
+          -- arquivo (padrão real: "005 - 10-11-2022 - Fornecedor - Item.pdf"),
+          -- ou pelo nome do fornecedor presente no nome do arquivo.
           and (
-              a.nome_base ilike '%' || dsv.data_pagamento::text || '%'
+              a.nome_base ilike '%' || to_char(dsv.data_pagamento, 'DD-MM-YYYY') || '%'
               or a.nome_base ilike replace(replace(dsv.fornecedor, ' ', '%'), '-', '%') || '%'
           )
         returning d.id, a.nome_base
