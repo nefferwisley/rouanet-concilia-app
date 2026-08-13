@@ -340,6 +340,103 @@ async def vincular_automatico(projeto_id: str, dep=Depends(get_conn)):
     }
 
 
+@router.post("/projeto/{projeto_id}/backfill-storage")
+async def backfill_storage(projeto_id: str, commit: bool = False, dep=Depends(get_conn)):
+    """
+    Repõe no Supabase Storage os arquivos que documentos_projeto (origem
+    google_drive) registrou antes da migração pra Storage existir, quando
+    o disco efêmero do container ainda era usado -- ver
+    scripts/backfill_storage_supabase.py, versão standalone deste mesmo
+    fluxo (útil quando quem roda tem GOOGLE_DRIVE_CREDENTIALS_JSON e
+    SUPABASE_SERVICE_ROLE_KEY localmente; esta versão em endpoint roda com
+    as credenciais que já estão configuradas no ambiente do servidor).
+
+    O arquivo_ref salvo nas linhas antigas é um path local (perdido), não
+    o ID do arquivo no Drive -- por isso relista a pasta do Drive de novo e
+    casa por nome.
+
+    commit=false (padrão): só reporta o que faria. commit=true: grava de
+    verdade.
+    """
+    conn, _ = dep
+    projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
+    if not projeto:
+        raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
+
+    links = await conn.fetch(
+        """
+        select arquivo_ref from documentos_projeto
+        where projeto_id = $1 and origem = 'google_drive' and nome_arquivo is null and arquivo_ref is not null
+        """,
+        projeto_id,
+    )
+    if not links:
+        return {"dry_run": not commit, "erro": "Nenhum link de pasta do Drive registrado pra este projeto."}
+
+    arquivos_remotos: dict[str, str] = {}
+    pastas_com_erro = []
+    for link in links:
+        listagem = await run_in_threadpool(listar_arquivos, link["arquivo_ref"])
+        if listagem is None:
+            pastas_com_erro.append(link["arquivo_ref"])
+            continue
+        for item in listagem:
+            arquivos_remotos[item["name"]] = item["id"]
+
+    docs = await conn.fetch(
+        """
+        select id, nome_arquivo from documentos_projeto
+        where projeto_id = $1 and origem = 'google_drive' and nome_arquivo is not null
+        """,
+        projeto_id,
+    )
+
+    repostos, falhas, ja_no_bucket = 0, 0, 0
+    detalhes = []
+    for doc in docs:
+        caminho_logico = f"{projeto_id}/{doc['nome_arquivo']}"
+
+        existente = await run_in_threadpool(storage_service.baixar_arquivo, caminho_logico)
+        if existente is not None:
+            ja_no_bucket += 1
+            continue
+
+        file_id = arquivos_remotos.get(doc["nome_arquivo"])
+        if not file_id:
+            falhas += 1
+            detalhes.append({"arquivo": doc["nome_arquivo"], "status": "nao_encontrado_na_pasta_drive_atual"})
+            continue
+
+        if not commit:
+            detalhes.append({"arquivo": doc["nome_arquivo"], "status": "reporia"})
+            continue
+
+        conteudo = await run_in_threadpool(baixar_arquivo, file_id)
+        if conteudo is None:
+            falhas += 1
+            detalhes.append({"arquivo": doc["nome_arquivo"], "status": "falha_download_drive"})
+            continue
+
+        novo_ref = await run_in_threadpool(storage_service.upload_arquivo, caminho_logico, conteudo)
+        await conn.execute("update documentos_projeto set arquivo_ref = $1 where id = $2", novo_ref, doc["id"])
+        repostos += 1
+        detalhes.append({"arquivo": doc["nome_arquivo"], "status": "reposto"})
+
+    logger.info(
+        "Projeto %s: backfill-storage (commit=%s) — %d repostos, %d já no bucket, %d falhas.",
+        projeto_id, commit, repostos, ja_no_bucket, falhas,
+    )
+
+    return {
+        "dry_run": not commit,
+        "repostos": repostos,
+        "ja_no_bucket": ja_no_bucket,
+        "falhas": falhas,
+        "pastas_com_erro_ao_listar": pastas_com_erro,
+        "detalhes": detalhes,
+    }
+
+
 @router.post("/projeto/{projeto_id}/vincular-inteligente")
 async def vincular_inteligente(projeto_id: str, dep=Depends(get_conn)):
     """
