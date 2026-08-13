@@ -583,7 +583,7 @@ async def executar_importacao_pasta_bg(
     import shutil
     import asyncio
     from pathlib import Path
-    from backend.database import get_pool
+    from backend.database import adquirir_conn
     from motor.importar import parse_tipo_doc
     from motor.extrato_importer import tipo_por_sinal
 
@@ -656,8 +656,8 @@ async def executar_importacao_pasta_bg(
         _registrar(conciliacao_id, etapa="gravando dados no banco de dados", progresso=85)
         
         async def db_ops():
-            pool = await get_pool()
-            async with pool.acquire() as conn:
+            acquired_pool, conn = await adquirir_conn()
+            try:
                 async with conn.transaction():
                     conta = await conn.fetchrow("select id from contas_captadoras where projeto_id = $1", projeto_id)
                     if not conta:
@@ -824,6 +824,8 @@ async def executar_importacao_pasta_bg(
                         """,
                         projeto_id
                     )
+            finally:
+                await acquired_pool.release(conn)
 
         await db_ops()
         

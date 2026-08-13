@@ -4,7 +4,7 @@ import logging
 import yaml
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Query, UploadFile, status
 
-from backend.database import get_conn, get_pool
+from backend.database import adquirir_conn, get_conn
 from backend.services.importacao import executar_importacao_bg
 
 logger = logging.getLogger(__name__)
@@ -46,8 +46,8 @@ async def iniciar_importacao(
     # só aconteceria no teardown da dependency — que no FastAPI roda DEPOIS
     # que BackgroundTasks começa, então a task nunca veria a importação e o
     # progresso ficaria preso em "iniciando" (bug real observado em runtime).
-    pool = await get_pool()
-    async with pool.acquire() as conn2:
+    acquired_pool, conn2 = await adquirir_conn()
+    try:
         async with conn2.transaction():
             await conn2.execute(
                 "select set_config('request.jwt.claims', $1, true)", f'{{"sub":"{user_id}"}}'
@@ -60,6 +60,8 @@ async def iniciar_importacao(
                 """,
                 projeto_id, user_id, modo, json.dumps(conteudo_json),
             )
+    finally:
+        await acquired_pool.release(conn2)
     importacao_id = str(row["id"])
 
     background_tasks.add_task(

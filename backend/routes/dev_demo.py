@@ -17,7 +17,7 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
 from backend.config import settings
-from backend.database import get_pool
+from backend.database import adquirir_conn
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["dev"])
@@ -50,8 +50,8 @@ async def demo_login():
     Usado pelo botão 'Entrar com Token de Demonstração' da tela de login, para
     a avaliadora entrar sem depender do Supabase remoto estando ativo.
     """
-    pool = await get_pool()
-    async with pool.acquire() as conn:
+    acquired_pool, conn = await adquirir_conn()
+    try:
         # Conexão como dono (role 'rouanet') ignora RLS — é o único caminho de
         # descobrir o membro demo ANTES de qualquer sessão existir.
         membro = await conn.fetchrow(
@@ -64,6 +64,8 @@ async def demo_login():
             limit 1
             """
         )
+    finally:
+        await acquired_pool.release(conn)
 
     if not membro:
         return JSONResponse(status_code=404, content={"detail": "Nenhum projeto de demonstração encontrado."})

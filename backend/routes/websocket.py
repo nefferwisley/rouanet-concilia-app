@@ -11,7 +11,7 @@ import asyncio
 
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
 
-from backend.database import get_pool, verificar_jwt
+from backend.database import adquirir_conn, verificar_jwt
 
 router = APIRouter()
 
@@ -25,12 +25,12 @@ async def ws_importacao(websocket: WebSocket, importacao_id: str, token: str = Q
         return
 
     await websocket.accept()
-    pool = await get_pool()
     ultimo_payload = None
 
     try:
         while True:
-            async with pool.acquire() as conn:
+            acquired_pool, conn = await adquirir_conn()
+            try:
                 async with conn.transaction():
                     await conn.execute(
                         "select set_config('request.jwt.claims', $1, true)", f'{{"sub":"{user_id}"}}'
@@ -44,6 +44,8 @@ async def ws_importacao(websocket: WebSocket, importacao_id: str, token: str = Q
                         """,
                         importacao_id,
                     )
+            finally:
+                await acquired_pool.release(conn)
 
             if row is None:
                 await websocket.send_json({"tipo": "erro", "mensagem": "importação não encontrada ou sem permissão"})

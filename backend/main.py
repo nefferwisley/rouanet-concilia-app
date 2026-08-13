@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from backend.config import settings
-from backend.database import close_pool, get_pool
+from backend.database import adquirir_conn, close_pool, get_pool, reiniciar_pool
 from backend.routes import (
     auditoria,
     conciliacao,
@@ -96,7 +96,16 @@ async def health_db():
     ativo (pausa sozinho após 7 dias sem nenhuma consulta) — pingar só
     /health não conta, porque não toca o banco.
     """
-    pool = await get_pool()
-    async with pool.acquire() as conn:
-        await conn.fetchval("select 1")
+    try:
+        acquired_pool, conn = await adquirir_conn()
+        try:
+            await conn.fetchval("select 1")
+        finally:
+            await acquired_pool.release(conn)
+    except Exception as e:
+        log.exception("health/db: banco inacessível")
+        return JSONResponse(
+            status_code=503,
+            content={"status": "erro", "db": "inacessível", "detalhe": str(e)},
+        )
     return {"status": "ok", "db": "reachable"}

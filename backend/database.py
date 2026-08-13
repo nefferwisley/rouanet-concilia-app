@@ -11,6 +11,7 @@ bloqueia todo mundo (inclusive o dono dos dados). get_conn() faz isso: valida
 o JWT, abre uma transação, seta o claim e o role, e só então libera a conexão
 pra rota usar.
 """
+import asyncio
 import logging
 import re
 
@@ -36,8 +37,56 @@ _jwks_client = PyJWKClient(f"{settings.supabase_url}/auth/v1/.well-known/jwks.js
 async def get_pool() -> asyncpg.Pool:
     global _pool
     if _pool is None:
-        _pool = await asyncpg.create_pool(settings.database_url, min_size=1, max_size=10)
+        _pool = await _criar_pool()
     return _pool
+
+
+async def _criar_pool() -> asyncpg.Pool:
+    return await asyncpg.create_pool(
+        settings.database_url,
+        min_size=1,
+        max_size=10,
+        timeout=30,
+        command_timeout=30,
+    )
+
+
+async def reiniciar_pool(motivo: str):
+    """
+    Descarta o pool atual pra ser recriado na próxima chamada. Necessário
+    porque o Render free dorme após 15min sem requisição e o Supabase derruba
+    a conexão TCP na volta: o asyncpg.Pool guarda conexões mortas e acquire()
+    passa a falhar pra sempre.
+    """
+    global _pool
+    velho = _pool
+    _pool = None
+    if velho is not None:
+        try:
+            velho.terminate()
+        except Exception:
+            pass
+    log.warning("Pool de conexões reiniciado: %s", motivo)
+
+
+async def adquirir_conn() -> "tuple[asyncpg.Pool, asyncpg.Connection]":
+    """
+    Adquire uma conexão do pool com uma tentativa de recuperação: se o pool
+    estiver carregado de conexões mortas (Render dormindo + Supabase), o
+    acquire falha/estoura — derruba o pool e cria um novo.
+
+    Retorna (pool, conn) — libere com pool.release(conn). Guardar o pool é
+    necessário porque ele pode ter sido trocado depois do acquire.
+    """
+    pool = await get_pool()
+    try:
+        conn = await asyncio.wait_for(pool.acquire(), timeout=15)
+        return pool, conn
+    except (asyncpg.PostgresError, OSError, TimeoutError, asyncio.TimeoutError) as e:
+        await reiniciar_pool(f"acquire falhou ({type(e).__name__}); tentando reconectar")
+        pool = await get_pool()
+        conn = await asyncio.wait_for(pool.acquire(), timeout=15)
+        return pool, conn
 
 
 async def close_pool():
@@ -113,8 +162,7 @@ async def get_conn(authorization: str | None = Header(None)):
     except Exception:
         pass
 
-    pool = await get_pool()
-    conn = await pool.acquire()
+    acquired_pool, conn = await adquirir_conn()
     try:
         async with conn.transaction():
             # Garante que o usuário existe na tabela auth.users local do dev shim
@@ -133,4 +181,4 @@ async def get_conn(authorization: str | None = Header(None)):
             await conn.execute("set local role authenticated")
             yield conn, user_id
     finally:
-        await pool.release(conn)
+        await acquired_pool.release(conn)
