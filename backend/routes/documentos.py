@@ -341,7 +341,7 @@ async def vincular_automatico(projeto_id: str, dep=Depends(get_conn)):
 
 
 @router.post("/projeto/{projeto_id}/backfill-storage")
-async def backfill_storage(projeto_id: str, commit: bool = False, dep=Depends(get_conn)):
+async def backfill_storage(projeto_id: str, commit: bool = False, limite: int = 25, dep=Depends(get_conn)):
     """
     Repõe no Supabase Storage os arquivos que documentos_projeto (origem
     google_drive) registrou antes da migração pra Storage existir, quando
@@ -356,7 +356,12 @@ async def backfill_storage(projeto_id: str, commit: bool = False, dep=Depends(ge
     casa por nome.
 
     commit=false (padrão): só reporta o que faria. commit=true: grava de
-    verdade.
+    verdade -- mas só até `limite` uploads reais por chamada (padrão 25).
+    Download do Drive + upload pro Storage é ~3s por arquivo; processar
+    tudo de uma vez estourava o timeout do proxy antes de terminar (visto
+    na prática: 209 arquivos, request morreu no meio, só 44 tinham sido
+    gravados). Chame de novo com os mesmos parâmetros pra continuar de onde
+    parou -- arquivos já no bucket são pulados automaticamente.
     """
     conn, _ = dep
     projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
@@ -418,6 +423,10 @@ async def backfill_storage(projeto_id: str, commit: bool = False, dep=Depends(ge
 
         if not commit:
             detalhes.append({"arquivo": doc["nome_arquivo"], "status": "reporia"})
+            continue
+
+        if repostos >= limite:
+            detalhes.append({"arquivo": doc["nome_arquivo"], "status": "pendente_proximo_lote"})
             continue
 
         # Isolado em try/except: um arquivo com problema (nome com caractere
