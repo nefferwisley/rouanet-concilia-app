@@ -13,10 +13,10 @@ Este documento unificado serve para orientar qualquer agente (Gemini, Claude, He
 - Endpoint `PATCH /api/v1/projetos/{id}/transacoes/{id}/revisar` + componente `RevisaoPendentes.tsx` — aprova lançamentos com status `REVISAO_PENDENTE`. Testado clicando "Aprovar" em produção, funciona.
 - Endpoint `POST /api/v1/documentos/projeto/{id}/vincular-inteligente` (matching por nome ou data+fornecedor no nome do arquivo) + botão na aba Revisão Documental. Funciona sem erro (não retorna mais 500), mas hoje devolve **0 vínculos** neste projeto porque os nomes de arquivo do Drive (`166. Fermata - Licenciamento.pdf`) não seguem o mesmo padrão dos nomes usados na importação (`001 - 04-11-2022 - Nome - Item.pdf`) — ver item 🔴 3 abaixo.
 
-### 🔴 DESCOBERTA CRÍTICA — storage de documentos é efêmero
-O backend grava arquivos em `/app/uploads` dentro do container do Render. Esse diretório **é apagado em todo restart/redeploy** (Render free tier já reinicia sozinho após ~15min de inatividade). Confirmado: um documento que existia antes de um push nosso passou a dar `404` depois do redeploy. O indicador "Prontidão documental 96% / 178 com docs" na tela **está mentindo** — a maioria desses "documentos" não existe mais fisicamente.
+### 🔴 DESCOBERTA CRÍTICA — storage de documentos é efêmero (código já corrigido, falta config no Render)
+O backend grava arquivos em `/app/uploads` dentro do container do Render. Esse diretório **é apagado em todo restart/redeploy** (Render free tier já reinicia sozinho após ~15min de inatividade). Confirmado: um documento que existia antes de um push nosso passou a dar `404` depois do redeploy. O indicador "Prontidão documental 96% / 178 com docs" na tela **estava mentindo** — a maioria desses "documentos" não existia mais fisicamente.
 
-**Correção em andamento** (ver seção "🤖 Tarefa delegada" abaixo): migrar pra Supabase Storage.
+**Código corrigido, commit `ff30b15`** (ver seção "✅ Migração pra Supabase Storage — CONCLUÍDA" abaixo). **Falta só uma ação manual pra ativar de verdade**: configurar `SUPABASE_SERVICE_ROLE_KEY` no Render (Environment Variables do serviço) com a chave `service_role` do projeto Supabase (Project Settings > API). Sem essa env var, o código continua funcionando mas cai no mesmo fallback de disco efêmero — não quebra nada, só não resolve o problema até a chave ser configurada.
 
 ### 🔧 Gotchas de infraestrutura (não repetir esses erros)
 1. **Dois repositórios remotos separados**, mesmo monorepo local:
@@ -28,24 +28,28 @@ O backend grava arquivos em `/app/uploads` dentro do container do Render. Esse d
 4. Postgres: `date - date` retorna **integer** (dias), não `interval`. `extract(day from <integer>)` quebra com 500. Já corrigido em `backend/routes/documentos.py`, mas vale lembrar se aparecer em código novo.
 5. `opencode` (agente de coding local) — credenciais/créditos no momento desta sessão: Kimi For Coding expirado, OpenRouter sem créditos, Google (`gemini-3.5-flash`) funcionando e é o único confirmado **gratuito e funcional** pra tarefas grandes. Groq é gratuito mas tem teto de 8k tokens/min — estoura em tarefas com muito contexto de repo.
 
-### 🤖 Tarefa delegada em andamento — migração pra Supabase Storage
-Disparada via `opencode run` com `google/gemini-3.5-flash`, rodando em background no processo local da máquina (não depende desta sessão do Claude Code continuar aberta). **Para checar o progresso real, não confie em paths de `/tmp` ou scratchpad de sessões anteriores — eles são efêmeros.** Em vez disso:
+### ✅ Migração pra Supabase Storage — CONCLUÍDA (commit `ff30b15`, ainda não pushado pro `render-api`)
 
-**Histórico de execuções desta tarefa** (útil se travar de novo): 1ª tentativa (PID 559, iniciada ~05:46) progrediu até criar `backend/services/storage_service.py` (que já está pronto e correto, com `get_supabase_client`/`upload_arquivo`/`baixar_arquivo`) e então travou silenciosamente por 12+ minutos sem gerar nenhum arquivo novo nem log novo — matada e reiniciada. 2ª tentativa (PID 1986, iniciada ~06:10) morreu sozinha com `Error: unknown certificate verification error` sem progresso nenhum — confirmado que foi transitório (testei conectividade TLS direta com `curl`/`node` pro `generativelanguage.googleapis.com` logo depois e voltou 404 normal, sem erro de certificado). 3ª tentativa (PID 866, iniciada ~06:52) usa o mesmo prompt enxuto de continuação salvo em `task_supabase_storage_continuacao.md` (cita as assinaturas do `storage_service.py` já pronto e só o que falta — não repete análise). Se travar de novo: mate o processo, confira com `git status`/`find backend/ -newer <último-arquivo-criado>` o que já foi feito de verdade, e escreva um prompt de continuação ainda mais enxuto citando só o que falta. Se for erro de certificado de novo, é rede local instável — considerar pausar e tentar mais tarde, ou rodar via app desktop do opencode em vez de CLI.
-```bash
-git status                    # arquivos novos/modificados em backend/
-git diff backend/routes/documentos.py backend/routes/revisao.py backend/config.py
-ls backend/services/           # deve aparecer storage_service.py quando terminar
-ls backend/scripts/            # deve aparecer backfill_storage_supabase.py
-opencode session list          # ver sessões e horário da última atividade
-```
-Escopo completo da tarefa (o que checar se está tudo feito): adicionar client Supabase Storage, trocar as 3 escritas em disco (`enviar_documentos_projeto`, `sincronizar_drive` em `documentos.py`; `enviar_documento_transacao` em `revisao.py`) e a leitura (`GET /documentos/{id}/arquivo`) pra usar Storage em vez de disco local, script de backfill com `--dry-run`/`--commit` pra repor os 598 arquivos do Drive que foram perdidos, testes com mock (não bater na API real do Supabase).
+**Histórico**: delegada 3x ao `opencode`/`google/gemini-3.5-flash` (o único modelo gratuito funcional disponível — ver seção de gerenciamento de agentes abaixo). 1ª tentativa criou `storage_service.py` (ficou bom, reaproveitado) e travou silenciosamente depois. 2ª morreu com erro de certificado TLS transitório (rede local, confirmado não-sistêmico). 3ª travou sem produzir nada por 8+ minutos. Depois da 3ª falha, **implementei diretamente nesta sessão do Claude Code** em vez de insistir mais com o agente — reaproveitando o `storage_service.py` que já estava correto.
 
-**Depois que essa tarefa terminar, revisar com atenção antes de mergear** (código gerado por IA mexendo em service-role key e política de bucket — área sensível). Depois de aprovado: `git push render-api main` (backend) e rodar `./deploy_frontend.sh` (frontend, só se algo do frontend tiver mudado).
+**O que mudou:**
+- `backend/services/storage_service.py` — `get_supabase_client()` / `upload_arquivo()` / `baixar_arquivo()`, bucket privado `"documentos"`, fallback pra disco local quando `SUPABASE_SERVICE_ROLE_KEY` não configurada.
+- `backend/routes/documentos.py` — `enviar_documentos_projeto` e `sincronizar_drive` agora sobem pro bucket em vez de gravar em disco.
+- `backend/routes/revisao.py` — `enviar_documento_transacao` idem; `GET /documentos/{id}/arquivo` simplificado (a cascata de fallbacks manuais em disco, incluindo paths hardcoded tipo `/app/3. 1961`, foi removida — `storage_service.baixar_arquivo` já cobre isso).
+- `backend/scripts/backfill_storage_supabase.py` — repõe os 598 arquivos do Drive perdidos (`--dry-run` por padrão, `--commit` pra gravar). **Importante**: o `arquivo_ref` das linhas antigas é um path local morto, não um ID do Drive — o script relista a pasta do Drive de novo e casa por nome.
+- `backend/tests/test_storage_service.py` — 7 testes novos (fallback local real via `tmp_path`, client Supabase fake). Suite completa: 209→216 passaram, as 4 falhas em `test_conciliacao_auditoria.py` são pré-existentes (WIP não commitado de outra sessão em `auditoria.py`, confirmado via `git diff` isolado antes do commit, não relacionado a esta mudança).
 
-### 🟡 Bloqueado até a migração de storage terminar
-- Reprocessar os 598 arquivos do Drive desse projeto (`a2fe2ae0-4041-47c9-bda1-e347982d0bc2`) — via o script de backfill acima.
-- Repensar a estratégia de matching automático de documentos (hoje 0% de acerto pela divergência de nomenclatura Drive vs. importação) — não vale a pena atacar antes do storage estabilizar, porque `arquivo_ref` muda de semântica (path de disco → path de bucket).
+**⚠️ Nota de escopo, não resolvido**: `_disponivel()` em `listar_documentos_transacao` (WIP de outra sessão, já existia antes desta migração) ainda faz checagem de disco local pura — vai ficar incoerente com a realidade assim que o Storage virar o caminho principal (vai reportar `disponivel: false` pra arquivo que está no bucket mas não no disco). Não mexi porque é uma feature de outra sessão que eu não tinha contexto completo pra alterar com segurança; precisa de atenção antes de confiar nesse campo.
+
+**Próximos passos pra ativar de verdade em produção:**
+1. Criar o bucket `documentos` no Supabase (o código tenta criar sozinho na primeira chamada, mas requer que a service_role key já tenha permissão — mais seguro criar manualmente antes: Supabase Dashboard → Storage → New bucket → nome `documentos`, privado).
+2. Configurar `SUPABASE_SERVICE_ROLE_KEY` nas env vars do serviço no Render (Project Settings do Supabase → API → `service_role` key — **não** é a mesma chave do JWT secret).
+3. `git push render-api main` (esse commit ainda está só local + no `origin`, não foi ao Render).
+4. Depois do deploy, rodar o backfill: `python -m backend.scripts.backfill_storage_supabase --projeto-id a2fe2ae0-4041-47c9-bda1-e347982d0bc2 --commit` (contra a `DATABASE_URL` de produção) pra repor os 598 arquivos.
+
+### 🟡 Agora desbloqueado (storage resolvido)
+- Reprocessar os 598 arquivos do Drive — via `backfill_storage_supabase.py` (passo 4 acima).
+- Repensar a estratégia de matching automático de documentos (hoje 0% de acerto pela divergência de nomenclatura Drive vs. importação — isso é independente do storage, continua sem solução).
 
 ### 🎛️ Gerenciamento de agentes (Claude / Antigravity / opencode)
 
@@ -65,14 +69,11 @@ Você tem 3 ferramentas de agente disponíveis, cada uma libera tokens/uso aos p
 - **Antigravity** (Google) — não usada nesta sessão, mas já foi usada antes (ver seção 3 abaixo, cache em `brain/<id>/implementation_plan.md`). Use como terceira opção quando Claude e opencode estiverem sem cota.
 
 **Fila de tarefas priorizada (pra qualquer agente pegar a próxima):**
-1. 🔵 **EM ANDAMENTO** (opencode/gemini-3.5-flash, PID pode já ter mudado — checar `opencode session list`) — migração de storage pra Supabase, checklist de 9 itens. Ver progresso real com `git status`/`git diff --stat backend/` (NÃO confiar em paths de log em `/tmp` ou scratchpad — são efêmeros por sessão).
-   - ⚠️ Ponto de atenção já encontrado em `backend/services/storage_service.py`: ele importa `UPLOAD_DIR` de dentro de `backend/routes/revisao.py` (linha ~75, dentro do fallback local) — um `services/` importando de `routes/` é invertido (deveria ser o contrário). Não é bug funcional, mas vale corrigir na revisão final antes de mergear.
-2. 🟡 **BLOQUEADO até #1 terminar** — script de backfill dos 598 arquivos do Drive perdidos neste projeto (`a2fe2ae0-4041-47c9-bda1-e347982d0bc2`).
-3. 🟡 **BLOQUEADO até #1 terminar** — repensar estratégia de matching automático de documento↔transação (hoje 0% de acerto). **Descoberta desta sessão**: o Agente Reconciliação do orquestrador Phidata (`/api/v1/orquestrador/conciliacao/reconciliacao-automatica`, confirmado vivo em produção) faz matching RAG só pra **rubricas** (categoria orçamentária), não pra documentos — não resolve este item diretamente, mas pode servir de referência de padrão de código se decidirem fazer RAG de documentos também.
-4. 🟢 **LIVRE, sem dependência** — revisão de segurança do `storage_service.py` antes do merge final (service-role key, política do bucket).
-5. 🟢 **LIVRE, sem dependência** — decidir se a feature de "WebSocket de sincronia" (ver seção 3 abaixo, WIP não commitado) deve ser finalizada ou descartada — hoje o frontend tenta conectar numa rota que dá 404 no backend.
-
-**Regra de não-conflito**: enquanto o item 1 estiver em andamento, nenhum outro agente deve editar `backend/routes/documentos.py`, `backend/routes/revisao.py`, `backend/config.py` ou `backend/requirements.txt` — são os arquivos que o opencode está mexendo.
+1. ✅ **CONCLUÍDO** — migração de storage pra Supabase (commit `ff30b15`). Falta só a ação manual descrita acima (criar bucket, configurar `SUPABASE_SERVICE_ROLE_KEY` no Render, `git push render-api main`, rodar backfill).
+2. 🟢 **LIVRE, sem dependência** — rodar o backfill de verdade contra produção depois do push (ver passo 4 da seção acima).
+3. 🟢 **LIVRE, sem dependência** — repensar estratégia de matching automático de documento↔transação (hoje 0% de acerto, independente do storage). **Descoberta desta sessão**: o Agente Reconciliação do orquestrador Phidata (`/api/v1/orquestrador/conciliacao/reconciliacao-automatica`, confirmado vivo em produção) faz matching RAG só pra **rubricas** (categoria orçamentária), não pra documentos — não resolve este item diretamente, mas pode servir de referência de padrão de código se decidirem fazer RAG de documentos também.
+4. 🟢 **LIVRE, sem dependência** — resolver a incoerência do `_disponivel()` em `revisao.py::listar_documentos_transacao` (ver nota ⚠️ na seção acima).
+5. 🟢 **LIVRE, sem dependência** — decidir se a feature de "WebSocket de sincronia" (ver seção 3 mais abaixo, WIP não commitado) deve ser finalizada ou descartada — hoje o frontend tenta conectar numa rota que dá 404 no backend.
 
 ### ⚠️ WIP não commitado de outra sessão (achado, não mexido)
 Havia (e ainda há, preservado intacto) trabalho não commitado de outra sessão: painel `DivergenciasPanel.tsx`, separação `prestador`/`razao_social`, e a feature de "WebSocket de sincronia" descrita na seção 3 mais abaixo neste documento. **A feature de WebSocket parece incompleta**: o frontend tenta conectar em `wss://.../ws/projeto/{id}/sincronia` mas o backend responde 404 pra essa rota (não foi commitada, ou o handler não existe). Se for continuar essa feature, comece checando se `backend/routes/websocket.py` (modificado, não commitado) realmente registra essa rota em `backend/main.py`.
