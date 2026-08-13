@@ -42,9 +42,9 @@ O backend grava arquivos em `/app/uploads` dentro do container do Render. Esse d
 **⚠️ Nota de escopo, não resolvido**: `_disponivel()` em `listar_documentos_transacao` (WIP de outra sessão, já existia antes desta migração) ainda faz checagem de disco local pura — vai ficar incoerente com a realidade assim que o Storage virar o caminho principal (vai reportar `disponivel: false` pra arquivo que está no bucket mas não no disco). Não mexi porque é uma feature de outra sessão que eu não tinha contexto completo pra alterar com segurança; precisa de atenção antes de confiar nesse campo.
 
 **Próximos passos pra ativar de verdade em produção:**
-1. Criar o bucket `documentos` no Supabase (o código tenta criar sozinho na primeira chamada, mas requer que a service_role key já tenha permissão — mais seguro criar manualmente antes: Supabase Dashboard → Storage → New bucket → nome `documentos`, privado).
-2. Configurar `SUPABASE_SERVICE_ROLE_KEY` nas env vars do serviço no Render (Project Settings do Supabase → API → `service_role` key — **não** é a mesma chave do JWT secret).
-3. `git push render-api main` (esse commit ainda está só local + no `origin`, não foi ao Render).
+1. ✅ **Feito** — bucket `documentos` criado (privado) no projeto Supabase de produção via SQL direto (`insert into storage.buckets`). **Projeto de produção identificado**: `cibrdwuzikwzugojgbdw` ("rouanetconcilia" no Supabase, região sa-east-1) — confirmado comparando contagem de transações (185) com o que a tela mostra ao vivo. Existe um segundo projeto `okszeaecgyrymoxwwhdm` ("rouanet-concilia-dev", 183 transações) que parece ser uma cópia de dev/staging ligeiramente dessincronizada — não usar esse pra produção.
+2. ⏳ **Falta** — configurar `SUPABASE_SERVICE_ROLE_KEY` nas env vars do serviço no Render (Project Settings do Supabase, projeto `cibrdwuzikwzugojgbdw` → API → `service_role` key — **não** é a mesma chave do JWT secret). É credencial sensível — nenhuma ferramenta de agente deveria buscar/expor esse valor automaticamente; precisa ser copiada do dashboard do Supabase e colada direto no dashboard do Render pelo usuário.
+3. `git push render-api main` (esse commit ainda está só local + no `origin`, não foi ao Render) — fazer depois que o passo 2 estiver confirmado.
 4. Depois do deploy, rodar o backfill: `python -m backend.scripts.backfill_storage_supabase --projeto-id a2fe2ae0-4041-47c9-bda1-e347982d0bc2 --commit` (contra a `DATABASE_URL` de produção) pra repor os 598 arquivos.
 
 ### 🟡 Agora desbloqueado (storage resolvido)
