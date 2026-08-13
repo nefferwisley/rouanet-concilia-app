@@ -1,5 +1,6 @@
 import logging
 import os
+import unicodedata
 from pathlib import Path
 from supabase import create_client, Client
 from backend.config import settings
@@ -12,6 +13,26 @@ logger = logging.getLogger(__name__)
 UPLOAD_DIR = Path(os.environ.get("UPLOAD_DIR", "/app/uploads"))
 
 _client = None
+
+
+def sanitizar_chave(caminho: str) -> str:
+    """
+    Normaliza um path lógico pra uma chave de objeto ASCII-segura no bucket.
+
+    Descoberto na prática (backfill de produção): nomes com acentuação
+    (ex: "Conciliação", "Edição") quebravam o upload com
+    "InvalidKey" vindo da API do Supabase Storage, mesmo sendo UTF-8 válido
+    no banco -- a camada HTTP do client (storage3) não lida bem com chave de
+    objeto fora de ASCII. Troca por equivalente sem acento (ç→c, ã→a, é→e,
+    etc.) via normalização NFKD; o nome ORIGINAL com acento continua intacto
+    em nome_arquivo no banco, só a CHAVE do bucket é que muda.
+    """
+    caminho = str(caminho).replace("\\", "/")
+    if caminho.startswith("/"):
+        caminho = caminho[1:]
+    nfkd = unicodedata.normalize("NFKD", caminho)
+    return nfkd.encode("ascii", "ignore").decode("ascii")
+
 
 def get_supabase_client() -> Client | None:
     """
@@ -49,10 +70,8 @@ def upload_arquivo(caminho_logico: str, conteudo: bytes) -> str:
     Se o Supabase não estiver configurado, usa fallback para salvar em disco local (UPLOAD_DIR / caminho_logico).
     """
     client = get_supabase_client()
-    caminho_clean = str(caminho_logico).replace("\\", "/")
-    if caminho_clean.startswith("/"):
-        caminho_clean = caminho_clean[1:]
-    
+    caminho_clean = sanitizar_chave(caminho_logico)
+
     if client:
         try:
             # Tenta upload. Se já existir, faz update.
@@ -90,10 +109,8 @@ def baixar_arquivo(caminho_logico: str) -> bytes | None:
     Se o Supabase não estiver configurado, tenta ler do disco local.
     """
     client = get_supabase_client()
-    caminho_clean = str(caminho_logico).replace("\\", "/")
-    if caminho_clean.startswith("/"):
-        caminho_clean = caminho_clean[1:]
-        
+    caminho_clean = sanitizar_chave(caminho_logico)
+
     if client:
         try:
             res = client.storage.from_("documentos").download(caminho_clean)

@@ -409,7 +409,10 @@ async def backfill_storage(projeto_id: str, commit: bool = False, limite: int = 
     repostos, falhas, ja_no_bucket = 0, 0, 0
     detalhes = []
     for doc in docs:
-        caminho_logico = f"{projeto_id}/{doc['nome_arquivo']}"
+        # sanitizar_chave já é o que upload_arquivo/baixar_arquivo aplicam
+        # internamente (acentos quebram a chave do objeto no Storage) --
+        # usar a mesma forma aqui pra bater com o que já está em nomes_existentes.
+        caminho_logico = storage_service.sanitizar_chave(f"{projeto_id}/{doc['nome_arquivo']}")
 
         if caminho_logico in nomes_existentes:
             ja_no_bucket += 1

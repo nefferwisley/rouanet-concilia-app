@@ -12,6 +12,27 @@ from backend.services import storage_service
 
 
 # ============================================================
+# sanitizar_chave — acentos quebravam upload com InvalidKey no Supabase
+# (achado em produção rodando o backfill dos 598 arquivos do Drive)
+# ============================================================
+
+def test_sanitizar_chave_remove_acentos_mantendo_estrutura():
+    assert (
+        storage_service.sanitizar_chave("projeto/1. Pagamentos/166. Conciliação - Edição.pdf")
+        == "projeto/1. Pagamentos/166. Conciliacao - Edicao.pdf"
+    )
+
+
+def test_sanitizar_chave_normaliza_barra_invertida_e_barra_inicial():
+    assert storage_service.sanitizar_chave("\\projeto\\arquivo.pdf") == "projeto/arquivo.pdf"
+
+
+def test_sanitizar_chave_idempotente_em_string_ja_ascii():
+    caminho = "projeto/sub/arquivo.pdf"
+    assert storage_service.sanitizar_chave(caminho) == caminho
+
+
+# ============================================================
 # get_supabase_client — sem configuração cai em None
 # ============================================================
 
