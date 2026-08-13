@@ -13,6 +13,8 @@ escolhidos pelo dispatcher extract_documento + settings.ocr_backend.
 import json
 import logging
 import os
+import re
+import unicodedata
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
@@ -36,6 +38,57 @@ CONFIANCA_MINIMA = 0.85
 # É armazenamento local/efêmero do container: cai numa troca de container.
 # Pra produção, trocar por Supabase Storage/S3 — ver dashboard de status.
 UPLOAD_DIR = Path(os.environ.get("UPLOAD_DIR", "/app/uploads"))
+
+
+# ============================================================
+# Extração de nome/item a partir do nome do arquivo -- mesmos padrões já
+# usados no frontend (AuditoriaProjeto.tsx::extrairPrestador/extrairItemServico),
+# portados pro backend pra vincular documento×transação de verdade.
+#
+# Descoberta ao investigar por que vincular_inteligente sempre dava 0
+# matches: t.fornecedor no banco é genérico (ex: "Circunstancia
+# Cinematografica e Prod" repetido em dezenas de lançamentos diferentes) --
+# quem tem o nome REAL do prestador é o nome do arquivo, tanto no
+# documentos_transacao.arquivo_ref herdado da importação ("001 -
+# 04-11-2022 - Mônica Guimarães - Produtora Executiva.pdf") quanto no
+# documentos_projeto.nome_arquivo vindo do Drive ("166. Fermata -
+# Licenciamento.pdf"). Duas convenções de nome diferentes, mesma ideia:
+# NNN <separador> Nome <separador> Item.
+# ============================================================
+_RE_NOME_TRACOS = re.compile(r"^\d+\s*-\s*\d{2}-\d{2}-\d{4}\s*-\s*([^-(\n]+)")
+_RE_ITEM_TRACOS = re.compile(r"^\d+\s*-\s*\d{2}-\d{2}-\d{4}\s*-\s*[^-(\n]+\s*-\s*([^-.\n]+)")
+_RE_NOME_PONTO = re.compile(r"^\d+\.\s+([^-(\n]+)")
+_RE_ITEM_PONTO = re.compile(r"^\d+\.\s+[^-(\n]+\s*-\s*([^-.\n]+)")
+
+
+def _basename(nome_arquivo: str) -> str:
+    return nome_arquivo.replace("\\", "/").rsplit("/", 1)[-1]
+
+
+def _extrair_nome_prestador(nome_arquivo: str | None) -> str | None:
+    if not nome_arquivo:
+        return None
+    base = _basename(nome_arquivo)
+    m = _RE_NOME_TRACOS.match(base) or _RE_NOME_PONTO.match(base)
+    return m.group(1).strip() if m else None
+
+
+def _extrair_item(nome_arquivo: str | None) -> str | None:
+    if not nome_arquivo:
+        return None
+    base = _basename(nome_arquivo)
+    m = _RE_ITEM_TRACOS.match(base) or _RE_ITEM_PONTO.match(base)
+    if not m:
+        return None
+    return re.sub(r"\.[^/.]+$", "", m.group(1)).strip()
+
+
+def _normalizar_texto(s: str | None) -> str:
+    if not s:
+        return ""
+    nfkd = unicodedata.normalize("NFKD", s)
+    sem_acento = nfkd.encode("ascii", "ignore").decode("ascii")
+    return re.sub(r"\s+", " ", sem_acento).strip().lower()
 
 
 @router.post("/ocr")
@@ -546,6 +599,138 @@ async def vincular_inteligente(projeto_id: str, dep=Depends(get_conn)):
         "vinculados_por_data": len(linkados_data),
         "arquivos_nome": [row["nome_base"] for row in linkados_nome],
         "arquivos_data": [row["nome_base"] for row in linkados_data],
+    }
+
+
+@router.post("/projeto/{projeto_id}/vincular-por-prestador")
+async def vincular_por_prestador(projeto_id: str, commit: bool = False, dep=Depends(get_conn)):
+    """
+    Vincula documentos_projeto (Drive, já restaurados no Storage pelo
+    backfill) aos lançamentos certos comparando NOME DO PRESTADOR + ITEM
+    extraídos do nome do arquivo -- não por t.fornecedor (genérico demais,
+    ex: "Circunstancia Cinematografica e Prod" repetido em dezenas de
+    lançamentos) nem por nome de arquivo idêntico (convenções diferentes
+    entre a importação original e a pasta do Drive atual).
+
+    Cada lado tem uma convenção de nome diferente mas a mesma estrutura
+    (NNN <sep> Nome <sep> Item): documentos_transacao.arquivo_ref herdou o
+    nome da importação ("001 - 04-11-2022 - Mônica Guimarães - Produtora
+    Executiva.pdf"), documentos_projeto.nome_arquivo veio do Drive ("166.
+    Fermata - Licenciamento.pdf"). Extrai nome+item dos dois lados,
+    normaliza (sem acento, minúsculo) e casa por (nome, item) exato --
+    só aplica quando o candidato do lado do Drive é ÚNICO pra aquele par,
+    pra não vincular o documento errado quando a mesma pessoa aparece em
+    vários lançamentos com itens diferentes.
+
+    commit=false (padrão): só reporta o que casaria. commit=true: grava.
+    """
+    conn, _ = dep
+    projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
+    if not projeto:
+        raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
+
+    docs_transacao = await conn.fetch(
+        """
+        select d.id, d.transacao_id, d.arquivo_ref
+        from documentos_transacao d
+        join transacoes t on t.id = d.transacao_id
+        where t.projeto_id = $1
+        """,
+        projeto_id,
+    )
+    docs_drive = await conn.fetch(
+        """
+        select id, nome_arquivo, arquivo_ref
+        from documentos_projeto
+        where projeto_id = $1 and origem = 'google_drive' and nome_arquivo is not null
+        """,
+        projeto_id,
+    )
+    existentes_rows = await conn.fetch(
+        "select name from storage.objects where bucket_id = 'documentos' and name like $1",
+        f"{projeto_id}/%",
+    )
+    nomes_no_bucket = {row["name"] for row in existentes_rows}
+
+    # Índice do lado Drive por (nome, item) normalizados -- só usa arquivo
+    # que já está confirmado no bucket (backfill já rodou).
+    candidatos_por_chave: dict[tuple[str, str], list[dict]] = {}
+    for doc in docs_drive:
+        if doc["arquivo_ref"] not in nomes_no_bucket:
+            continue
+        nome = _normalizar_texto(_extrair_nome_prestador(doc["nome_arquivo"]))
+        item = _normalizar_texto(_extrair_item(doc["nome_arquivo"]))
+        if not nome:
+            continue
+        chave = (nome, item)
+        candidatos_por_chave.setdefault(chave, []).append(doc)
+
+    vinculados, ja_ok, ambiguos, sem_match = 0, 0, 0, 0
+    detalhes = []
+    for doc_t in docs_transacao:
+        if doc_t["arquivo_ref"] in nomes_no_bucket:
+            ja_ok += 1
+            continue
+
+        nome = _normalizar_texto(_extrair_nome_prestador(doc_t["arquivo_ref"]))
+        item = _normalizar_texto(_extrair_item(doc_t["arquivo_ref"]))
+        if not nome:
+            sem_match += 1
+            detalhes.append({"transacao_id": str(doc_t["transacao_id"]), "status": "nome_nao_extraido"})
+            continue
+
+        candidatos = candidatos_por_chave.get((nome, item), [])
+        if not candidatos:
+            # Sem item, tenta só por nome -- mas só aceita se for único
+            # candidato pra esse nome em TODO o projeto (senão é ambíguo).
+            candidatos_por_nome = [
+                d for chave, ds in candidatos_por_chave.items() if chave[0] == nome for d in ds
+            ]
+            candidatos = candidatos_por_nome if len(candidatos_por_nome) == 1 else []
+
+        if len(candidatos) == 0:
+            sem_match += 1
+            detalhes.append({
+                "transacao_id": str(doc_t["transacao_id"]), "status": "sem_correspondencia",
+                "nome_extraido": nome, "item_extraido": item,
+            })
+            continue
+        if len(candidatos) > 1:
+            ambiguos += 1
+            detalhes.append({
+                "transacao_id": str(doc_t["transacao_id"]), "status": "ambiguo",
+                "nome_extraido": nome, "candidatos": len(candidatos),
+            })
+            continue
+
+        candidato = candidatos[0]
+        detalhes.append({
+            "transacao_id": str(doc_t["transacao_id"]), "status": "vincularia" if not commit else "vinculado",
+            "nome_extraido": nome, "arquivo_drive": candidato["nome_arquivo"],
+        })
+        if commit:
+            await conn.execute(
+                "update documentos_transacao set arquivo_ref = $1 where id = $2",
+                candidato["arquivo_ref"], doc_t["id"],
+            )
+            await conn.execute(
+                "update transacoes set tem_nf = true, tem_comprovante = true where id = $1",
+                doc_t["transacao_id"],
+            )
+        vinculados += 1
+
+    logger.info(
+        "Projeto %s: vincular-por-prestador (commit=%s) — %d vinculados, %d já ok, %d ambíguos, %d sem match.",
+        projeto_id, commit, vinculados, ja_ok, ambiguos, sem_match,
+    )
+
+    return {
+        "dry_run": not commit,
+        "vinculados": vinculados,
+        "ja_ok": ja_ok,
+        "ambiguos": ambiguos,
+        "sem_match": sem_match,
+        "detalhes": detalhes,
     }
 
 
