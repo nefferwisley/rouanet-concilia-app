@@ -734,6 +734,146 @@ async def vincular_por_prestador(projeto_id: str, commit: bool = False, dep=Depe
     }
 
 
+@router.get("/projeto/{projeto_id}/candidatos-ambiguos")
+async def listar_candidatos_ambiguos(projeto_id: str, dep=Depends(get_conn)):
+    """
+    Lançamentos onde vincular_por_prestador achou o nome do prestador mas
+    não conseguiu vincular sozinho por haver mais de um arquivo candidato
+    (mesmo nome, item não desambigua) -- versão "somente leitura, com os
+    candidatos completos" pra alimentar uma tela de escolha manual em vez
+    de só reportar a contagem. Calculado ao vivo a cada chamada (não é
+    uma foto congelada), então reflete backfills/vínculos feitos depois.
+    """
+    conn, _ = dep
+    projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
+    if not projeto:
+        raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
+
+    docs_transacao = await conn.fetch(
+        """
+        select d.id as documento_transacao_id, d.transacao_id, d.arquivo_ref,
+               t.data_pagamento, t.valor_bruto
+        from documentos_transacao d
+        join transacoes t on t.id = d.transacao_id
+        where t.projeto_id = $1
+        """,
+        projeto_id,
+    )
+    docs_drive = await conn.fetch(
+        """
+        select id, nome_arquivo, arquivo_ref
+        from documentos_projeto
+        where projeto_id = $1 and origem = 'google_drive' and nome_arquivo is not null
+        """,
+        projeto_id,
+    )
+    existentes_rows = await conn.fetch(
+        "select name from storage.objects where bucket_id = 'documentos' and name like $1",
+        f"{projeto_id}/%",
+    )
+    nomes_no_bucket = {row["name"] for row in existentes_rows}
+
+    candidatos_por_chave: dict[tuple[str, str], list[dict]] = {}
+    candidatos_por_nome: dict[str, list[dict]] = {}
+    for doc in docs_drive:
+        if doc["arquivo_ref"] not in nomes_no_bucket:
+            continue
+        nome = _normalizar_texto(_extrair_nome_prestador(doc["nome_arquivo"]))
+        item = _normalizar_texto(_extrair_item(doc["nome_arquivo"]))
+        if not nome:
+            continue
+        candidatos_por_chave.setdefault((nome, item), []).append(doc)
+        candidatos_por_nome.setdefault(nome, []).append(doc)
+
+    resultado = []
+    for doc_t in docs_transacao:
+        if doc_t["arquivo_ref"] in nomes_no_bucket:
+            continue  # já vinculado corretamente, nada a revisar
+        nome = _normalizar_texto(_extrair_nome_prestador(doc_t["arquivo_ref"]))
+        item = _normalizar_texto(_extrair_item(doc_t["arquivo_ref"]))
+        if not nome:
+            continue
+        candidatos = candidatos_por_chave.get((nome, item)) or candidatos_por_nome.get(nome, [])
+        if len(candidatos) <= 1:
+            continue  # 0 = sem correspondência, 1 = seria vinculado automaticamente
+
+        resultado.append({
+            "transacao_id": str(doc_t["transacao_id"]),
+            "data_pagamento": doc_t["data_pagamento"].isoformat() if doc_t["data_pagamento"] else None,
+            "valor_bruto": float(doc_t["valor_bruto"]) if doc_t["valor_bruto"] is not None else None,
+            "nome_extraido": nome,
+            "item_extraido": item,
+            "candidatos": [
+                {
+                    "documento_projeto_id": str(c["id"]),
+                    "nome_arquivo": c["nome_arquivo"],
+                    "item_extraido": _extrair_item(c["nome_arquivo"]),
+                }
+                for c in candidatos
+            ],
+        })
+
+    resultado.sort(key=lambda r: (r["nome_extraido"], r["data_pagamento"] or ""))
+    return {"total": len(resultado), "ambiguos": resultado}
+
+
+@router.post("/projeto/{projeto_id}/vincular-manual")
+async def vincular_manual_documento(
+    projeto_id: str,
+    transacao_id: str = Form(...),
+    documento_projeto_id: str = Form(...),
+    dep=Depends(get_conn),
+):
+    """
+    Aplica UMA escolha manual: vincula o lançamento ao arquivo do Drive que
+    o usuário escolheu entre os candidatos ambíguos (ver
+    GET candidatos-ambiguos). Complementa vincular_por_prestador, que só
+    aplica automaticamente quando o candidato é único -- aqui é o humano
+    desambiguando.
+    """
+    conn, user_id = dep
+    transacao = await conn.fetchrow(
+        "select id from transacoes where id = $1 and projeto_id = $2", transacao_id, projeto_id
+    )
+    if not transacao:
+        raise HTTPException(404, "Transação não encontrada neste projeto.")
+
+    doc_drive = await conn.fetchrow(
+        "select id, arquivo_ref from documentos_projeto where id = $1 and projeto_id = $2",
+        documento_projeto_id, projeto_id,
+    )
+    if not doc_drive or not doc_drive["arquivo_ref"]:
+        raise HTTPException(404, "Documento do Drive não encontrado neste projeto.")
+
+    existe_no_bucket = await conn.fetchval(
+        "select exists(select 1 from storage.objects where bucket_id = 'documentos' and name = $1)",
+        doc_drive["arquivo_ref"],
+    )
+    if not existe_no_bucket:
+        raise HTTPException(409, "Esse arquivo ainda não está confirmado no bucket -- rode o backfill primeiro.")
+
+    doc_transacao = await conn.fetchrow(
+        "select id from documentos_transacao where transacao_id = $1 order by created_at desc limit 1",
+        transacao_id,
+    )
+    if doc_transacao:
+        await conn.execute(
+            "update documentos_transacao set arquivo_ref = $1 where id = $2",
+            doc_drive["arquivo_ref"], doc_transacao["id"],
+        )
+    else:
+        await conn.execute(
+            "insert into documentos_transacao (transacao_id, tipo, arquivo_ref) values ($1, 'OUTRO', $2)",
+            transacao_id, doc_drive["arquivo_ref"],
+        )
+    await conn.execute(
+        "update transacoes set tem_nf = true, tem_comprovante = true where id = $1",
+        transacao_id,
+    )
+    logger.info("vincular-manual: transação %s vinculada a %s por %s", transacao_id, doc_drive["arquivo_ref"], user_id)
+    return {"transacao_id": transacao_id, "arquivo_ref": doc_drive["arquivo_ref"], "status": "vinculado"}
+
+
 @router.get("/projeto/{projeto_id}")
 async def listar_documentos_projeto(projeto_id: str, dep=Depends(get_conn)):
     conn, _ = dep

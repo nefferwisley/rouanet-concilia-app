@@ -22,6 +22,19 @@ def test_vincular_por_prestador_requires_auth():
     assert response.status_code == 401
 
 
+def test_candidatos_ambiguos_requires_auth():
+    response = client.get("/api/v1/documentos/projeto/fake-uuid/candidatos-ambiguos")
+    assert response.status_code == 401
+
+
+def test_vincular_manual_requires_auth():
+    response = client.post(
+        "/api/v1/documentos/projeto/fake-uuid/vincular-manual",
+        data={"transacao_id": "fake", "documento_projeto_id": "fake"},
+    )
+    assert response.status_code == 401
+
+
 # ============================================================
 # _extrair_nome_prestador -- padrão da importação (NNN - DATA - Nome - Item)
 # ============================================================

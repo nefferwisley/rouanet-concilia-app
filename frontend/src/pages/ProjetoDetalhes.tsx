@@ -10,6 +10,7 @@ import { DeleteProjectButton } from "../components/DeleteProjectButton";
 import { RevisaoDocumental } from "../components/RevisaoDocumental";
 import { RevisaoManual } from "../components/RevisaoManual";
 import { RevisaoPendentes } from "../components/RevisaoPendentes";
+import { RevisaoDocumentosAmbiguos } from "../components/RevisaoDocumentosAmbiguos";
 import { ConciliacaoManual } from "../components/ConciliacaoManual";
 import { OrganizacaoDocumental } from "../components/OrganizacaoDocumental";
 import { Regularizacao } from "../components/Regularizacao";
@@ -207,6 +208,7 @@ export function ProjetoDetalhes() {
 
       <div className={aba === "documentacao" ? "space-y-4" : "hidden"}>
         <RevisaoPendentes projetoId={projeto.id} />
+        <RevisaoDocumentosAmbiguos projetoId={projeto.id} />
         <RevisaoDocumental projetoId={projeto.id} />
         <RevisaoManual projetoId={projeto.id} />
       </div>
