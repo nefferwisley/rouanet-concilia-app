@@ -67,7 +67,7 @@ async def listar_divergencias(
 
     linhas = await conn.fetch(
         """
-        select t.id, t.fornecedor, t.razao_social, t.cnpj_fornecedor,
+        select t.id, t.fornecedor, t.razao_social, t.prestador, t.cnpj_fornecedor,
                t.data_pagamento, t.valor_bruto, t.tem_nf, t.tem_comprovante,
                r.codigo as rubrica_codigo,
                (select ce.movimento_id from conciliacao_extrato ce
@@ -104,11 +104,11 @@ async def listar_divergencias(
                 id=tid,
                 fornecedor=r["fornecedor"],
                 razao_social=r["razao_social"],
-                # `prestador` ainda não existe no schema (a coluna da planilha
-                # nunca foi importada). Fica None de propósito: a regra
-                # PRESTADOR_AUSENTE passa a expor exatamente esse buraco em vez
-                # de escondê-lo atrás de um palpite.
-                prestador=None,
+                # Vem da coluna PRESTADOR DE SERVIÇO da planilha revisada
+                # (migrations 0010/0011). Quando é nulo, é porque aquele
+                # pagamento do extrato ainda não foi registrado na planilha —
+                # e PRESTADOR_AUSENTE denuncia isso em vez de inventar um nome.
+                prestador=r["prestador"],
                 documento=r["cnpj_fornecedor"],
                 data_pagamento=r["data_pagamento"],
                 valor=Decimal(str(r["valor_bruto"] or 0)),
