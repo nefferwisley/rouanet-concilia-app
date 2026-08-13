@@ -19,6 +19,12 @@ function sanitizarToken(t: string | null): string | null {
   return limpo.length > 10 ? limpo : null;
 }
 
+declare global {
+  interface Window {
+    __rc_refresh_inflight?: Promise<boolean>;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenState] = useState<string | null>(() => sanitizarToken(localStorage.getItem("rc_token")));
   const [user, setUser] = useState<AuthUser | null>(() => {
@@ -45,19 +51,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function renovar(): Promise<boolean> {
     const rt = localStorage.getItem("rc_refresh_token");
     if (!rt) return false;
-    try {
-      const nova = await renovarSessao(rt);
-      setToken(nova.access_token, nova.refresh_token);
-      if (nova.user.email) {
-        setUser(nova.user);
-        localStorage.setItem("rc_user", JSON.stringify(nova.user));
+
+    // Supabase rotaciona o refresh_token a cada uso: chamadas concorrentes
+    // (api.ts em 401 + este renovar + reload) disputariam o mesmo token e a
+    // perdedora levaria "Invalid Refresh Token". Um guardian global garante
+    // que só UMA renovação roda por vez.
+    if (window.__rc_refresh_inflight) return window.__rc_refresh_inflight;
+    const tentativa = (async () => {
+      try {
+        const nova = await renovarSessao(rt);
+        setToken(nova.access_token, nova.refresh_token);
+        if (nova.user.email) {
+          setUser(nova.user);
+          localStorage.setItem("rc_user", JSON.stringify(nova.user));
+        }
+        return true;
+      } catch {
+        setToken(null);
+        return false;
+      } finally {
+        window.__rc_refresh_inflight = undefined;
       }
-      return true;
-    } catch {
-      setToken(null);
-      return false;
-    }
+    })();
+    window.__rc_refresh_inflight = tentativa;
+    return tentativa;
   }
+
+  // Renova proativamente (token JWT dura 1h). O timeout levemente menor que
+  // o de expiração impede que webhooks/pollings/WebSocket sejam surpreendidos
+  // por um token morto — renovando antes de expirar, o backend nunca vê um
+  // JWT expirado e a mensagem "Sessão expirada" deixa de aparecer em uso normal.
+  useEffect(() => {
+    const renovarSeExistir = () => void renovar();
+    const intervalo = window.setInterval(renovarSeExistir, 50 * 60 * 1000);
+    window.addEventListener("focus", renovarSeExistir);
+    return () => {
+      window.clearInterval(intervalo);
+      window.removeEventListener("focus", renovarSeExistir);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function login(email: string, pass: string) {
     const sessao = await loginComEmailESenha(email, pass);

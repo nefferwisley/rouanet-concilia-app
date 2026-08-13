@@ -2,6 +2,37 @@ import { renovarSessao } from "./supabase";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
+declare global {
+  interface Window {
+    __rc_refresh_inflight?: Promise<boolean>;
+  }
+}
+
+/** Reusa o mesmo guardian de AuthContext: uma única renovação por vez. */
+async function renovarSessaoGuardada(): Promise<boolean> {
+  const rt = localStorage.getItem("rc_refresh_token");
+  if (!rt) return false;
+  if (window.__rc_refresh_inflight) return window.__rc_refresh_inflight;
+  const tentativa = (async () => {
+    try {
+      const nova = await renovarSessao(rt);
+      localStorage.setItem("rc_token", nova.access_token);
+      if (nova.refresh_token) localStorage.setItem("rc_refresh_token", nova.refresh_token);
+      if (nova.user.email) localStorage.setItem("rc_user", JSON.stringify(nova.user));
+      return true;
+    } catch {
+      localStorage.removeItem("rc_token");
+      localStorage.removeItem("rc_refresh_token");
+      localStorage.removeItem("rc_user");
+      return false;
+    } finally {
+      window.__rc_refresh_inflight = undefined;
+    }
+  })();
+  window.__rc_refresh_inflight = tentativa;
+  return tentativa;
+}
+
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
@@ -47,16 +78,12 @@ async function fetchComAutoRefresh(url: string, init: RequestInit, tentouRefresh
     if (resp.status === 401 && !tentouRefresh) {
       const rt = localStorage.getItem("rc_refresh_token");
       if (rt) {
-        try {
-          const nova = await renovarSessao(rt);
-          localStorage.setItem("rc_token", nova.access_token);
-          if (nova.refresh_token) localStorage.setItem("rc_refresh_token", nova.refresh_token);
+        const renovou = await renovarSessaoGuardada();
+        if (renovou) {
           // Tenta a requisição novamente com o novo token
           return fetchComAutoRefresh(url, init, true, tentouRetry);
-        } catch {
-          localStorage.removeItem("rc_token");
-          localStorage.removeItem("rc_refresh_token");
-          localStorage.removeItem("rc_user");
+        }
+        if (!window.__rc_refresh_inflight) {
           window.location.href = "/login";
         }
       } else {
