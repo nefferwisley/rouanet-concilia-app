@@ -95,9 +95,10 @@ async function fetchComAutoRefresh(url: string, init: RequestInit, tentouRefresh
     return resp;
   } catch (err: any) {
     // Render free tier dorme após ~15min sem tráfego; o cold start leva
-    // ~50s. Em vez de desistir logo, espera 8s entre tentativas (até ~48s
-    // no total) antes de reportar o erro de "servidor iniciando".
-    if (tentouRetry < 6) {
+    // ~50s (e um redeploy pode levar mais alguns). Em vez de desistir logo,
+    // espera 8s entre tentativas (até ~80s no total) antes de reportar o
+    // erro de "servidor iniciando".
+    if (tentouRetry < 10) {
       await new Promise((r) => setTimeout(r, 8000));
       return fetchComAutoRefresh(url, init, tentouRefresh, tentouRetry + 1);
     }
