@@ -1,4 +1,8 @@
 export interface Projeto {
+  patrocinador?: string;
+  cnpj_patrocinador?: string;
+  conta_captadora?: string;
+  agencia_captadora?: string;
   id: string;
   pronac: string;
   nome: string;

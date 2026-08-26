@@ -69,6 +69,36 @@ describe("Dashboard por projeto", () => {
     expect(screen.queryByText("128")).not.toBeInTheDocument();
   });
 
+  it("distribui os status financeiros em categorias exclusivas", async () => {
+    api.get.mockImplementation((url: string) => {
+      if (url === "/api/v1/projetos/p-1") return Promise.resolve({ ...p1, proponente: "Instituto Um", valor_captado: 1000 });
+      if (url.includes("/api/v1/projetos/p-1/auditoria")) {
+        return Promise.resolve({
+          ...auditoria(10, 4, 750),
+          resumo: { total: 10, orcado: 850, debitado: 750, com_docs: 7, sem_docs: 3, total_ok: 4, total_pendente: 6 },
+        });
+      }
+      return Promise.reject(new Error(`URL inesperada: ${url}`));
+    });
+
+    render(<MemoryRouter><Dashboard /></MemoryRouter>);
+
+    await waitFor(() => expect(screen.getByTestId("status-conciliadas")).toHaveTextContent("4"));
+    expect(screen.getByTestId("status-em-analise")).toHaveTextContent("3");
+    expect(screen.getByTestId("status-pendencias")).toHaveTextContent("3");
+  });
+
+  it("expõe regiões e tabelas navegáveis do dashboard", async () => {
+    render(<MemoryRouter><Dashboard /></MemoryRouter>);
+
+    await screen.findByText("Instituto Um");
+    expect(screen.getByRole("region", { name: "Indicadores financeiros" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Evolução financeira" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Situação das conciliações" })).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Pagamentos com pendências" })).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Últimos lançamentos" })).toBeInTheDocument();
+  });
+
   it("não mostra números quando nenhum projeto foi selecionado", () => {
     selection.projetoSelecionado = null;
     selection.projetoSelecionadoId = null;

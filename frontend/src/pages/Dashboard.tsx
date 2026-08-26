@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   ArrowUpRight,
@@ -127,6 +127,10 @@ function MetricCard({ icon: Icon, label, value, helper, color }: {
   );
 }
 
+function DashboardCard({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <div className={`dashboard-card min-w-0 ${className}`}>{children}</div>;
+}
+
 export function Dashboard() {
   const api = useAPI();
   const navigate = useNavigate();
@@ -194,10 +198,15 @@ export function Dashboard() {
   const taxaConciliacao = percentual(resumo.total_ok, resumo.total);
   const emAnalise = Math.max(resumo.com_docs - resumo.total_ok, 0);
   const pendentesExclusivos = Math.max(resumo.total - resumo.total_ok - emAnalise, 0);
+  const statusResumo = [
+    { id: "conciliadas", label: "Conciliadas", value: resumo.total_ok, description: "Documentos e banco validados" },
+    { id: "em-analise", label: "Em análise", value: emAnalise, description: "Documentação completa; banco pendente" },
+    { id: "pendencias", label: "Com pendências", value: pendentesExclusivos, description: "Falta documento ou pareamento" },
+  ];
 
   const andamento = useMemo(() => [
     { nome: "Conciliadas", valor: resumo.total_ok, cor: "#14b8a6" },
-    { nome: "Docs completos", valor: emAnalise, cor: "#f59e0b" },
+    { nome: "Em análise", valor: emAnalise, cor: "#f59e0b" },
     { nome: "Com pendências", valor: pendentesExclusivos, cor: "#f43f5e" },
   ], [emAnalise, pendentesExclusivos, resumo.total_ok]);
 
@@ -307,15 +316,15 @@ export function Dashboard() {
 
       {dados && !carregando && (
         <>
-          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <section aria-label="Indicadores financeiros" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <MetricCard icon={CircleDollarSign} label="Valor captado" value={moeda(dados.projeto.valor_captado ?? resumo.orcado)} helper="Valor disponível no cadastro do projeto" color="bg-gradient-to-br from-teal-500 to-teal-700" />
             <MetricCard icon={BarChart3} label="Pagamentos" value={String(resumo.total)} helper="Lançamentos financeiros deste projeto" color="bg-gradient-to-br from-blue-500 to-blue-700" />
             <MetricCard icon={Receipt} label="Despesas realizadas" value={moeda(resumo.debitado)} helper="Soma dos valores brutos registrados" color="bg-gradient-to-br from-orange-400 to-orange-600" />
             <MetricCard icon={CheckCircle2} label="Conciliações" value={`${taxaConciliacao}%`} helper={`${resumo.total_ok} de ${resumo.total} lançamentos validados`} color="bg-gradient-to-br from-violet-500 to-violet-700" />
           </section>
 
-          <section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
-            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+          <section aria-label="Evolução financeira" className="grid grid-cols-1 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+            <DashboardCard className="p-5 sm:p-6">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Despesas por mês</h3>
               <p className="mt-1 text-[11px] text-slate-400">Somente lançamentos do projeto selecionado</p>
               <div className="mt-5 h-[260px]">
@@ -325,9 +334,9 @@ export function Dashboard() {
                   </ResponsiveContainer>
                 ) : <div className="flex h-full items-center justify-center rounded-xl border border-dashed border-slate-200 text-sm text-slate-400 dark:border-navy-600">Sem lançamentos para apresentar.</div>}
               </div>
-            </div>
+            </DashboardCard>
 
-            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+            <DashboardCard className="p-5 sm:p-6">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Andamento para conclusão</h3>
               <p className="mt-1 text-[11px] text-slate-400">Documentação e conciliação bancária</p>
               <div className="mt-4 grid min-h-[260px] grid-cols-1 items-center gap-4 sm:grid-cols-2">
@@ -338,29 +347,29 @@ export function Dashboard() {
                   </>
                 ) : <div className="col-span-full flex h-full items-center justify-center rounded-xl border border-dashed border-slate-200 text-sm text-slate-400 dark:border-navy-600">Sem dados para distribuir.</div>}
               </div>
-            </div>
+            </DashboardCard>
           </section>
 
-          <section className="space-y-3">
+          <section aria-label="Situação das conciliações" className="space-y-3">
             <h3 className="text-base font-bold text-slate-900 dark:text-white">Situação das conciliações</h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {[
-                { label: "Conciliadas", valor: resumo.total_ok, taxa: percentual(resumo.total_ok, resumo.total), Icon: Check, cor: "bg-emerald-500" },
-                { label: "Docs completos", valor: resumo.com_docs, taxa: percentual(resumo.com_docs, resumo.total), Icon: FileCheck2, cor: "bg-amber-400" },
-                { label: "Pendências", valor: resumo.total_pendente, taxa: percentual(resumo.total_pendente, resumo.total), Icon: AlertTriangle, cor: "bg-rose-500" },
-                { label: "Total", valor: resumo.total, taxa: resumo.total ? 100 : 0, Icon: Info, cor: "bg-blue-600" },
-              ].map(({ label, valor, taxa, Icon, cor }) => <div key={label} className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-navy-700 dark:bg-navy-800"><div className="flex items-center gap-3"><div className={`flex h-11 w-11 items-center justify-center rounded-full text-white ${cor}`}><Icon className="h-5 w-5" /></div><div><p className="text-xs text-slate-500 dark:text-slate-400">{label}</p><p className="text-2xl font-bold text-slate-950 dark:text-white">{valor}</p></div></div><strong className="text-xs text-slate-500">{taxa}%</strong></div>)}
+              {statusResumo.map((item) => {
+                const Icon = item.id === "conciliadas" ? Check : item.id === "em-analise" ? FileCheck2 : AlertTriangle;
+                const cor = item.id === "conciliadas" ? "bg-emerald-500" : item.id === "em-analise" ? "bg-amber-400" : "bg-rose-500";
+                return <div key={item.id} data-testid={`status-${item.id}`} className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-navy-700 dark:bg-navy-800"><div className="flex items-center gap-3"><div className={`flex h-11 w-11 items-center justify-center rounded-full text-white ${cor}`}><Icon className="h-5 w-5" /></div><div><p className="text-xs text-slate-500 dark:text-slate-400">{item.label}</p><p className="text-2xl font-bold text-slate-950 dark:text-white">{item.value}</p><p className="mt-1 text-[10px] text-slate-400">{item.description}</p></div></div><strong className="text-xs text-slate-500">{percentual(item.value, resumo.total)}%</strong></div>;
+              })}
+              <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-navy-700 dark:bg-navy-800"><div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-600 text-white"><Info className="h-5 w-5" /></div><div><p className="text-xs text-slate-500 dark:text-slate-400">Total</p><p className="text-2xl font-bold text-slate-950 dark:text-white">{resumo.total}</p></div></div><strong className="text-xs text-slate-500">{resumo.total ? 100 : 0}%</strong></div>
             </div>
           </section>
 
           <section className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+            <DashboardCard className="p-5 sm:p-6">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Evolução mensal das conciliações</h3>
               <div className="mt-5 h-[250px]">
                 <ResponsiveContainer width="100%" height="100%"><BarChart data={porMes}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" opacity={0.45} /><XAxis dataKey="mes" tick={{ fontSize: 11 }} /><YAxis allowDecimals={false} tick={{ fontSize: 11 }} /><Tooltip /><Legend /><Bar dataKey="conciliadas" name="Conciliadas" stackId="a" fill="#10b981" radius={[3, 3, 0, 0]} /><Bar dataKey="pendentes" name="Pendentes" stackId="a" fill="#f59e0b" radius={[3, 3, 0, 0]} /></BarChart></ResponsiveContainer>
               </div>
-            </div>
-            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+            </DashboardCard>
+            <DashboardCard className="p-5 sm:p-6">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Alertas do projeto</h3>
               <div className="mt-5 space-y-3">
                 {resumo.sem_docs > 0 && <div className="flex items-center gap-3 rounded-xl border border-rose-100 p-3 dark:border-rose-500/20"><AlertTriangle className="h-5 w-5 text-rose-500" /><div><p className="text-xs font-bold text-slate-900 dark:text-white">{resumo.sem_docs} lançamentos sem documentação completa</p><p className="text-[10px] text-slate-400">Anexe documento fiscal e comprovante.</p></div></div>}
@@ -368,18 +377,18 @@ export function Dashboard() {
                 {resumo.total_ok > 0 && <div className="flex items-center gap-3 rounded-xl border border-emerald-100 p-3 dark:border-emerald-500/20"><CheckCircle2 className="h-5 w-5 text-emerald-500" /><div><p className="text-xs font-bold text-slate-900 dark:text-white">{resumo.total_ok} conciliações validadas</p><p className="text-[10px] text-slate-400">Resultado calculado para este projeto.</p></div></div>}
                 {resumo.total === 0 && <p className="rounded-xl border border-dashed border-slate-200 p-8 text-center text-sm text-slate-400 dark:border-navy-600">Nenhum alerta: o projeto ainda não possui lançamentos.</p>}
               </div>
-            </div>
+            </DashboardCard>
           </section>
 
           <section className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+            <DashboardCard className="p-5 sm:p-6">
               <div className="flex items-center justify-between"><h3 className="text-base font-bold text-slate-900 dark:text-white">Pagamentos com pendências</h3><Link to="/conciliacao" className="text-xs font-bold text-[#0f9f9a] hover:underline">Revisar conciliações</Link></div>
-              <div className="mt-4 overflow-x-auto"><table className="w-full text-left text-xs"><thead><tr className="border-b border-slate-100 text-slate-400 dark:border-navy-700"><th className="px-2 py-3 font-medium">Fornecedor</th><th className="px-2 py-3 font-medium">Pendência</th><th className="px-2 py-3 font-medium">Valor</th></tr></thead><tbody className="divide-y divide-slate-50 dark:divide-navy-700/60">{pendentes.map((transacao) => <tr key={transacao.id}><td className="px-2 py-3 font-semibold text-slate-800 dark:text-white">{transacao.razao_social || transacao.fornecedor || "Não identificado"}</td><td className="px-2 py-3 text-rose-500">{motivoPendente(transacao)}</td><td className="px-2 py-3 text-slate-600 dark:text-slate-300">{moeda(transacao.valor_bruto)}</td></tr>)}</tbody></table>{pendentes.length === 0 && <p className="py-8 text-center text-sm text-slate-400">Nenhuma pendência encontrada.</p>}</div>
-            </div>
-            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-navy-700 dark:bg-navy-800">
+              <div className="mt-4 overflow-x-auto"><table aria-label="Pagamentos com pendências" className="dashboard-table"><thead><tr><th scope="col">Fornecedor</th><th scope="col">Pendência</th><th scope="col">Valor</th></tr></thead><tbody>{pendentes.map((transacao) => <tr key={transacao.id}><td>{transacao.razao_social || transacao.fornecedor || "Não identificado"}</td><td className="text-rose-500">{motivoPendente(transacao)}</td><td>{moeda(transacao.valor_bruto)}</td></tr>)}</tbody></table>{pendentes.length === 0 && <p className="py-8 text-center text-sm text-slate-400">Nenhuma pendência encontrada.</p>}</div>
+            </DashboardCard>
+            <DashboardCard className="p-5 sm:p-6">
               <div className="flex items-center justify-between"><h3 className="text-base font-bold text-slate-900 dark:text-white">Últimos lançamentos</h3><Link to="/despesas" className="inline-flex items-center gap-1 text-xs font-bold text-[#0f9f9a] hover:underline">Ver todas as despesas <ArrowUpRight className="h-3.5 w-3.5" /></Link></div>
-              <div className="mt-4 overflow-x-auto"><table className="w-full text-left text-xs"><thead><tr className="border-b border-slate-100 text-slate-400 dark:border-navy-700"><th className="px-2 py-3 font-medium">Fornecedor</th><th className="px-2 py-3 font-medium">Data</th><th className="px-2 py-3 font-medium">Status</th></tr></thead><tbody className="divide-y divide-slate-50 dark:divide-navy-700/60">{ultimas.map((transacao) => <tr key={transacao.id}><td className="px-2 py-3 font-semibold text-slate-800 dark:text-white">{transacao.razao_social || transacao.fornecedor || "Não identificado"}</td><td className="px-2 py-3 text-slate-500">{dataCurta(transacao.data_pagamento)}</td><td className="px-2 py-3"><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${transacao.conciliado_ok ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10" : "bg-amber-50 text-amber-600 dark:bg-amber-500/10"}`}>{transacao.conciliado_ok ? "Conciliado" : "Pendente"}</span></td></tr>)}</tbody></table>{ultimas.length === 0 && <p className="py-8 text-center text-sm text-slate-400">Nenhum lançamento cadastrado.</p>}</div>
-            </div>
+              <div className="mt-4 overflow-x-auto"><table aria-label="Últimos lançamentos" className="dashboard-table"><thead><tr><th scope="col">Fornecedor</th><th scope="col">Data</th><th scope="col">Status</th></tr></thead><tbody>{ultimas.map((transacao) => <tr key={transacao.id}><td>{transacao.razao_social || transacao.fornecedor || "Não identificado"}</td><td>{dataCurta(transacao.data_pagamento)}</td><td><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${transacao.conciliado_ok ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10" : "bg-amber-50 text-amber-600 dark:bg-amber-500/10"}`}>{transacao.conciliado_ok ? "Conciliado" : "Pendente"}</span></td></tr>)}</tbody></table>{ultimas.length === 0 && <p className="py-8 text-center text-sm text-slate-400">Nenhum lançamento cadastrado.</p>}</div>
+            </DashboardCard>
           </section>
         </>
       )}

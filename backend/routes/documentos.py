@@ -364,6 +364,12 @@ async def sincronizar_drive(projeto_id: str, dep=Depends(get_conn)):
     await conn.execute("update documentos_projeto set status = 'processado' where id = $1", link_row["id"])
 
     logger.info("Projeto %s: %d arquivo(s) sincronizado(s) do Drive por %s", projeto_id, len(registrados), user_id)
+    # 1. Execute vínculo por nome/caminho
+    vinc_auto_res = await vincular_automatico(projeto_id, dep)
+    
+    # 2. Execute vincular-por-prestador com commit=true
+    vinc_prest_res = await vincular_por_prestador(projeto_id, True, dep)
+    
     return {
         "projeto_id": projeto_id,
         "sincronizados": len(registrados),
@@ -371,6 +377,12 @@ async def sincronizar_drive(projeto_id: str, dep=Depends(get_conn)):
         "ja_sincronizado_antes": ja_sincronizado_antes,
         "outros_projetos_mesma_pasta": sorted(set(outros_projetos_mesma_pasta)),
         "correcoes_manuais_ativas": len(carregar_correcoes()),
+        
+        "vinculados": vinc_auto_res["vinculados"] + vinc_prest_res["vinculados"],
+        "ja_ok": vinc_prest_res["ja_ok"],
+        "ambiguos": vinc_prest_res["ambiguos"],
+        "sem_match": vinc_prest_res["sem_match"],
+        "falhas": 0
     }
 
 

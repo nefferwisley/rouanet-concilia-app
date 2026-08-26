@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 
 import { ImportarModal } from "./ImportarModal";
 import { AuditoriaProjeto } from "../components/AuditoriaProjeto";
@@ -15,21 +15,36 @@ import { ConciliacaoManual } from "../components/ConciliacaoManual";
 import { OrganizacaoDocumental } from "../components/OrganizacaoDocumental";
 import { Regularizacao } from "../components/Regularizacao";
 import { ChecklistFinal } from "../components/ChecklistFinal";
+import { Dashboard } from "./Dashboard";
 import { useAPI } from "../hooks/useAPI";
 import { Projeto } from "../types";
 
 const ABAS = [
-  { chave: "geral", rotulo: "Lançamentos e Auditoria", emoji: "📋" },
-  { chave: "conciliacao", rotulo: "Conciliação Manual", emoji: "🏦" },
-  { chave: "documentacao", rotulo: "Revisão Documental", emoji: "🖨" },
-  { chave: "entrega", rotulo: "Entrega Final", emoji: "🗂" },
+  { chave: "visao-geral", rotulo: "Painel", emoji: "📊" },
+  { chave: "lancamentos", rotulo: "Lançamentos e Auditoria", emoji: "📋" },
+  { chave: "documentos", rotulo: "Documentos", emoji: "📑" },
+  { chave: "entrega", rotulo: "Entrega Final", emoji: "📦" },
 ] as const;
 
 type Aba = (typeof ABAS)[number]["chave"];
 
 export function ProjetoDetalhes() {
   const { id } = useParams<{ id: string }>();
-  const api = useAPI();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Extract active tab from URL path
+  const pathParts = location.pathname.split('/');
+  let aba: Aba = "visao-geral";
+  const lastPart = pathParts[pathParts.length - 1];
+  if (lastPart === "auditoria" || lastPart === "lancamentos") aba = "lancamentos";
+  else if (lastPart === "documentos") aba = "documentos";
+  else if (lastPart === "entrega") aba = "entrega";
+  else if (lastPart === "visao-geral") aba = "visao-geral";
+
+  const setAba = (novaAba: string) => {
+    navigate(`/projetos/${id}/${novaAba}`);
+  };  const api = useAPI();
   const [projeto, setProjeto] = useState<Projeto | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
@@ -37,8 +52,7 @@ export function ProjetoDetalhes() {
   const [mostrarEditar, setMostrarEditar] = useState(false);
   const [importandoAutonomo, setImportandoAutonomo] = useState(false);
   const [erroImportacaoAutonoma, setErroImportacaoAutonoma] = useState<string | null>(null);
-  const [aba, setAba] = useState<Aba>("geral");
-
+  
   const recarregarProjeto = () => {
     if (!id) return;
     setCarregando(true);
@@ -198,15 +212,16 @@ export function ProjetoDetalhes() {
         </div>
       </div>
 
-      <div className={aba === "geral" ? "space-y-4" : "hidden"}>
+      <div className={aba === "visao-geral" ? "space-y-4" : "hidden"}>
+        <Dashboard />
+      </div>
+
+      <div className={aba === "lancamentos" ? "space-y-4" : "hidden"}>
         <AuditoriaProjeto projetoId={projeto.id} />
       </div>
 
-      <div className={aba === "conciliacao" ? "space-y-4" : "hidden"}>
-        <ConciliacaoManual projetoId={projeto.id} />
-      </div>
 
-      <div className={aba === "documentacao" ? "space-y-4" : "hidden"}>
+      <div className={aba === "documentos" ? "space-y-4" : "hidden"}>
         <RevisaoPendentes projetoId={projeto.id} />
         <RevisaoDocumentosAmbiguos projetoId={projeto.id} />
         <RevisaoDocumental projetoId={projeto.id} />

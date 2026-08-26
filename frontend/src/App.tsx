@@ -10,8 +10,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard").then(m => ({ default: m
 const ProjetosPage = lazy(() => import("./pages/ProjetosPage").then(m => ({ default: m.ProjetosPage })));
 const ProponentesPage = lazy(() => import("./pages/ProponentesPage").then(m => ({ default: m.ProponentesPage })));
 const CaptacoesPage = lazy(() => import("./pages/CaptacoesPage").then(m => ({ default: m.CaptacoesPage })));
-const DespesasPage = lazy(() => import("./pages/DespesasPage").then(m => ({ default: m.DespesasPage })));
-const ConciliacaoPage = lazy(() => import("./pages/ConciliacaoPage").then(m => ({ default: m.ConciliacaoPage })));
+const LancamentosPage = lazy(() => import("./pages/LancamentosPage").then(m => ({ default: m.LancamentosPage })));
 const RelatoriosPage = lazy(() => import("./pages/RelatoriosPage").then(m => ({ default: m.RelatoriosPage })));
 const AlertasPage = lazy(() => import("./pages/AlertasPage").then(m => ({ default: m.AlertasPage })));
 const AgendaPage = lazy(() => import("./pages/AgendaPage").then(m => ({ default: m.AgendaPage })));
@@ -22,7 +21,6 @@ const ImportacaoDetalhes = lazy(() => import("./pages/ImportacaoDetalhes").then(
 const LoginPage = lazy(() => import("./pages/LoginPage").then(m => ({ default: m.LoginPage })));
 const ProjetoDetalhes = lazy(() => import("./pages/ProjetoDetalhes").then(m => ({ default: m.ProjetoDetalhes })));
 const RelatorioPage = lazy(() => import("./pages/RelatorioPage").then(m => ({ default: m.RelatorioPage })));
-const DesignMockup = lazy(() => import("./pages/DesignMockup"));
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { token } = useAuth();
@@ -37,7 +35,6 @@ function MainLayout() {
   const { token } = useAuth();
   const [menuAberto, setMenuAberto] = useState(false);
   const isLoginPage = location.pathname === '/login';
-  const isDesignPage = location.pathname.startsWith('/design');
   
   if (isLoginPage) {
     return (
@@ -49,15 +46,7 @@ function MainLayout() {
     );
   }
 
-  if (isDesignPage) {
-    return (
-      <Suspense fallback={<div className="p-8 text-center text-slate-500">Carregando...</div>}>
-        <Routes>
-          <Route path="/design/*" element={<DesignMockup />} />
-        </Routes>
-      </Suspense>
-    );
-  }
+
 
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -73,20 +62,20 @@ function MainLayout() {
             <Suspense fallback={<div className="p-8 text-center text-slate-500">Carregando...</div>}>
               <Routes>
                 <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/projetos/:id/visao-geral" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/projetos" element={<ProtectedRoute><ProjetosPage /></ProtectedRoute>} />
+                              <Route path="/projetos" element={<ProtectedRoute><ProjetosPage /></ProtectedRoute>} />
               <Route path="/proponentes" element={<ProtectedRoute><ProponentesPage /></ProtectedRoute>} />
-              <Route path="/captacoes" element={<ProtectedRoute><CaptacoesPage /></ProtectedRoute>} />
-              <Route path="/despesas" element={<ProtectedRoute><DespesasPage /></ProtectedRoute>} />
-              <Route path="/conciliacao" element={<ProtectedRoute><ConciliacaoPage /></ProtectedRoute>} />
+              <Route path="/projetos/:id/captacoes" element={<ProtectedRoute><CaptacoesPage /></ProtectedRoute>} />
+              <Route path="/projetos/:id/visao-geral" element={<ProtectedRoute><ProjetoDetalhes /></ProtectedRoute>} />
+              <Route path="/projetos/:id/auditoria" element={<ProtectedRoute><ProjetoDetalhes /></ProtectedRoute>} />
+              <Route path="/projetos/:id/lancamentos" element={<ProtectedRoute><ProjetoDetalhes /></ProtectedRoute>} />
+              <Route path="/projetos/:id/documentos" element={<ProtectedRoute><ProjetoDetalhes /></ProtectedRoute>} />
+              <Route path="/projetos/:id/entrega" element={<ProtectedRoute><ProjetoDetalhes /></ProtectedRoute>} />
               <Route path="/relatorios" element={<ProtectedRoute><RelatoriosPage /></ProtectedRoute>} />
               <Route path="/alertas" element={<ProtectedRoute><AlertasPage /></ProtectedRoute>} />
               <Route path="/agenda" element={<ProtectedRoute><AgendaPage /></ProtectedRoute>} />
-              <Route path="/documentos" element={<ProtectedRoute><DocumentosPage /></ProtectedRoute>} />
               <Route path="/usuarios" element={<ProtectedRoute><UsuariosPage /></ProtectedRoute>} />
 
-              <Route path="/projeto/:id" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/importacao/:id" element={<ProtectedRoute><ImportacaoDetalhes /></ProtectedRoute>} />
+                            <Route path="/importacao/:id" element={<ProtectedRoute><ImportacaoDetalhes /></ProtectedRoute>} />
               <Route path="/relatorio/:id" element={<ProtectedRoute><RelatorioPage /></ProtectedRoute>} />
               </Routes>
             </Suspense>

@@ -31,8 +31,7 @@ const menuItems: NavItem[] = [
   { name: "Projetos", path: "/projetos", icon: Briefcase },
   { name: "Proponentes", path: "/proponentes", icon: User },
   { name: "Captações", path: "/captacoes", icon: CircleDollarSign },
-  { name: "Despesas", path: "/despesas", icon: Receipt },
-  { name: "Conciliações", path: "/conciliacao", icon: RefreshCw },
+  { name: "Lançamentos", path: "/lancamentos", icon: Receipt },
   { name: "Relatórios", path: "/relatorios", icon: BarChart2 },
   { name: "Alertas", path: "/alertas", icon: Bell, badge: 12 },
   { name: "Agenda", path: "/agenda", icon: CalendarDays },
@@ -104,7 +103,8 @@ export function Sidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean;
                 key={item.name}
                 to={destino}
                 onClick={onClose}
-                className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                aria-current={isActive ? "page" : undefined}
+                className={`interactive-focus flex min-h-11 items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   isActive
                     ? "bg-teal-50/90 dark:bg-teal-500/15 text-[#0f9f9a] font-semibold border-l-4 border-[#0f9f9a] rounded-l-none"
                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-navy-800/60 hover:text-slate-900 dark:hover:text-white"

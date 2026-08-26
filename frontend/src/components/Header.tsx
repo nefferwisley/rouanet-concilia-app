@@ -33,7 +33,7 @@ export function Header({ onOpenMenu }: { onOpenMenu?: () => void }) {
     : getPageMeta(pathname);
 
   return (
-    <header className="min-h-[84px] bg-white dark:bg-navy-900 flex items-center justify-between gap-4 px-6 lg:px-8 border-b border-slate-100 dark:border-navy-800 shrink-0 transition-colors">
+    <header className="min-h-[84px] bg-white dark:bg-navy-900 flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 border-b border-slate-100 dark:border-navy-800 shrink-0 transition-colors">
       <div className="flex min-w-0 items-center gap-3">
         <button
           type="button"
@@ -63,7 +63,7 @@ export function Header({ onOpenMenu }: { onOpenMenu?: () => void }) {
               selecionarProjeto(event.target.value);
               navigate(`/projetos/${event.target.value}/visao-geral`);
             }}
-            className="h-10 max-w-[280px] rounded-xl border border-slate-200/80 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm outline-none transition focus:border-[#0f9f9a] focus:ring-2 focus:ring-[#0f9f9a]/20 disabled:cursor-not-allowed disabled:text-slate-400 dark:border-navy-700 dark:bg-navy-800 dark:text-slate-200"
+            className="interactive-focus h-10 max-w-[280px] rounded-xl border border-slate-200/80 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm outline-none transition focus:border-[#0f9f9a] disabled:cursor-not-allowed disabled:text-slate-400 dark:border-navy-700 dark:bg-navy-800 dark:text-slate-200"
             aria-label="Projeto selecionado"
           >
             <option value="" disabled>{carregando ? "Carregando projetos..." : "Selecionar projeto"}</option>
@@ -82,8 +82,8 @@ export function Header({ onOpenMenu }: { onOpenMenu?: () => void }) {
         {/* Notifications */}
         <button
           type="button"
-          className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/80 bg-white text-slate-600 shadow-sm hover:bg-slate-50 dark:border-navy-700 dark:bg-navy-800 dark:text-slate-300 dark:hover:bg-navy-700 transition-colors"
-          aria-label="Notificações"
+          className="interactive-focus relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/80 bg-white text-slate-600 shadow-sm hover:bg-slate-50 dark:border-navy-700 dark:bg-navy-800 dark:text-slate-300 dark:hover:bg-navy-700 transition-colors"
+          aria-label="Notificações, 3 não lidas"
         >
           <Bell className="h-4 w-4" />
           <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-sm">
@@ -94,7 +94,7 @@ export function Header({ onOpenMenu }: { onOpenMenu?: () => void }) {
         {/* Theme Toggle */}
         <button
           type="button"
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/80 bg-white text-slate-600 shadow-sm hover:bg-slate-50 dark:border-navy-700 dark:bg-navy-800 dark:text-slate-300 dark:hover:bg-navy-700 transition-colors"
+          className="interactive-focus flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/80 bg-white text-slate-600 shadow-sm hover:bg-slate-50 dark:border-navy-700 dark:bg-navy-800 dark:text-slate-300 dark:hover:bg-navy-700 transition-colors"
           onClick={toggle}
           aria-label="Alternar tema"
           title="Alternar tema"
@@ -103,7 +103,7 @@ export function Header({ onOpenMenu }: { onOpenMenu?: () => void }) {
         </button>
 
         {/* User Profile */}
-        <div className="flex items-center gap-3 pl-2 cursor-pointer">
+        <div className="flex items-center gap-3 pl-2">
           <div className="relative">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 text-xs font-bold text-white shadow-sm ring-2 ring-emerald-500/20">
               A

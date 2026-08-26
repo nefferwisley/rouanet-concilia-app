@@ -7,8 +7,8 @@
   --brand-teal: #0f9f9a;
   --brand-teal-dark: #087f7b;
   --brand-blue: #2878e5;
-  --surface-border: #e6ebf1;
-  --surface-shadow: 0 10px 28px -20px rgba(15, 23, 42, 0.38);
+  --surface-border: #e2e8f0;
+  --surface-shadow: 0 12px 32px -24px rgba(15, 23, 42, 0.45);
 }
 
 .dark { color-scheme: dark; }
@@ -79,9 +79,11 @@ body { min-width: 320px; }
 }
 
 .dashboard-card {
-  @apply rounded-2xl border border-slate-200/80 bg-white dark:border-navy-700 dark:bg-navy-800;
+  @apply rounded-[18px] border border-slate-200/80 bg-white dark:border-navy-700 dark:bg-navy-800;
   box-shadow: var(--surface-shadow);
 }
+
+.interactive-focus { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-navy-900; }
 
 .dashboard-panel {
   @apply dashboard-card min-w-0 p-5 sm:p-6;
