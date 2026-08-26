@@ -85,7 +85,7 @@ function MainLayout() {
               <Route path="/documentos" element={<ProtectedRoute><DocumentosPage /></ProtectedRoute>} />
               <Route path="/usuarios" element={<ProtectedRoute><UsuariosPage /></ProtectedRoute>} />
 
-              <Route path="/projeto/:id" element={<ProtectedRoute><ProjetoDetalhes /></ProtectedRoute>} />
+              <Route path="/projeto/:id" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/importacao/:id" element={<ProtectedRoute><ImportacaoDetalhes /></ProtectedRoute>} />
               <Route path="/relatorio/:id" element={<ProtectedRoute><RelatorioPage /></ProtectedRoute>} />
               </Routes>

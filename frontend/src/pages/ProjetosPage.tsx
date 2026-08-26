@@ -104,7 +104,6 @@ export function ProjetosPage() {
                   <p className="text-sm font-bold text-slate-900 dark:text-white">{item.transacoes_count ?? 0}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Link to={`/projeto/${item.id}`} onClick={() => selecionarProjeto(item.id)} className="px-3 py-1.5 text-xs font-semibold text-[#0f9f9a] hover:underline">Detalhes</Link>
                   <button
                     type="button"
                     onClick={() => { selecionarProjeto(item.id); navigate(`/projetos/${item.id}/visao-geral`); }}

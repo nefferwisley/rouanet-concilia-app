@@ -4,7 +4,7 @@ import { Projeto } from "../types";
 
 export function ProjectCard({ projeto }: { projeto: Projeto }) {
   const navigate = useNavigate();
-  const abrir = () => navigate(`/projeto/${projeto.id}`);
+  const abrir = () => navigate(`/projetos/${projeto.id}/visao-geral`);
 
   return (
     <div
