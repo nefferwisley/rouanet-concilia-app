@@ -2,6 +2,105 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: light;
+  --brand-teal: #0f9f9a;
+  --brand-teal-dark: #087f7b;
+  --brand-blue: #2878e5;
+  --surface-border: #e6ebf1;
+  --surface-shadow: 0 10px 28px -20px rgba(15, 23, 42, 0.38);
+}
+
+.dark { color-scheme: dark; }
+
+* { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+
+body { min-width: 320px; }
+
+.brand-ring {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border-radius: 999px;
+  background: conic-gradient(from 12deg, #0f9f9a 0 69%, #dce5e9 69% 86%, #f5a623 86% 100%);
+  box-shadow: inset 0 0 0 1px rgba(15, 159, 154, 0.08);
+}
+
+.brand-ring::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: inherit;
+  background: white;
+}
+
+.dark .brand-ring::after { background: #0b1126; }
+
+.brand-ring span {
+  position: absolute;
+  z-index: 1;
+  right: -1px;
+  top: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #f5a623;
+  box-shadow: 0 0 0 2px white;
+}
+
+.dark .brand-ring span { box-shadow: 0 0 0 2px #0b1126; }
+
+.sidebar-link {
+  @apply relative mx-3 flex min-h-11 w-[calc(100%-1.5rem)] items-center gap-3 rounded-none px-4 text-left text-[13px] font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-navy-800 dark:hover:text-white;
+}
+
+.sidebar-link svg { @apply h-[18px] w-[18px] shrink-0 stroke-[1.7]; }
+
+.sidebar-link-active {
+  @apply bg-teal-50/80 font-semibold text-teal-700 dark:bg-teal-500/10 dark:text-teal-300;
+}
+
+.sidebar-link-active::after {
+  content: "";
+  position: absolute;
+  right: -12px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 8px 0 0 8px;
+  background: var(--brand-teal);
+}
+
+.sidebar-link-disabled { @apply cursor-default hover:bg-transparent hover:text-slate-600 dark:hover:bg-transparent dark:hover:text-slate-400; }
+
+.header-icon-button {
+  @apply flex h-10 w-10 items-center justify-center rounded-xl border border-transparent text-slate-500 transition-colors hover:border-slate-200 hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/50 dark:text-slate-400 dark:hover:border-navy-700 dark:hover:bg-navy-800 dark:hover:text-white;
+}
+
+.dashboard-card {
+  @apply rounded-2xl border border-slate-200/80 bg-white dark:border-navy-700 dark:bg-navy-800;
+  box-shadow: var(--surface-shadow);
+}
+
+.dashboard-panel {
+  @apply dashboard-card min-w-0 p-5 sm:p-6;
+}
+
+.dashboard-table-wrap { @apply overflow-x-auto; }
+
+.dashboard-table { @apply w-full min-w-[680px] border-collapse text-left text-xs; }
+.dashboard-table th { @apply border-b border-slate-100 px-4 py-3 font-semibold text-slate-500 dark:border-navy-700 dark:text-slate-400; }
+.dashboard-table td { @apply border-b border-slate-100 px-4 py-3 text-slate-600 dark:border-navy-700/70 dark:text-slate-300; }
+.dashboard-table tbody tr:last-child td { @apply border-b-0; }
+.dashboard-table tbody tr { @apply transition-colors hover:bg-slate-50/80 dark:hover:bg-navy-700/30; }
+
+.metric-icon { @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white shadow-sm; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
 .btn-primary {
   @apply bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-[13px] font-bold disabled:opacity-50 transition-colors;
 }
@@ -34,10 +133,10 @@
   @apply text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50;
 }
 .table-head {
-  @apply text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-navy-950 border-b border-slate-200 dark:border-navy-700;
+  @apply text-left text-xs font-semibold tracking-wide text-slate-400 dark:text-slate-500 bg-transparent border-b border-slate-100 dark:border-navy-700;
 }
 .table-head th {
-  @apply py-3 px-3.5;
+  @apply py-4 px-4;
 }
 
 .pill {

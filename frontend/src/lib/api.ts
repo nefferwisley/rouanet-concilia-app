@@ -98,7 +98,12 @@ async function fetchComAutoRefresh(url: string, init: RequestInit, tentouRefresh
     // ~50s (e um redeploy pode levar mais alguns). Em vez de desistir logo,
     // espera 8s entre tentativas (até ~80s no total) antes de reportar o
     // erro de "servidor iniciando".
-    if (tentouRetry < 10) {
+    // Repetir automaticamente operações de escrita pode duplicar importações
+    // quando o servidor recebeu o POST, mas a conexão caiu antes da resposta.
+    // Retry transparente fica restrito a métodos seguros/idempotentes.
+    const metodo = (init.method || "GET").toUpperCase();
+    const podeRepetir = metodo === "GET" || metodo === "HEAD" || metodo === "OPTIONS";
+    if (podeRepetir && tentouRetry < 10) {
       await new Promise((r) => setTimeout(r, 8000));
       return fetchComAutoRefresh(url, init, tentouRefresh, tentouRetry + 1);
     }
@@ -116,6 +121,9 @@ async function tratar<T>(resp: Response): Promise<T> {
       /* corpo não era JSON */
     }
     throw new ApiError(resp.status, formatarDetail(detail, resp.statusText));
+  }
+  if (resp.status === 204 || resp.status === 205) {
+    return undefined as T;
   }
   return resp.json() as Promise<T>;
 }

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "rouanet-concilia-server": {
+      "command": "python",
+      "args": ["-m", "backend.mcp_server"],
+      "env": {
+        "PYTHONPATH": "."
+      },
+      "description": "Servidor MCP Oficial RouanetConcilia para auditoria contábil, conciliação tripartite e regras SALIC / ANCINE"
+    }
+  }
+}

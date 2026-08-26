@@ -19,6 +19,8 @@ interface MovimentoExtrato {
 interface CandidatoSugestao {
   id: string;
   fornecedor?: string;
+  prestador?: string | null;
+  razao_social?: string | null;
   valor_bruto?: number;
   data_pagamento?: string | null;
   rubrica_codigo?: string | null;
@@ -31,7 +33,8 @@ interface CandidatoSugestao {
 interface TransacaoCandidata {
   id: string;
   fornecedor?: string;
-  cnpj_fornecedor?: string | null;
+  razao_social?: string | null;
+  prestador?: string | null;
   data_pagamento?: string;
   valor_bruto?: number;
   status: string;
@@ -59,27 +62,6 @@ function limparTextoExtrato(str?: string | null): string {
     .replace(/^Doc\s*:\s*/i, "")
     .trim();
   return limpo || str.trim();
-}
-
-function extrairPrestador(fornecedor: string, documento: string | null | undefined): string {
-  if (!documento) {
-    return fornecedor;
-  }
-  const nomeDoc = documento.split(/[\\/]/).pop() || "";
-  
-  // Pattern 1: "005 - 10-11-2022 - Frico Guimarães - Diretor de Fotografia.pdf"
-  const matchDashes = nomeDoc.match(/^\d+\s*-\s*\d{2}-\d{2}-\d{4}\s*-\s*([^-(\n]+)/);
-  if (matchDashes && matchDashes[1]) {
-    return matchDashes[1].trim();
-  }
-  
-  // Pattern 2: "1. Mônica Guimarães - Produtora.pdf" ou "7. Luis Cipullo (1961).pdf"
-  const matchDot = nomeDoc.match(/^\d+\.\s+([^-(\n]+)/);
-  if (matchDot && matchDot[1]) {
-    return matchDot[1].trim();
-  }
-  
-  return fornecedor;
 }
 
 /** P3 — Conciliação com botões (extrato × lançamento):
@@ -350,9 +332,10 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
                           {dados.transacoes.map((t) => {
                             const mesmoValor = Math.abs((t.valor_bruto ?? 0) - Math.abs(m.valor)) < 0.01;
                             
-                            // Extrai PF (prestador) e PJ (fornecedor/razão social)
-                            const nomePF = extrairPrestador(t.fornecedor || "-", t.documento);
-                            const nomePJ = t.fornecedor || "-";
+                            // PRESTADOR vem do banco (coluna da planilha revisada);
+                            // razão social é quem recebeu. Sem regex sobre arquivo.
+                            const nomePF = t.prestador || t.razao_social || t.fornecedor || "-";
+                            const nomePJ = t.razao_social || t.fornecedor || "-";
                             const nomeCompleto = nomePF !== nomePJ 
                               ? `${nomePF} (${nomePJ})` 
                               : nomePF;
@@ -416,8 +399,8 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
                               )}
                               <span className="font-bold text-slate-200">
                                 {(() => {
-                                  const pf = extrairPrestador(transacaoAtual.fornecedor || "-", transacaoAtual.documento);
-                                  const pj = transacaoAtual.fornecedor || "-";
+                                  const pf = transacaoAtual.prestador || transacaoAtual.razao_social || transacaoAtual.fornecedor || "-";
+                                  const pj = transacaoAtual.razao_social || transacaoAtual.fornecedor || "-";
                                   return pf !== pj ? `${pf} (${pj})` : pf;
                                 })()}
                               </span>

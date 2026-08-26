@@ -23,7 +23,8 @@ export interface TransacaoAuditoria {
   id: string;
   fornecedor?: string;
   razao_social?: string | null;
-  cnpj_fornecedor?: string | null;
+  prestador?: string | null;
+  documento?: string | null;
   data_pagamento?: string;
   valor_bruto?: number;
   tem_nf: boolean;

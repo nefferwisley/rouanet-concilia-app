@@ -383,8 +383,16 @@ async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
     )
     transacoes = await conn.fetch(
         """
-        select t.id, t.fornecedor, t.cnpj_fornecedor, t.data_pagamento, t.valor_bruto, t.status,
-               r.codigo as rubrica_codigo, r.descricao as rubrica_descricao,
+        select t.id, t.fornecedor, t.razao_social, t.prestador, t.documento,
+               t.data_pagamento, t.valor_bruto, t.status,
+               (select r.codigo from despesas d
+                 join rubricas r on r.id = d.rubrica_id
+                where d.transacao_id = t.id
+                order by d.created_at, d.id limit 1) as rubrica_codigo,
+               (select r.descricao from despesas d
+                 join rubricas r on r.id = d.rubrica_id
+                where d.transacao_id = t.id
+                order by d.created_at, d.id limit 1) as rubrica_descricao,
                (
                    select id from documentos_transacao doc
                    where doc.transacao_id = t.id order by created_at desc limit 1
@@ -394,10 +402,8 @@ async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
                    where doc.transacao_id = t.id order by created_at desc limit 1
                ) as documento
         from transacoes t
-        left join despesas d on d.transacao_id = t.id
-        left join rubricas r on r.id = d.rubrica_id
         where t.projeto_id = $1
-        order by t.data_pagamento nulls last, t.created_at
+        order by t.data_pagamento nulls last, t.created_at, t.id
         """,
         projeto_id,
     )
@@ -406,7 +412,9 @@ async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
         {
             "id": str(t["id"]),
             "fornecedor": t["fornecedor"],
-            "cnpj_fornecedor": t["cnpj_fornecedor"],
+            "razao_social": t["razao_social"],
+            "prestador": t["prestador"],
+            "documento": t["documento"],
             "data_pagamento": t["data_pagamento"].isoformat() if t["data_pagamento"] else None,
             "valor_bruto": float(t["valor_bruto"]) if t["valor_bruto"] is not None else None,
             "status": t["status"],
@@ -439,6 +447,8 @@ async def listar_extrato_pendentes(projeto_id: str, dep=Depends(get_conn)):
                         {
                             "id": t["id"],
                             "fornecedor": t["fornecedor"],
+                            "prestador": t["prestador"],
+                            "razao_social": t["razao_social"],
                             "valor_bruto": t["valor_bruto"],
                             "data_pagamento": t["data_pagamento"],
                             "rubrica_codigo": t["rubrica_codigo"],

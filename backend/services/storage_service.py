@@ -1,4 +1,5 @@
 import logging
+import ntpath
 import os
 import unicodedata
 from pathlib import Path
@@ -27,11 +28,35 @@ def sanitizar_chave(caminho: str) -> str:
     etc.) via normalização NFKD; o nome ORIGINAL com acento continua intacto
     em nome_arquivo no banco, só a CHAVE do bucket é que muda.
     """
-    caminho = str(caminho).replace("\\", "/")
-    if caminho.startswith("/"):
-        caminho = caminho[1:]
+    if not isinstance(caminho, str) or not caminho:
+        raise ValueError("Chave de storage inválida.")
+    if "\x00" in caminho:
+        raise ValueError("Chave de storage contém NUL.")
+
+    if caminho.startswith(("/", "\\")) or ntpath.isabs(caminho) or ntpath.splitdrive(caminho)[0]:
+        raise ValueError("Chave de storage deve ser relativa.")
+
+    caminho = caminho.replace("\\", "/")
+    partes = caminho.split("/")
+    if any(parte in ("", ".", "..") for parte in partes):
+        raise ValueError("Chave de storage contém componente inválido.")
+
     nfkd = unicodedata.normalize("NFKD", caminho)
-    return nfkd.encode("ascii", "ignore").decode("ascii")
+    chave = nfkd.encode("ascii", "ignore").decode("ascii")
+    if not chave or any(parte in ("", ".", "..") for parte in chave.split("/")):
+        raise ValueError("Chave de storage inválida após normalização.")
+    return chave
+
+
+def _caminho_local_seguro(caminho_clean: str) -> Path:
+    """Resolve uma chave já validada sem sair do diretório de uploads."""
+    base = UPLOAD_DIR.resolve()
+    destino = (base / Path(caminho_clean)).resolve()
+    try:
+        destino.relative_to(base)
+    except ValueError as exc:  # defesa em profundidade contra regressão futura
+        raise ValueError("Chave de storage fora do diretório permitido.") from exc
+    return destino
 
 
 def get_supabase_client() -> Client | None:
@@ -69,8 +94,8 @@ def upload_arquivo(caminho_logico: str, conteudo: bytes) -> str:
     Retorna o caminho_logico salvo no bucket (ex: "projeto_id/nome.pdf").
     Se o Supabase não estiver configurado, usa fallback para salvar em disco local (UPLOAD_DIR / caminho_logico).
     """
-    client = get_supabase_client()
     caminho_clean = sanitizar_chave(caminho_logico)
+    client = get_supabase_client()
 
     if client:
         try:
@@ -97,19 +122,91 @@ def upload_arquivo(caminho_logico: str, conteudo: bytes) -> str:
             raise e
     else:
         # Fallback local para desenvolvimento/testes
-        local_path = UPLOAD_DIR / caminho_clean
+        local_path = _caminho_local_seguro(caminho_clean)
         local_path.parent.mkdir(parents=True, exist_ok=True)
         local_path.write_bytes(conteudo)
         logger.info("Supabase não configurado. Gravado em disco local (fallback): %s", local_path)
         return caminho_clean
+
+
+def criar_arquivo_se_ausente(caminho_logico: str, conteudo: bytes) -> tuple[str, bool]:
+    """Cria um objeto sem sobrescrever uma chave que já existia.
+
+    Retorna ``(caminho, criado)``. O indicador permite que fluxos transacionais
+    compensem apenas objetos criados pela própria execução. ``upload_arquivo``
+    mantém seu contrato público e sua semântica histórica de upsert.
+    """
+    caminho_clean = sanitizar_chave(caminho_logico)
+    client = get_supabase_client()
+
+    if client:
+        try:
+            client.storage.from_("documentos").upload(
+                path=caminho_clean,
+                file=conteudo,
+                file_options={"content-type": "application/octet-stream"},
+            )
+            logger.info("Objeto novo criado no Supabase Storage: documentos/%s", caminho_clean)
+            return caminho_clean, True
+        except Exception as exc:
+            erro = str(exc).lower()
+            if "already exists" in erro or "duplicate" in erro:
+                existente = client.storage.from_("documentos").download(caminho_clean)
+                if existente != conteudo:
+                    raise RuntimeError(
+                        "Objeto preexistente tem conteúdo diferente da chave solicitada."
+                    ) from exc
+                logger.info("Objeto já existia no Supabase Storage: documentos/%s", caminho_clean)
+                return caminho_clean, False
+            logger.error(
+                "Falha ao criar arquivo no Supabase Storage (documentos/%s): %s",
+                caminho_clean,
+                exc,
+            )
+            raise
+
+    local_path = _caminho_local_seguro(caminho_clean)
+    local_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with local_path.open("xb") as arquivo:
+            arquivo.write(conteudo)
+    except FileExistsError:
+        if local_path.read_bytes() != conteudo:
+            raise RuntimeError(
+                "Objeto preexistente tem conteúdo diferente da chave solicitada."
+            )
+        logger.info("Objeto já existia no disco local (fallback): %s", local_path)
+        return caminho_clean, False
+    logger.info("Objeto novo criado no disco local (fallback): %s", local_path)
+    return caminho_clean, True
+
+def arquivo_existe(caminho_logico: str) -> bool:
+    caminho_clean = sanitizar_chave(caminho_logico)
+    client = get_supabase_client()
+    if client:
+        try:
+            # Pega metadata pra evitar download
+            path_parts = caminho_clean.split('/')
+            if len(path_parts) > 1:
+                folder = '/'.join(path_parts[:-1])
+                file_name = path_parts[-1]
+                res = client.storage.from_("documentos").list(folder, options={"search": file_name})
+                for obj in res:
+                    if obj["name"] == file_name:
+                        return True
+            return False
+        except Exception:
+            return False
+    else:
+        return _caminho_local_seguro(caminho_clean).is_file()
 
 def baixar_arquivo(caminho_logico: str) -> bytes | None:
     """
     Baixa os bytes do arquivo do bucket 'documentos' do Supabase Storage.
     Se o Supabase não estiver configurado, tenta ler do disco local.
     """
-    client = get_supabase_client()
     caminho_clean = sanitizar_chave(caminho_logico)
+    client = get_supabase_client()
 
     if client:
         try:
@@ -120,11 +217,45 @@ def baixar_arquivo(caminho_logico: str) -> bytes | None:
             return None
     else:
         # Fallback local
-        local_path = UPLOAD_DIR / caminho_clean
+        local_path = _caminho_local_seguro(caminho_clean)
         if local_path.is_file():
             return local_path.read_bytes()
-        # Se for legacy com caminho completo absoluto
-        local_abs = Path(caminho_logico)
-        if local_abs.is_file():
-            return local_abs.read_bytes()
         return None
+
+
+def remover_arquivo(caminho_logico: str) -> bool:
+    """
+    Remove o arquivo do bucket 'documentos' do Supabase Storage ou do disco local (fallback).
+    Retorna True se removido com sucesso, False caso contrário.
+    """
+    caminho_clean = sanitizar_chave(caminho_logico)
+    client = get_supabase_client()
+
+    if client:
+        try:
+            resultado = client.storage.from_("documentos").remove([caminho_clean])
+            removido_confirmado = isinstance(resultado, list) and any(
+                isinstance(item, dict)
+                and (item.get("name") == caminho_clean or item.get("id"))
+                for item in resultado
+            )
+            if not removido_confirmado:
+                logger.warning(
+                    "Storage não confirmou a remoção de documentos/%s (retorno=%r)",
+                    caminho_clean,
+                    resultado,
+                )
+                return False
+            logger.info("Arquivo removido do Supabase Storage: documentos/%s", caminho_clean)
+            return True
+        except Exception as e:
+            logger.warning("Falha ao remover arquivo do Supabase Storage (documentos/%s): %s", caminho_clean, e)
+            return False
+    else:
+        # Fallback local
+        local_path = _caminho_local_seguro(caminho_clean)
+        if local_path.is_file():
+            local_path.unlink()
+            logger.info("Arquivo removido do disco local (fallback): %s", local_path)
+            return True
+        return False

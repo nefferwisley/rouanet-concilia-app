@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useAPI } from "../hooks/useAPI";
+import { ApiError } from "../lib/api";
 
 interface TransacaoAuditoria {
   id: string;
@@ -33,6 +34,13 @@ interface UploadResultado {
 const brl = (v: number | undefined) =>
   (v ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+function mensagemErroArquivo(erro: unknown): string {
+  const status = erro instanceof ApiError ? erro.status : undefined;
+  if (status === 403) return "Você não tem permissão para abrir este arquivo.";
+  if (status === 404) return "O arquivo não está disponível. Sincronize a pasta ou anexe-o novamente.";
+  return "Não foi possível abrir o arquivo. Tente novamente.";
+}
+
 /** P1 — Revisão documental por lançamento: anexa o PDF/XML do pagamento a
  *  cada transação e dispara o OCR (carregando a chave Gemini digitada na
  *  hora; se não houver, o documento é anexado mesmo assim). */
@@ -47,6 +55,8 @@ export function RevisaoDocumental({ projetoId }: { projetoId: string }) {
   const [mensagens, setMensagens] = useState<Record<string, string>>({});
   const [vinculando, setVinculando] = useState(false);
   const [mensagemVinculo, setMensagemVinculo] = useState<string | null>(null);
+  const [baixandoDocumentos, setBaixandoDocumentos] = useState<Set<string>>(() => new Set());
+  const [mensagensDownload, setMensagensDownload] = useState<Record<string, string>>({});
   const [chaveGemini, setChaveGemini] = useState(() => {
     return localStorage.getItem("gemini_api_key") || "";
   });
@@ -113,6 +123,27 @@ export function RevisaoDocumental({ projetoId }: { projetoId: string }) {
       }));
     } finally {
       setEnviando(null);
+    }
+  };
+
+  const baixarDocumento = async (documento: DocumentoTransacao) => {
+    if (baixandoDocumentos.has(documento.id)) return;
+    const nome = documento.arquivo_ref.split(/[\\/]/).pop() || "documento";
+    setBaixandoDocumentos((anteriores) => new Set(anteriores).add(documento.id));
+    setMensagensDownload((anteriores) => {
+      const { [documento.id]: _removida, ...restantes } = anteriores;
+      return restantes;
+    });
+    try {
+      await download(`/api/v1/documentos/${documento.id}/arquivo`, nome);
+    } catch (erro) {
+      setMensagensDownload((anteriores) => ({ ...anteriores, [documento.id]: mensagemErroArquivo(erro) }));
+    } finally {
+      setBaixandoDocumentos((anteriores) => {
+        const proximos = new Set(anteriores);
+        proximos.delete(documento.id);
+        return proximos;
+      });
     }
   };
 
@@ -216,20 +247,16 @@ export function RevisaoDocumental({ projetoId }: { projetoId: string }) {
                       ) : (
                         documentosPorTransacao[t.id].map((d) => (
                           <span key={d.id} className="flex items-center gap-1 flex-wrap">
-                            <a
-                              href="#"
-                              onClick={async (e) => {
-                                e.preventDefault();
-                                try {
-                                  await download(`/api/v1/documentos/${d.id}/arquivo`, d.arquivo_ref.split(/[\\/]/).pop() ?? "doc");
-                                } catch (err: any) {
-                                  alert(err?.message || "O arquivo ainda não está salvo no servidor. Sincronize a pasta do Drive.");
-                                }
-                              }}
-                              className="text-blue-600 hover:underline"
+                            <button
+                              type="button"
+                              disabled={baixandoDocumentos.has(d.id)}
+                              onClick={() => void baixarDocumento(d)}
+                              className="text-blue-600 hover:underline disabled:opacity-60 disabled:cursor-wait"
+                              title={d.arquivo_ref.split(/[\\/]/).pop() || "documento"}
                             >
                               📄 {d.arquivo_ref.split(/[\\/]/).pop()}
-                            </a>
+                            </button>
+                            {mensagensDownload[d.id] && <span role="status" className="text-amber-600">{mensagensDownload[d.id]}</span>}
                             <span className="text-slate-400">
                               {d.tipo}
                               {d.confianca_ocr != null && ` · ${Math.round(d.confianca_ocr * 100)}%`}

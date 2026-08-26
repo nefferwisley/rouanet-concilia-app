@@ -17,6 +17,7 @@ import re
 import unicodedata
 from pathlib import Path
 
+import asyncpg
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from starlette.concurrency import run_in_threadpool
 
@@ -244,9 +245,11 @@ async def enviar_documentos_projeto(
                     f"Arquivo '{arquivo.filename}' excede {settings.max_upload_mb}MB.",
                 )
 
+            import uuid
             nome_limpo = Path(arquivo.filename).name
+            prefixo = uuid.uuid4().hex[:8]
             caminho_bucket = await run_in_threadpool(
-                storage_service.upload_arquivo, f"{projeto_id}/{nome_limpo}", conteudo
+                storage_service.upload_arquivo, f"{projeto_id}/{prefixo}_{nome_limpo}", conteudo
             )
 
             row = await conn.fetchrow(
@@ -799,11 +802,19 @@ async def listar_candidatos_ambiguos(projeto_id: str, dep=Depends(get_conn)):
         """,
         projeto_id,
     )
-    existentes_rows = await conn.fetch(
-        "select name from storage.objects where bucket_id = 'documentos' and name like $1",
-        f"{projeto_id}/%",
-    )
-    nomes_no_bucket = {row["name"] for row in existentes_rows}
+    try:
+        async with conn.transaction():
+            existentes_rows = await conn.fetch(
+                "select name from storage.objects where bucket_id = 'documentos' and name like $1",
+                f"{projeto_id}/%",
+            )
+        nomes_no_bucket = {row["name"] for row in existentes_rows}
+    except (asyncpg.UndefinedTableError, asyncpg.InvalidSchemaNameError):
+        nomes_no_bucket = set()
+        for ref in {doc["arquivo_ref"] for doc in docs_drive if doc["arquivo_ref"]}:
+            existe = await run_in_threadpool(storage_service.arquivo_existe, ref)
+            if existe:
+                nomes_no_bucket.add(ref)
 
     candidatos_por_chave: dict[tuple[str, str], list[dict]] = {}
     candidatos_por_nome: dict[str, list[dict]] = {}

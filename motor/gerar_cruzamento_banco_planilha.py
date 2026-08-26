@@ -493,23 +493,23 @@ def gerar_planilha_saas(banco, plan, match):
         cands = plan_por_valor_data.get((b["d"].isoformat() if b["d"] else None, b["v"]), [])
         if p is None and cands:
             p = cands[0]
-        ws.append([
-            num,
-            b["d"].isoformat() if b["d"] else "",
-            b.get("fornecedor") or "",
-            b.get("cnpj_fornecedor") or "",
-            b["v"],
-            b.get("status") or "",
-            b.get("metodo") or "",
-            b.get("extrato_ref") or "",
-            b.get("historico") or "",
-            b.get("documento") or "",
-            b.get("tipo") or "",
-            p["ctrl"] if p else "",
-            p["rub"] if p else "",
-            p["status"] if p else "",
-            p["doc"] if p else "",
-        ])
+            ws.append([
+                num,
+                b["d"].isoformat() if b["d"] else "",
+                b.get("fornecedor") or "",
+                b.get("documento") or "",
+                b["v"],
+                b.get("status") or "",
+                b.get("metodo") or "",
+                b.get("extrato_ref") or "",
+                b.get("historico") or "",
+                b.get("documento") or "",
+                b.get("tipo") or "",
+                p["ctrl"] if p else "",
+                p["rub"] if p else "",
+                p["status"] if p else "",
+                p["doc"] if p else "",
+            ])
     for col, w in {"A": 6, "B": 12, "C": 40, "D": 24, "E": 14, "F": 16, "G": 16, "H": 22,
                    "I": 40, "J": 40, "K": 14, "L": 10, "M": 20, "N": 30, "O": 52}.items():
         ws.column_dimensions[col].width = w

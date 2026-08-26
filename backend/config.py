@@ -7,9 +7,9 @@ class Settings(BaseSettings):
     supabase_url: str = ""     # https://xxxx.supabase.co — usado só pra buscar o JWKS (chaves ES256 novas)
     supabase_service_role_key: str = ""  # Service role key pra bypassar RLS no Storage
     google_api_key: str = ""
-    # Ambiente: "dev" habilita o login de demonstração SEM autenticação
-    # (routes/dev_demo.py); qualquer outro valor desabilita a rota.
-    app_env: str = "dev"
+    # Falha fechada: rotas de desenvolvimento só são habilitadas quando o
+    # ambiente é declarado explicitamente como dev/test.
+    app_env: str = "production"
     # Backend de leitura automática de documentos (P4): "" (auto: Gemini se
     # houver chave, Ollama local caso contrário), "gemini" ou "ollama".
     ocr_backend: str = ""
@@ -19,6 +19,10 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         extra = "ignore"
+
+    @property
+    def dev_routes_enabled(self) -> bool:
+        return self.app_env.strip().lower() in {"dev", "test"}
 
 
 settings = Settings()

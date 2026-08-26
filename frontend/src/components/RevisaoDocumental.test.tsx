@@ -3,9 +3,9 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { RevisaoDocumental } from './RevisaoDocumental';
-import { mockGet, mockPostForm } from '../test/setup';
+import { mockDownload, mockGet, mockPostForm } from '../test/setup';
 
 const mockAuditoria = {
   transacoes: [
@@ -25,6 +25,7 @@ describe('RevisaoDocumental', () => {
   beforeEach(() => {
     mockGet.mockClear();
     mockPostForm.mockClear();
+    mockDownload.mockClear();
     mockGet.mockResolvedValue(mockAuditoria);
   });
 
@@ -54,5 +55,19 @@ describe('RevisaoDocumental', () => {
     await waitFor(() => screen.getByPlaceholderText('AIza…'));
     const campo = screen.getByPlaceholderText('AIza…') as HTMLInputElement;
     expect(campo.type).toBe('password');
+  });
+
+  it('baixa documento pelo id com basename acentuado', async () => {
+    mockGet
+      .mockResolvedValueOnce(mockAuditoria)
+      .mockResolvedValueOnce([{ id: 'doc-1', tipo: 'NFE', arquivo_ref: 'pasta/nota-áç.pdf', criado_em: '2026-08-01' }]);
+    render(<RevisaoDocumental projetoId="projeto-123" />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /ver documentos/i }));
+    fireEvent.click(await screen.findByText(/nota-áç\.pdf/i));
+
+    await waitFor(() => {
+      expect(mockDownload).toHaveBeenCalledWith('/api/v1/documentos/doc-1/arquivo', 'nota-áç.pdf');
+    });
   });
 });

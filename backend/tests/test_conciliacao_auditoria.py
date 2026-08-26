@@ -101,11 +101,14 @@ def test_listar_importacoes_requires_auth():
 # Auditoria — lógica pura de filtro (sem DB)
 # ============================================================
 
-@pytest.mark.parametrize(
+@ pytest.mark.parametrize(
     "filtro, esperado",
     [
-        ("pendente", "t.status = 'PENDENTE'"),
-        ("ok", "t.status = 'CONCILIADO_OK'"),
+        # Nova implementação baseada na realidade dos dados (documentos + extrato)
+        ("pendente", "not exists (select 1 from documentos_transacao _d where _d.transacao_id = t.id) or not exists (select 1 from conciliacao_extrato _ce where _ce.transacao_id = t.id)"),
+        ("ok", "exists (select 1 from documentos_transacao _d where _d.transacao_id = t.id) and exists (select 1 from conciliacao_extrato _ce where _ce.transacao_id = t.id)"),
+        ("revisao_pendente", "t.status = 'REVISAO_PENDENTE'"),
+        # com_docs e sem_docs usam a lógica baseada em tem_nf/tem_comprovante (flags booleanas)
         ("com_docs", "t.tem_nf and t.tem_comprovante"),
         ("sem_docs", "not (t.tem_nf and t.tem_comprovante)"),
         (None, "true"),

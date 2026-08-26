@@ -34,6 +34,23 @@ def test_limpar_planilha_requires_auth():
     assert client.delete("/api/v1/projetos/fake-uuid/planilha").status_code == 401
 
 
+def test_editar_linha_planilha_requires_auth():
+    resposta = client.patch(
+        "/api/v1/projetos/fake-uuid/planilha/controle:1",
+        json={
+            "expected_version": 1,
+            "op_id": "550e8400-e29b-41d4-a716-446655440000",
+            "valor": "100.00",
+        },
+    )
+    assert resposta.status_code == 401
+
+
+def test_listar_conflitos_planilha_requires_auth():
+    resposta = client.get("/api/v1/projetos/fake-uuid/planilha-conflitos")
+    assert resposta.status_code == 401
+
+
 # ============================================================
 # Parser puro — interpretação do XLSX
 # ============================================================
@@ -92,3 +109,17 @@ def test_parse_linha_fisica_correta():
     ])
     linhas = parse_planilha(conteudo, aba="CONCILIAÇÃO REVISADA")
     assert linhas[0].linha == 3  # 1 cabeçalho + 1 ignorada + 1
+
+
+def test_sync_id_normaliza_controle_numerico():
+    from backend.routes.planilha import _sync_id
+
+    linha = type("Linha", (), {"controle": "1.0", "linha": 3})()
+    assert _sync_id(linha) == "controle:1"
+
+
+def test_sync_id_sem_controle_usa_linha_fisica():
+    from backend.routes.planilha import _sync_id
+
+    linha = type("Linha", (), {"controle": None, "linha": 91})()
+    assert _sync_id(linha) == "linha:91"

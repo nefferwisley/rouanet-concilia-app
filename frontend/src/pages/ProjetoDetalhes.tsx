@@ -36,6 +36,7 @@ export function ProjetoDetalhes() {
   const [mostrarImportar, setMostrarImportar] = useState(false);
   const [mostrarEditar, setMostrarEditar] = useState(false);
   const [importandoAutonomo, setImportandoAutonomo] = useState(false);
+  const [erroImportacaoAutonoma, setErroImportacaoAutonoma] = useState<string | null>(null);
   const [aba, setAba] = useState<Aba>("geral");
 
   const recarregarProjeto = () => {
@@ -63,29 +64,32 @@ export function ProjetoDetalhes() {
 
   const executarImportacaoAutonoma = async () => {
     if (!id) return;
+    setErroImportacaoAutonoma(null);
     setImportandoAutonomo(true);
     try {
       const res = await api.post<{ conciliacao_id: string }>(`/api/v1/projetos/${id}/importar-autonomo`, {});
       const pollId = setInterval(async () => {
         try {
-          const st = await api.get<{ status: string; erro?: string }>(`/api/v1/conciliacao/${res.conciliacao_id}`);
-          if (st.status === "concluido") {
-            clearInterval(pollId);
-            setImportandoAutonomo(false);
-            recarregarProjeto();
-          } else if (st.status === "erro") {
-            clearInterval(pollId);
-            setImportandoAutonomo(false);
-            alert(st.erro || "Erro no processamento autônomo.");
-          }
-        } catch {
+            const st = await api.get<{ status: string; erro?: string; erro_fatal?: string; mensagem?: string }>(`/api/v1/conciliacao/${res.conciliacao_id}`);
+            if (st.status === "sucesso" || st.status === "concluido") {
+              clearInterval(pollId);
+              setImportandoAutonomo(false);
+              setErroImportacaoAutonoma(null);
+              recarregarProjeto();
+            } else if (st.status === "erro") {
+              clearInterval(pollId);
+              setImportandoAutonomo(false);
+              setErroImportacaoAutonoma(st.erro_fatal || st.erro || st.mensagem || "Erro no processamento autônomo.");
+            }
+        } catch (error) {
           clearInterval(pollId);
           setImportandoAutonomo(false);
+          setErroImportacaoAutonoma(error instanceof Error ? error.message : "Falha ao consultar o processamento autônomo.");
         }
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setImportandoAutonomo(false);
-      alert(err.message || "Falha ao iniciar processamento autônomo.");
+      setErroImportacaoAutonoma(err instanceof Error ? err.message : "Falha ao iniciar processamento autônomo.");
     }
   };
 
@@ -119,62 +123,56 @@ export function ProjetoDetalhes() {
         ← Projetos
       </Link>
 
-      <div className="card">
-        <div className="flex flex-wrap justify-between items-start gap-4">
+      <div className="bg-white dark:bg-navy-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-navy-700 flex flex-wrap items-center justify-between mb-6 gap-4">
+        <div className="flex items-center gap-6">
+          <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-navy-900 border-4 border-white dark:border-navy-800 shadow-md flex items-center justify-center text-2xl font-bold text-slate-400 shrink-0">
+            {projeto.pronac.substring(0,2)}
+          </div>
           <div>
-            <p className="eyebrow">{projeto.pronac}</p>
-            <h1 className="text-xl font-bold tracking-tight mt-0.5">{projeto.nome}</h1>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-slate-500 dark:text-slate-400">
-              {projeto.proponente && <span>👤 {projeto.proponente}</span>}
-              {projeto.banco && <span>🏦 {projeto.banco}</span>}
-              {projeto.controller && <span>🧑‍💼 Controller: {projeto.controller}</span>}
+            <div className="flex items-center gap-3 mb-2">
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{projeto.nome}</h3>
+              <span className="px-2.5 py-1 text-xs font-semibold text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-500/10 rounded-full border border-blue-100 dark:border-blue-500/20">{projeto.pronac}</span>
+            </div>
+            <div className="flex flex-wrap gap-8 text-sm">
+              <div>
+                <p className="text-slate-400 dark:text-slate-500 mb-1">Proponente:</p>
+                <p className="font-medium dark:text-slate-200">{projeto.proponente || "Não informado"}</p>
+              </div>
+              <div>
+                <p className="text-slate-400 dark:text-slate-500 mb-1">Banco Captador:</p>
+                <p className="font-medium dark:text-slate-200">{projeto.banco || "Não informado"}</p>
+              </div>
+              <div>
+                <p className="text-slate-400 dark:text-slate-500 mb-1">Controller:</p>
+                <p className="font-medium dark:text-slate-200">{projeto.controller || "Não atribuído"}</p>
+              </div>
             </div>
           </div>
-          <div className="flex gap-2 shrink-0">
+        </div>
+        
+        <div className="flex flex-col gap-2 shrink-0">
+          <div className="flex gap-2 justify-end">
             <button
-              className="px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors"
+              className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-navy-600 hover:bg-slate-50 dark:hover:bg-navy-700 rounded-lg transition-colors"
               onClick={() => setMostrarEditar(true)}
             >
-              ✏️ Editar
+              Editar Projeto
             </button>
-            <DeleteProjectButton
-              projectId={projeto.id}
-              onDeleted={() => {}}
-            />
+            <DeleteProjectButton projectId={projeto.id} onDeleted={() => {}} />
           </div>
-        </div>
-        <div className="flex flex-wrap gap-2 mt-4">
-          <button className="btn-primary" onClick={() => setMostrarImportar(true)}>
-            + Nova Importação
-          </button>
-          <button
-            className="btn-primary bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center gap-1.5 shadow-md transition-all"
-            onClick={executarImportacaoAutonoma}
-            disabled={importandoAutonomo}
-          >
-            {importandoAutonomo ? "⚡ Conciliando Pasta do Servidor..." : "⚡ Importação Autônoma (Pasta 1961)"}
-          </button>
-          <button
-            className="btn-secondary opacity-50 cursor-not-allowed"
-            disabled
-            title="Em breve — requer integração com API oficial do MinC/SALIC, ainda não disponível publicamente"
-          >
-            🌐 Transmitir via API SALIC
-          </button>
-          <button
-            className="btn-secondary opacity-50 cursor-not-allowed"
-            disabled
-            title="Em breve — exportação no layout oficial de lote SALIC/MinC"
-          >
-            📄 Exportar XML Lote SALIC/MinC
-          </button>
-          <button
-            className="btn-secondary opacity-50 cursor-not-allowed"
-            disabled
-            title="Em breve — geração do pacote de prestação de contas no formato MinC"
-          >
-            📤 Exportar Prestação SALIC (MinC)
-          </button>
+          <div className="flex gap-2 justify-end mt-2">
+             <button className="btn-primary" onClick={() => setMostrarImportar(true)}>+ Nova Importação</button>
+             <button
+               className="btn-primary bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-all shadow-sm"
+               onClick={executarImportacaoAutonoma}
+               disabled={importandoAutonomo}
+             >
+               {importandoAutonomo ? "Conciliando..." : "Importação Autônoma"}
+             </button>
+          </div>
+          {erroImportacaoAutonoma && (
+            <p role="alert" className="text-xs text-red-600 dark:text-red-400 text-right mt-1">{erroImportacaoAutonoma}</p>
+          )}
         </div>
       </div>
 
@@ -182,20 +180,22 @@ export function ProjetoDetalhes() {
 
       <ConfrontoSalic projetoId={projeto.id} />
 
-      <div className="flex gap-1 p-1 rounded-xl bg-slate-100 dark:bg-navy-900/70 overflow-x-auto">
-        {ABAS.map((a) => (
-          <button
-            key={a.chave}
-            onClick={() => setAba(a.chave)}
-            className={`flex-1 min-w-fit px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-              aba === a.chave
-                ? "bg-white dark:bg-navy-700 text-blue-600 dark:text-blue-400 shadow-sm"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-            }`}
-          >
-            {a.emoji} {a.rotulo}
-          </button>
-        ))}
+      <div className="bg-white dark:bg-navy-800 rounded-t-2xl border-b border-slate-100 dark:border-navy-700 overflow-x-auto shadow-sm">
+        <div className="flex items-center gap-8 px-6">
+          {ABAS.map((a) => (
+            <button
+              key={a.chave}
+              onClick={() => setAba(a.chave)}
+              className={`py-4 text-sm font-semibold transition-colors border-b-2 whitespace-nowrap ${
+                aba === a.chave
+                  ? "text-blue-700 dark:text-blue-400 border-blue-600 dark:border-blue-400"
+                  : "text-slate-400 dark:text-slate-500 border-transparent hover:text-slate-600 dark:hover:text-slate-300"
+              }`}
+            >
+              {a.rotulo}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className={aba === "geral" ? "space-y-4" : "hidden"}>

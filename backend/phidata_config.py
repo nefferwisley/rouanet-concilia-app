@@ -24,7 +24,7 @@ OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://host.docker.internal:11434")
 # minutos por chamada com o 7B. O 1.5b responde em segundos, com queda de
 # qualidade aceitável pra orquestrar/testar o fluxo.
 OLLAMA_MODEL_ID = os.getenv("OLLAMA_MODEL_ID", "qwen2.5-coder:1.5b")
-GEMINI_MODEL_ID = os.getenv("GEMINI_MODEL_ID", "gemini-2.0-flash-exp")
+GEMINI_MODEL_ID = os.getenv("GEMINI_MODEL_ID", "gemini-3.1-flash-lite")
 # Sem isso, o qwen2.5-coder (modelo de código) não converge sozinho pra um
 # "fim" em prompts abertos em português (ex.: "audite e liste validações")
 # — ele gera token após token sem parar até bater o limite de contexto
@@ -128,9 +128,9 @@ def buscar_projeto(projeto_id: str) -> str:
 
 
 def buscar_transacoes(projeto_id: str) -> str:
-    """Busca as transações (pagamentos) do projeto: fornecedor, CNPJ, valores, status de conciliação."""
+    """Busca as transações (pagamentos) do projeto: fornecedor, documento, valores, status de conciliação."""
     return _query_json(
-        "select fornecedor, cnpj_fornecedor, data_pagamento, valor_bruto, valor_liquido, "
+        "select fornecedor, documento, data_pagamento, valor_bruto, valor_liquido, "
         "tem_nf, tem_comprovante, status, score_conciliacao "
         "from transacoes where projeto_id = %s order by data_pagamento desc limit %s",
         (projeto_id, _LIMITE_LINHAS_TOOL),

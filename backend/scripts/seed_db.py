@@ -115,7 +115,7 @@ def seed_db():
 
             cur.execute("""
                 INSERT INTO transacoes
-                (id, projeto_id, fornecedor, cnpj_fornecedor, data_pagamento, valor_bruto, valor_liquido, status, created_at, updated_at)
+                (id, projeto_id, fornecedor, documento, data_pagamento, valor_bruto, valor_liquido, status, created_at, updated_at)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
             """, (transacao_id, projeto_id, fornecedor, '12.345.678/0001-99', data, valor, valor * 0.9, status))
 

@@ -2,6 +2,14 @@
 creds.json
 *.json.key
 .env
+.env.*
+!.env.example
+!.env.sample
+token_local.txt
+*.env.bak
+*.env.backup
+*.env.old
+*.env~
 .streamlit/secrets.toml
 
 # Ambiente virtual Python
@@ -36,3 +44,10 @@ agency-agents/
 
 # Local Netlify folder
 .netlify
+
+# Testes temporários e outputs
+.tmp_pytest_*
+.opencode/
+saida/
+*.png
+

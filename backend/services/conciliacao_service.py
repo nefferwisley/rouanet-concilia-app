@@ -582,14 +582,187 @@ async def executar_importacao_pasta_bg(
     import tempfile
     import shutil
     import asyncio
+    import hashlib
+    import uuid
     from pathlib import Path
     from backend.database import adquirir_conn
+    from backend.services.storage_service import criar_arquivo_se_ausente, remover_arquivo
     from motor.importar import parse_tipo_doc
     from motor.extrato_importer import tipo_por_sinal
 
-    base = Path(tempfile.mkdtemp(prefix="importacao_pasta_"))
-    _registrar(conciliacao_id, base=str(base))
+    base = None
+    objetos_criados: list[tuple[str, str]] = []
+
+    lock_key = int.from_bytes(hashlib.sha256(str(projeto_id).encode()).digest()[:8], "little", signed=True)
+    acquired_pool, conn_bg = await adquirir_conn()
+    transacao_importacao = None
+    commit_iniciado = False
+    conexao_original_liberada = False
+    erros_operacionais: list[str] = []
+
+    async def referencia_persistida(conn, arquivo_ref: str) -> bool:
+        return bool(
+            await conn.fetchval(
+                '''
+                select exists (
+                    select 1
+                      from documentos_transacao d
+                      join transacoes t on t.id = d.transacao_id
+                     where t.projeto_id = $1 and d.arquivo_ref = $2
+                    union all
+                    select 1
+                      from documentos_projeto d
+                     where d.projeto_id = $1 and d.arquivo_ref = $2
+                )
+                ''',
+                projeto_id,
+                arquivo_ref,
+            )
+        )
+
+    async def cancelar_pendencia(conn, arquivo_ref: str) -> None:
+        await conn.execute(
+            '''
+            update storage_orfaos
+               set status = 'descartado',
+                   resolvido_em = now(),
+                   atualizado_em = now(),
+                   erro_ultimo = 'cancelado: chave possui referência persistida'
+             where bucket = 'documentos'
+               and chave = $1
+               and status = 'pendente'
+            ''',
+            arquivo_ref,
+        )
+
+    async def liberar_conexao_original() -> None:
+        nonlocal conexao_original_liberada
+        if conexao_original_liberada:
+            return
+        conexao_original_liberada = True
+        try:
+            await acquired_pool.release(conn_bg)
+        except Exception as exc_release:
+            erros_operacionais.append(
+                f"falha ao liberar conexão original: {exc_release}"
+            )
+
+    async def reconciliar_objetos_em_conexao_nova(
+        itens: list[tuple[str, str, str]], *, tentar_remocao: bool
+    ) -> None:
+        """Serializa a decisão pós-rollback/commit ambíguo numa conexão íntegra."""
+        if not itens:
+            return
+
+        pool_reconciliacao = None
+        conn_reconciliacao = None
+        tx_reconciliacao = None
+        try:
+            pool_reconciliacao, conn_reconciliacao = await adquirir_conn()
+            tx_reconciliacao = conn_reconciliacao.transaction()
+            await tx_reconciliacao.start()
+            # Bloqueante de propósito: um retry que venceu a corrida termina
+            # primeiro; só então consultamos se a chave ganhou referência.
+            await conn_reconciliacao.fetchval(
+                "SELECT pg_advisory_xact_lock($1)", lock_key
+            )
+
+            for ref, hash_doc, erro_anterior in itens:
+                if await referencia_persistida(conn_reconciliacao, ref):
+                    await cancelar_pendencia(conn_reconciliacao, ref)
+                    continue
+
+                erro_remocao = erro_anterior
+                if tentar_remocao:
+                    try:
+                        removido = await asyncio.to_thread(remover_arquivo, ref)
+                        erro_remocao = (
+                            None
+                            if removido
+                            else "storage retornou remoção não confirmada"
+                        )
+                    except Exception as exc_rem:
+                        erro_remocao = str(exc_rem)
+
+                if erro_remocao:
+                    await conn_reconciliacao.execute(
+                        '''
+                        insert into storage_orfaos (
+                            projeto_id, conciliacao_id, bucket, chave, sha256, erro_ultimo
+                        ) values ($1, $2, 'documentos', $3, $4, $5)
+                        on conflict (bucket, chave) where status = 'pendente'
+                        do update set
+                            tentativas = storage_orfaos.tentativas + 1,
+                            erro_ultimo = excluded.erro_ultimo,
+                            atualizado_em = now()
+                        ''',
+                        projeto_id,
+                        conciliacao_id,
+                        ref,
+                        hash_doc,
+                        erro_remocao,
+                    )
+
+            await tx_reconciliacao.commit()
+            tx_reconciliacao = None
+        except Exception as exc_reconciliacao:
+            erros_operacionais.append(
+                "falha na fila durável/reconciliação de storage: "
+                f"{exc_reconciliacao}"
+            )
+            if tx_reconciliacao is not None:
+                try:
+                    await tx_reconciliacao.rollback()
+                except Exception as exc_rollback:
+                    erros_operacionais.append(
+                        f"falha no rollback da fila durável: {exc_rollback}"
+                    )
+        finally:
+            if pool_reconciliacao is not None and conn_reconciliacao is not None:
+                try:
+                    await pool_reconciliacao.release(conn_reconciliacao)
+                except Exception as exc_release:
+                    erros_operacionais.append(
+                        f"falha ao liberar conexão da fila durável: {exc_release}"
+                    )
+
     try:
+        # O lock advisory é transacional para continuar correto atrás de
+        # poolers em modo transaction. A transação externa permanece aberta
+        # durante parse + persistência; db_ops usa apenas um savepoint interno.
+        transacao_importacao = conn_bg.transaction()
+        await transacao_importacao.start()
+        lock_acquired = await conn_bg.fetchval(
+            "SELECT pg_try_advisory_xact_lock($1)", lock_key
+        )
+        if not lock_acquired:
+            _registrar(
+                conciliacao_id,
+                status="erro",
+                etapa="erro",
+                erro_fatal="Já existe uma importação em andamento para este projeto.",
+            )
+            return
+
+        projeto_ja_populado = await conn_bg.fetchval(
+            '''
+            select exists (select 1 from transacoes where projeto_id = $1)
+                or exists (
+                    select 1 from extrato_movimentos m
+                    join contas_captadoras c on c.id = m.conta_id
+                    where c.projeto_id = $1
+                )
+            ''',
+            projeto_id,
+        )
+        if projeto_ja_populado:
+            raise RuntimeError(
+                "O projeto já possui transações ou extratos importados. "
+                "A substituição automática foi bloqueada até existir importação versionada."
+            )
+
+        base = Path(tempfile.mkdtemp(prefix="importacao_pasta_"))
+        _registrar(conciliacao_id, base=str(base))
         _registrar(conciliacao_id, status="em_progresso", etapa="preparando arquivos", progresso=10)
         
         pag_dir = base / "pagamentos"
@@ -601,7 +774,6 @@ async def executar_importacao_pasta_bg(
             extrato_file = ext_dir / Path(extrato_nome).name
             extrato_file.write_bytes(extrato_bytes)
         
-        import hashlib
         hashes_salvos = set()
         
         for nome_arq, c_bytes in comprovantes_dados:
@@ -645,28 +817,39 @@ async def executar_importacao_pasta_bg(
         raiz_pag = pag_dir
         
         _registrar(conciliacao_id, etapa="lendo comprovantes", progresso=30)
-        comprovantes, sem_valor = _parse_comprovantes(raiz_pag)
+        comprovantes, sem_valor = await asyncio.to_thread(_parse_comprovantes, raiz_pag)
         
         _registrar(conciliacao_id, etapa="lendo extratos", progresso=50)
-        movimentos = _parse_extratos(ext_dir)
+        movimentos = await asyncio.to_thread(_parse_extratos, ext_dir)
         
         _registrar(conciliacao_id, etapa="conciliando e cruzando dados", progresso=70)
-        resultado = conciliar(comprovantes, movimentos)
+        resultado = await asyncio.to_thread(conciliar, comprovantes, movimentos)
+
+        def data_iso_ou_none(valor):
+            if isinstance(valor, date):
+                return valor
+            if isinstance(valor, str):
+                try:
+                    return date.fromisoformat(valor)
+                except ValueError:
+                    return None
+            return None
+
+        for movimento in movimentos:
+            if data_iso_ou_none(movimento.get("data")) is None:
+                raise RuntimeError(
+                    f"Movimento de extrato com data inválida: {movimento.get('data')!r}."
+                )
         
         _registrar(conciliacao_id, etapa="gravando dados no banco de dados", progresso=85)
         
         async def db_ops():
-            acquired_pool, conn = await adquirir_conn()
             try:
-                async with conn.transaction():
-                    conta = await conn.fetchrow("select id from contas_captadoras where projeto_id = $1", projeto_id)
+                async with conn_bg.transaction():
+                    conta = await conn_bg.fetchrow("select id from contas_captadoras where projeto_id = $1", projeto_id)
                     if not conta:
-                        conta = await conn.fetchrow("insert into contas_captadoras (projeto_id) values ($1) returning id", projeto_id)
+                        conta = await conn_bg.fetchrow("insert into contas_captadoras (projeto_id) values ($1) returning id", projeto_id)
                     conta_id = conta["id"]
-                    
-                    await conn.execute("delete from conciliacao_extrato where transacao_id in (select id from transacoes where projeto_id = $1)", projeto_id)
-                    await conn.execute("delete from extrato_movimentos where conta_id = $1", conta_id)
-                    await conn.execute("delete from transacoes where projeto_id = $1", projeto_id)
                     
                     transacoes_inseridas = {}
                     
@@ -694,45 +877,56 @@ async def executar_importacao_pasta_bg(
                         favorecido_banco = comp.get("favorecido") or prestador_extraido
                         razao_social = f"Favorecido no extrato: {favorecido_banco}." if favorecido_banco else "-"
 
-                        data_pag = comp.get("data")
-                        if isinstance(data_pag, str):
-                            try:
-                                data_pag = date.fromisoformat(data_pag)
-                            except ValueError:
-                                data_pag = date(1970, 1, 1)
-                        elif not isinstance(data_pag, date):
-                            data_pag = date(1970, 1, 1)
+                        data_pag = data_iso_ou_none(comp.get("data"))
                             
                         valor = Decimal(str(comp.get("valor") or 0))
+                        tipo_doc = parse_tipo_doc(comp["fonte"]) or "OUTRO"
+                        tem_nf = tipo_doc == "NFE"
+                        tem_comprovante = bool(comp.get("tem_sisbb"))
                         
-                        row_t = await conn.fetchrow(
-                            """
+                        row_t = await conn_bg.fetchrow(
+                            '''
                             insert into transacoes (
-                                projeto_id, fornecedor, razao_social, cnpj_fornecedor, data_pagamento,
+                                projeto_id, fornecedor, razao_social, documento, data_pagamento,
                                 valor_bruto, valor_liquido, tem_nf, tem_comprovante, status
                             ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                             returning id
-                            """,
+                            ''',
                             projeto_id, prestador, razao_social, cnpj_cpf, data_pag,
-                            valor, valor, True, True, "PENDENTE"
+                            valor, valor, tem_nf, tem_comprovante, "PENDENTE"
                         )
                         t_id = row_t["id"]
                         
-                        tipo_doc = parse_tipo_doc(comp["fonte"]) or "OUTRO"
-                        await conn.execute(
-                            """
+                        origem_doc = Path(comp.get("caminho") or comp["fonte"])
+                        if not origem_doc.is_file():
+                            origem_doc = raiz_pag / Path(comp["fonte"]).name
+                        conteudo_doc = origem_doc.read_bytes()
+                        hash_doc = hashlib.sha256(conteudo_doc).hexdigest()
+                        extensao_doc = origem_doc.suffix.lower() or ".bin"
+                        arquivo_ref, criado_nesta_execucao = await asyncio.to_thread(
+                            criar_arquivo_se_ausente,
+                            f"{projeto_id}/comprovantes/{hash_doc}{extensao_doc}",
+                            conteudo_doc,
+                        )
+                        if criado_nesta_execucao:
+                            objetos_criados.append((arquivo_ref, hash_doc))
+                        await conn_bg.execute(
+                            '''
                             insert into documentos_transacao (transacao_id, tipo, arquivo_ref, confianca_ocr)
                             values ($1, $2, $3, $4)
-                            """,
-                            t_id, tipo_doc, comp["fonte"], 1.0
+                            ''',
+                            t_id, tipo_doc, arquivo_ref, comp.get("confianca_ocr")
                         )
+                        # A mesma transação que persiste a referência invalida
+                        # qualquer coleta pendente desta chave.
+                        await cancelar_pendencia(conn_bg, arquivo_ref)
                         
                         descricao_despesa = item_extraido or "Serviço Prestado"
-                        await conn.execute(
-                            """
+                        await conn_bg.execute(
+                            '''
                             insert into despesas (transacao_id, projeto_id, descricao, valor)
                             values ($1, $2, $3, $4)
-                            """,
+                            ''',
                             t_id, projeto_id, descricao_despesa, valor
                         )
                         
@@ -766,7 +960,7 @@ async def executar_importacao_pasta_bg(
                             fonte_nome = Path(fonte).name if fonte else ""
                             v_id = transacoes_inseridas.get(fonte) or transacoes_inseridas.get(fonte_nome)
                             if not v_id and d_obj and val_dec:
-                                row_fb = await conn.fetchrow(
+                                row_fb = await conn_bg.fetchrow(
                                     "select id from transacoes where projeto_id = $1 and data_pagamento = $2 and abs(valor_bruto - $3) < 0.01 limit 1",
                                     projeto_id, d_obj, val_dec
                                 )
@@ -782,53 +976,54 @@ async def executar_importacao_pasta_bg(
                         if m["sinal"] == "D":
                             valor_m = -valor_m
                             
-                        data_mov = m["data"]
-                        if isinstance(data_mov, str):
-                            try:
-                                data_mov = date.fromisoformat(data_mov)
-                            except ValueError:
-                                data_mov = date(1970, 1, 1)
+                        data_mov = data_iso_ou_none(m["data"])
                         
                         doc_mov_str = str(m.get("doc") or "")
                         chave_mov = (data_mov, doc_mov_str, abs(valor_m))
                         status_mov = mapa_status_cruzado.get(chave_mov, "PENDENTE")
                         t_id_vinculo = mapa_transacao_vincular.get(chave_mov, None)
                         
-                        row_m = await conn.fetchrow(
-                            """
+                        row_m = await conn_bg.fetchrow(
+                            '''
                             insert into extrato_movimentos (
                                 conta_id, data, historico, documento, tipo, valor, status_conciliacao
                             ) values ($1, $2, $3, $4, $5, $6, $7)
                             returning id
-                            """,
+                            ''',
                             conta_id, data_mov, m.get("historico") or m.get("favorecido"),
                             m["doc"], tipo_por_sinal(m["sinal"]), valor_m, status_mov
                         )
                         mov_id = row_m["id"]
                         
                         if status_mov == "CONCILIADO" and t_id_vinculo:
-                            await conn.execute(
+                            await conn_bg.execute(
                                 "update transacoes set status = 'CONCILIADO_OK' where id = $1",
                                 t_id_vinculo
                             )
-                            await conn.execute(
+                            await conn_bg.execute(
                                 "insert into conciliacao_extrato (transacao_id, movimento_id) values ($1, $2) on conflict do nothing",
                                 t_id_vinculo, mov_id
                             )
                             
-                    await conn.execute(
-                        """
+                    await conn_bg.execute(
+                        '''
                         update transacoes set status = 'CONCILIADO_OK'
                         where id in (select transacao_id from conciliacao_extrato)
                           and projeto_id = $1
-                        """,
+                        ''',
                         projeto_id
                     )
             finally:
-                await acquired_pool.release(conn)
+                pass
 
         await db_ops()
-        
+        commit_iniciado = True
+        await transacao_importacao.commit()
+        transacao_importacao = None
+        # As referências já estão persistidas: a partir daqui estes objetos
+        # não são órfãos e jamais podem entrar na compensação, mesmo se o
+        # bookkeeping em memória falhar.
+        objetos_criados.clear()
         _registrar(
             conciliacao_id,
             status="sucesso",
@@ -838,6 +1033,75 @@ async def executar_importacao_pasta_bg(
         )
     except Exception as e:
         logger.exception("Falha na importação de pasta bg %s", conciliacao_id)
-        _registrar(conciliacao_id, status="erro", etapa="erro", erro_fatal=str(e))
+        falhas_remocao: list[tuple[str, str, str]] = []
+
+        if not commit_iniciado:
+            # O lock ainda pertence à transação original. Compensar antes do
+            # rollback impede que um retry persista/reutilize a chave enquanto
+            # esta execução a remove.
+            for ref, hash_doc in objetos_criados:
+                try:
+                    removido = await asyncio.to_thread(remover_arquivo, ref)
+                    if not removido:
+                        falhas_remocao.append(
+                            (
+                                ref,
+                                hash_doc,
+                                "storage retornou remoção não confirmada",
+                            )
+                        )
+                except Exception as exc_rem:
+                    falhas_remocao.append((ref, hash_doc, str(exc_rem)))
+                    logger.error("Falha ao remover órfão %s: %s", ref, exc_rem)
+
+        # Commit iniciado e exceção é resultado ambíguo: nunca autoriza delete.
+        # Primeiro encerra/libera a sessão original; depois uma conexão íntegra
+        # readquire o lock e consulta as referências persistidas.
+        if transacao_importacao is not None:
+            try:
+                await transacao_importacao.rollback()
+            except Exception as exc_rollback:
+                erros_operacionais.append(
+                    f"falha no rollback da importação: {exc_rollback}"
+                )
+            finally:
+                transacao_importacao = None
+
+        await liberar_conexao_original()
+
+        if commit_iniciado:
+            await reconciliar_objetos_em_conexao_nova(
+                [
+                    (ref, hash_doc, "resultado de commit ambíguo")
+                    for ref, hash_doc in objetos_criados
+                ],
+                tentar_remocao=True,
+            )
+        elif falhas_remocao:
+            # A remoção já falhou enquanto o lock original estava ativo. Após
+            # readquirir o lock, revalida referências antes de enfileirar.
+            await reconciliar_objetos_em_conexao_nova(
+                falhas_remocao,
+                tentar_remocao=False,
+            )
+
+        erro_fatal = str(e)
+        if erros_operacionais:
+            erro_fatal += " | Erro operacional: " + " | ".join(erros_operacionais)
+        _registrar(
+            conciliacao_id,
+            status="erro",
+            etapa="erro",
+            erro_fatal=erro_fatal,
+        )
     finally:
-        shutil.rmtree(base, ignore_errors=True)
+        if base is not None:
+            shutil.rmtree(base, ignore_errors=True)
+        if transacao_importacao is not None:
+            try:
+                await transacao_importacao.rollback()
+            except Exception as exc_rollback:
+                logger.error("Falha no rollback final da importação: %s", exc_rollback)
+            finally:
+                transacao_importacao = None
+        await liberar_conexao_original()

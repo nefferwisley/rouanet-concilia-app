@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAPI } from "../hooks/useAPI";
@@ -21,14 +21,18 @@ export function ImportarModal({
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [configYaml, setConfigYaml] = useState<File | null>(null);
 
-  const [apiKeyGemini, setApiKeyGemini] = useState(() => {
-    return localStorage.getItem("gemini_api_key") || "";
-  });
+  const [apiKeyGemini, setApiKeyGemini] = useState("");
   const [modo, setModo] = useState<"dry_run" | "commit">("commit");
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [progresso, setProgresso] = useState<number | null>(null);
   const [etapa, setEtapa] = useState("");
+
+  useEffect(() => {
+    // Chaves antigas eram persistidas no navegador. A chave agora só existe
+    // enquanto este modal estiver aberto e nunca é registrada localmente.
+    localStorage.removeItem("gemini_api_key");
+  }, []);
 
   async function iniciar() {
     if (!projetoId) {
@@ -67,7 +71,10 @@ export function ImportarModal({
 
         const cid = resp.conciliacao_id;
         
-        const interval = setInterval(async () => {
+        // Agenda a próxima consulta somente depois que a atual terminar. O
+        // setInterval anterior acumulava dezenas de chamadas quando a API
+        // ficava ocupada lendo PDFs, congestionando o pool ao destravar.
+        const consultarStatus = async () => {
           try {
             const statusResp = await api.get<{
               status: string;
@@ -80,7 +87,6 @@ export function ImportarModal({
             setEtapa(statusResp.etapa || "Processando...");
 
             if (statusResp.status === "sucesso") {
-              clearInterval(interval);
               setEnviando(false);
               if (onImported) {
                 onImported();
@@ -89,18 +95,19 @@ export function ImportarModal({
                 navigate(0);
               }
             } else if (statusResp.status === "erro") {
-              clearInterval(interval);
               setEnviando(false);
               setProgresso(null);
               setErro(statusResp.erro_fatal || "Falha no processamento dos documentos.");
+            } else {
+              window.setTimeout(() => void consultarStatus(), 1200);
             }
           } catch (e) {
-            clearInterval(interval);
             setEnviando(false);
             setProgresso(null);
             setErro("Falha ao monitorar o progresso da importação.");
           }
-        }, 1200);
+        };
+        window.setTimeout(() => void consultarStatus(), 1200);
 
       } catch (e) {
         setEnviando(false);
@@ -344,11 +351,7 @@ export function ImportarModal({
             className="input w-full bg-slate-950 border-slate-800 text-white rounded-lg p-2"
             placeholder="Chave API Gemini"
             value={apiKeyGemini}
-            onChange={(e) => {
-              const val = e.target.value;
-              setApiKeyGemini(val);
-              localStorage.setItem("gemini_api_key", val);
-            }}
+            onChange={(e) => setApiKeyGemini(e.target.value)}
             disabled={enviando}
           />
         </div>

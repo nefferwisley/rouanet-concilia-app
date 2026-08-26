@@ -47,8 +47,8 @@ docker-compose logs -f frontend   # Vite dev server logs
 
 ### Backend (.env)
 ```env
-DATABASE_URL=postgresql://rouanet:rouanet_dev_password@postgres:5432/rouanet_concilia
-SUPABASE_JWT_SECRET=dev-secret-key-min-32-chars-long-!!!
+DATABASE_URL=<defina-no-gerenciador-de-segredos>
+SUPABASE_JWT_SECRET=<defina-no-gerenciador-de-segredos>
 GOOGLE_API_KEY=<optional-gemini-key-for-rag>
 CORS_ORIGINS=http://localhost:5173,http://localhost:3000
 ```
@@ -111,8 +111,8 @@ Terminal 1 — Backend:
 ```bash
 cd backend
 pip install -r requirements.txt
-export DATABASE_URL=postgresql://rouanet:rouanet_dev_password@localhost:5432/rouanet_concilia
-export SUPABASE_JWT_SECRET=dev-secret-key-min-32-chars-long-!!!
+export DATABASE_URL=<defina-no-gerenciador-de-segredos>
+export SUPABASE_JWT_SECRET=<defina-no-gerenciador-de-segredos>
 uvicorn main:app --reload --port 8000
 ```
 
@@ -137,7 +137,7 @@ docker run -p 5432:5432 \
 python -m motor.importar \
   --config config_1961.yaml \
   --json lançamentos_1961.json \
-  --db-url="postgresql://rouanet:rouanet_dev_password@localhost:5432/rouanet_concilia" \
+  --db-url="${DATABASE_URL}" \
   --api-key-gemini="<optional-key>" \
   --dry-run --verbose
 ```

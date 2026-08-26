@@ -66,7 +66,17 @@ export function NovoProjetoModal({ onClose, onCriado }: { onClose: () => void; o
         <h2 className="text-lg font-bold">Novo Projeto</h2>
         <input className="input" placeholder="PRONAC *" value={form.pronac} onChange={set("pronac")} />
 
-        <SalicConsulta pronacInicial={form.pronac} />
+        <SalicConsulta
+          pronacInicial={form.pronac}
+          onProjetoEncontrado={(p) =>
+            setForm((f) => ({
+              ...f,
+              pronac: p.pronac || f.pronac,
+              nome: p.nome || f.nome,
+              proponente: p.proponente || f.proponente,
+            }))
+          }
+        />
 
         <input className="input" placeholder="Nome do Projeto *" value={form.nome} onChange={set("nome")} />
         <input className="input" placeholder="Proponente" value={form.proponente} onChange={set("proponente")} />

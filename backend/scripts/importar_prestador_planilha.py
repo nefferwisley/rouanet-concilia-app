@@ -201,12 +201,12 @@ update transacoes t
 -- tipo_pessoa segue o DOCUMENTO, não o nome: 11 dígitos = PF, 14 = PJ.
 update transacoes
    set tipo_pessoa = case
-         when length(regexp_replace(coalesce(cnpj_fornecedor,''),'\\D','','g')) = 11 then 'PF'
-         when length(regexp_replace(coalesce(cnpj_fornecedor,''),'\\D','','g')) = 14 then 'PJ'
+         when length(regexp_replace(coalesce(documento,''),'\\D','','g')) = 11 then 'PF'
+         when length(regexp_replace(coalesce(documento,''),'\\D','','g')) = 14 then 'PJ'
        end
  where projeto_id = '{a.projeto}'
    and tipo_pessoa is null
-   and cnpj_fornecedor is not null;
+   and documento is not null;
 
 commit;
 """

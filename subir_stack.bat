@@ -8,12 +8,17 @@ REM ============================================================
 setlocal
 cd /d "%~dp0"
 
+if not defined ROUANET_DB_PASSWORD (
+    echo ERRO: defina ROUANET_DB_PASSWORD no ambiente antes de executar. 1>&2
+    exit /b 1
+)
+
 echo [1/3] Subindo Postgres (Docker, porta 5433)...
 docker ps --filter "name=^rouanet_db$" --format "{{.Names}}" | findstr /C:"rouanet_db" >nul 2>&1
 if errorlevel 1 (
     docker run -d --name rouanet_db --restart always ^
         -e POSTGRES_USER=rouanet ^
-        -e POSTGRES_PASSWORD=rouanet_dev_password ^
+        -e "POSTGRES_PASSWORD=%ROUANET_DB_PASSWORD%" ^
         -e POSTGRES_DB=rouanet_concilia ^
         -p 5433:5432 ^
         -v rouanet_pg_data:/var/lib/postgresql/data ^
@@ -26,7 +31,7 @@ if errorlevel 1 (
 )
 
 echo [2/3] Aguardando Postgres aceitar conexoes...
-set PGPASSWORD=rouanet_dev_password
+set "PGPASSWORD=%ROUANET_DB_PASSWORD%"
 for /L %%i in (1,1,30) do (
     "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U rouanet -h 127.0.0.1 -p 5433 -d rouanet_concilia -c "select 1" >nul 2>&1
     if not errorlevel 1 goto :db_ok
@@ -39,12 +44,12 @@ goto :end
 echo    Postgres OK na porta 5433.
 
 echo [3/3] Subindo backend (uvicorn :8000) e frontend (vite :5173)...
-start "rouanet-backend" cmd /c "set PYTHONPATH=%CD%&& python -m uvicorn main:app --host 127.0.0.1 --port 8000"
+start "rouanet-backend" cmd /c "set APP_ENV=dev&& set PYTHONPATH=%CD%&& python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000"
 start "rouanet-frontend" cmd /c "cd frontend && npm run dev"
 
 echo.
 echo Stack no ar:
-echo   Postgres : postgresql://rouanet:rouanet_dev_password@127.0.0.1:5433/rouanet_concilia
+echo   Postgres : 127.0.0.1:5433/rouanet_concilia ^(credencial via ambiente^)
 echo   Backend  : http://127.0.0.1:8000  (docs: /docs)
 echo   Frontend : http://127.0.0.1:5173
 goto :end

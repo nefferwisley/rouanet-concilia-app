@@ -16,6 +16,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from backend.database import get_conn
 from backend.dominio import divergencias as dom
+from backend.services import storage_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/projetos", tags=["divergencias"])
@@ -34,6 +35,15 @@ def _arquivo_existe(ref: str | None, projeto_id: str) -> bool:
     p = Path(ref)
     if p.is_file():
         return True
+    # Referências novas são chaves lógicas completas, por exemplo
+    # ``projeto/comprovantes/<hash>.pdf``. O teste antigo só procurava o nome
+    # final em ``uploads/projeto`` e declarava ausente um arquivo que estava
+    # exatamente em ``uploads/<referência>``.
+    try:
+        if (UPLOAD_DIR / ref).is_file():
+            return True
+    except OSError:
+        pass
     nome = p.name
     for base in (UPLOAD_DIR / projeto_id, UPLOAD_DIR, Path("/app/uploads")):
         try:
@@ -41,7 +51,13 @@ def _arquivo_existe(ref: str | None, projeto_id: str) -> bool:
                 return True
         except OSError:
             continue
-    return False
+    # Em produção o arquivo pode viver apenas no bucket Supabase. A camada de
+    # storage já conhece os dois backends e é a fonte de verdade final.
+    try:
+        return storage_service.baixar_arquivo(ref) is not None
+    except Exception:
+        logger.exception("Falha ao verificar disponibilidade do documento %s", ref)
+        return False
 
 
 @router.get("/{projeto_id}/divergencias")
@@ -54,10 +70,11 @@ async def listar_divergencias(
     """
     Roda a avaliação sob demanda e devolve as divergências encontradas.
 
-    A planilha revisada ainda não é armazenada no sistema, então as regras que
-    dependem dela voltam em `regras_nao_avaliadas` — explicitamente NÃO
-    avaliadas, e não como "nenhuma divergência". A diferença importa: dizer
-    que está tudo certo sem ter olhado é pior que não responder.
+    A planilha revisada é armazenada por projeto (routes/planilha.py); quando o
+    projeto ainda não enviou arquivo, as regras que dependem dela voltam em
+    `regras_nao_avaliadas` — explicitamente NÃO avaliadas, e não como "nenhuma
+    divergência". A diferença importa: dizer que está tudo certo sem ter olhado
+    é pior que não responder.
     """
     conn, _ = dep
 
@@ -67,7 +84,7 @@ async def listar_divergencias(
 
     linhas = await conn.fetch(
         """
-        select t.id, t.fornecedor, t.razao_social, t.prestador, t.cnpj_fornecedor,
+        select t.id, t.fornecedor, t.razao_social, t.prestador, t.documento,
                t.data_pagamento, t.valor_bruto, t.tem_nf, t.tem_comprovante,
                r.codigo as rubrica_codigo,
                (select ce.movimento_id from conciliacao_extrato ce
@@ -109,7 +126,7 @@ async def listar_divergencias(
                 # pagamento do extrato ainda não foi registrado na planilha —
                 # e PRESTADOR_AUSENTE denuncia isso em vez de inventar um nome.
                 prestador=r["prestador"],
-                documento=r["cnpj_fornecedor"],
+                documento=r["documento"],
                 data_pagamento=r["data_pagamento"],
                 valor=Decimal(str(r["valor_bruto"] or 0)),
                 tem_nf=bool(r["tem_nf"]),
@@ -140,7 +157,33 @@ async def listar_divergencias(
         for m in movs
     ]
 
-    resultado = dom.avaliar(lancamentos, movimentos, planilha=None)
+    plan_rows = await conn.fetch(
+        """
+        select linha, controle, prestador, razao_social, data, valor, rubrica, documento_fiscal
+          from planilha_revisada
+         where projeto_id = $1
+         order by linha
+        """,
+        projeto_id,
+    )
+    planilha = [
+        dom.LinhaPlanilha(
+            linha=r["linha"],
+            controle=r["controle"],
+            prestador=r["prestador"],
+            razao_social=r["razao_social"],
+            data=r["data"],
+            valor=Decimal(str(r["valor"])) if r["valor"] is not None else None,
+            rubrica=r["rubrica"],
+            documento_fiscal=r["documento_fiscal"],
+        )
+        for r in plan_rows
+    ]
+
+    # A planilha agora vive no SaaS (routes/planilha.py); planilha só é None
+    # quando o projeto ainda não enviou nenhum arquivo — e aí as regras que
+    # dependem dela voltam em regras_nao_avaliadas, como antes.
+    resultado = dom.avaliar(lancamentos, movimentos, planilha=planilha or None)
 
     itens = resultado["divergencias"]
     if tipo:

@@ -9,10 +9,20 @@ arquivo, em duas convenções diferentes (importação original vs. pasta do
 Drive atual). Mesmos padrões já usados e validados no frontend
 (AuditoriaProjeto.tsx::extrairPrestador/extrairItemServico).
 """
+import asyncio
+
+import asyncpg
+import pytest
 from fastapi.testclient import TestClient
 
 from backend.main import app
-from backend.routes.documentos import _extrair_item, _extrair_nome_prestador, _normalizar_texto
+from backend.routes.documentos import (
+    _extrair_item,
+    _extrair_nome_prestador,
+    _normalizar_texto,
+    listar_candidatos_ambiguos,
+)
+from backend.services import storage_service
 
 client = TestClient(app)
 
@@ -113,3 +123,74 @@ def test_normaliza_nome_dos_dois_padroes_bate_na_mesma_pessoa():
 
 def test_normaliza_none_retorna_string_vazia():
     assert _normalizar_texto(None) == ""
+
+
+class _TransactionFake:
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        return False
+
+
+class _ConnCandidatosFake:
+    def __init__(self, storage_result=None, storage_error=None):
+        self.storage_result = storage_result
+        self.storage_error = storage_error
+
+    async def fetchrow(self, sql, *args):
+        return {"id": "projeto-1"}
+
+    async def fetch(self, sql, *args):
+        if "storage.objects" in sql:
+            if self.storage_error:
+                raise self.storage_error
+            return self.storage_result
+        if "documentos_transacao" in sql:
+            return [{
+                "documento_transacao_id": "dt-1",
+                "transacao_id": "transacao-1",
+                "arquivo_ref": "001 - 01-01-2024 - Fermata (1961).pdf",
+                "data_pagamento": None,
+                "valor_bruto": None,
+            }]
+        return [
+            {"id": "doc-1", "nome_arquivo": "101. Fermata - Licenciamento.pdf", "arquivo_ref": "projeto-1/a.pdf"},
+            {"id": "doc-2", "nome_arquivo": "102. Fermata - Trilha.pdf", "arquivo_ref": "projeto-1/b.pdf"},
+        ]
+
+    def transaction(self):
+        return _TransactionFake()
+
+
+def test_candidatos_ambiguos_usa_storage_objects_quando_disponivel(monkeypatch):
+    conn = _ConnCandidatosFake(storage_result=[
+        {"name": "projeto-1/a.pdf"}, {"name": "projeto-1/b.pdf"},
+    ])
+    monkeypatch.setattr(storage_service, "baixar_arquivo", lambda ref: pytest.fail("fallback indevido"))
+
+    resposta = asyncio.run(listar_candidatos_ambiguos("projeto-1", dep=(conn, "usuario-1")))
+
+    assert resposta["total"] == 1
+    assert len(resposta["ambiguos"][0]["candidatos"]) == 2
+
+
+@pytest.mark.parametrize("erro_storage", [asyncpg.UndefinedTableError, asyncpg.InvalidSchemaNameError])
+def test_candidatos_ambiguos_funciona_com_storage_local(monkeypatch, tmp_path, erro_storage):
+    conn = _ConnCandidatosFake(storage_error=erro_storage("storage.objects ausente"))
+    monkeypatch.setattr(storage_service, "UPLOAD_DIR", tmp_path)
+    monkeypatch.setattr(storage_service, "get_supabase_client", lambda: None)
+    storage_service.upload_arquivo("projeto-1/a.pdf", b"a")
+    storage_service.upload_arquivo("projeto-1/b.pdf", b"b")
+
+    resposta = asyncio.run(listar_candidatos_ambiguos("projeto-1", dep=(conn, "usuario-1")))
+
+    assert resposta["total"] == 1
+    assert len(resposta["ambiguos"][0]["candidatos"]) == 2
+
+
+def test_candidatos_ambiguos_nao_mascara_outro_erro_sql():
+    conn = _ConnCandidatosFake(storage_error=RuntimeError("falha SQL inesperada"))
+
+    with pytest.raises(RuntimeError, match="falha SQL inesperada"):
+        asyncio.run(listar_candidatos_ambiguos("projeto-1", dep=(conn, "usuario-1")))

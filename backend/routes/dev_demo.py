@@ -13,7 +13,7 @@ import logging
 import time
 
 import jwt as pyjwt
-from fastapi import APIRouter
+from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 
 from backend.config import settings
@@ -25,6 +25,12 @@ router = APIRouter(tags=["dev"])
 # Por padrão o Supabase usa um token expirando em 1h; pro demo a avaliação
 # dura o dia inteiro sem o avaliador precisar renovar.
 DEMO_EXPIRA_HORAS = 8
+
+
+def registrar_rota_demo(app: FastAPI) -> None:
+    """Registra a rota somente em ambientes locais explicitamente permitidos."""
+    if settings.dev_routes_enabled:
+        app.include_router(router)
 
 
 def _assinar_token(sub: str, email: str, horas: int) -> str:
@@ -50,6 +56,11 @@ async def demo_login():
     Usado pelo botão 'Entrar com Token de Demonstração' da tela de login, para
     a avaliadora entrar sem depender do Supabase remoto estando ativo.
     """
+    # Defesa em profundidade: mesmo se o router for incluído por engano, a
+    # rota permanece inacessível fora de dev/test.
+    if not settings.dev_routes_enabled:
+        raise HTTPException(status_code=404, detail="Not Found")
+
     acquired_pool, conn = await adquirir_conn()
     try:
         # Conexão como dono (role 'rouanet') ignora RLS — é o único caminho de

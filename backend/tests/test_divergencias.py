@@ -11,6 +11,7 @@ from decimal import Decimal
 import pytest
 
 from backend.dominio import divergencias as dom
+from backend.routes import divergencias as route_divergencias
 
 
 def _lanc(**kw):
@@ -38,7 +39,7 @@ def test_cpf_real_de_producao_e_valido(cpf):
     """
     Caso real (Luis F Monte Cipullo): este CPF é VÁLIDO. O problema dele nunca
     foi o dígito verificador — é estar guardado numa coluna chamada
-    `cnpj_fornecedor`. Documento de pessoa física em campo de PJ não é erro de
+    `documento`. Documento de pessoa física em campo de PJ não é erro de
     formato, é erro de modelagem, e quem acusa isso é TIPO_PESSOA_INCOERENTE.
     """
     d = dom.so_digitos(cpf)
@@ -107,6 +108,34 @@ def test_arquivo_registrado_mas_ausente_e_severidade_alta():
     r = dom.avaliar([_lanc(arquivos=("nf.pdf",), arquivos_ausentes=("nf.pdf",))], [_mov()])
     d = next(x for x in r["divergencias"] if x.tipo == "ARQUIVO_INDISPONIVEL")
     assert d.severidade == dom.ALTA
+
+
+def test_arquivo_existe_com_chave_logica_aninhada(monkeypatch, tmp_path):
+    ref = "projeto-1/comprovantes/hash.pdf"
+    arquivo = tmp_path / ref
+    arquivo.parent.mkdir(parents=True)
+    arquivo.write_bytes(b"pdf")
+    monkeypatch.setattr(route_divergencias, "UPLOAD_DIR", tmp_path)
+    monkeypatch.setattr(
+        route_divergencias.storage_service,
+        "baixar_arquivo",
+        lambda _ref: pytest.fail("não deve baixar arquivo local já encontrado"),
+    )
+
+    assert route_divergencias._arquivo_existe(ref, "projeto-1") is True
+
+
+def test_arquivo_existe_consulta_storage_remoto(monkeypatch, tmp_path):
+    monkeypatch.setattr(route_divergencias, "UPLOAD_DIR", tmp_path)
+    monkeypatch.setattr(
+        route_divergencias.storage_service,
+        "baixar_arquivo",
+        lambda ref: b"pdf" if ref == "projeto-1/comprovantes/remoto.pdf" else None,
+    )
+
+    assert route_divergencias._arquivo_existe(
+        "projeto-1/comprovantes/remoto.pdf", "projeto-1"
+    ) is True
 
 
 def test_prestador_ausente_bloqueia_recibo():

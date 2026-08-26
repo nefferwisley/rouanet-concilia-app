@@ -20,7 +20,13 @@ const brl = (v: number | undefined) =>
 /** P4 — Integração com a API pública SALIC:
  *  permite consultar qualquer projeto cultural aprovado pelo PRONAC e
  *  exibe a situação oficial do Ministério da Cultura. */
-export function SalicConsulta({ pronacInicial }: { pronacInicial?: string }) {
+export function SalicConsulta({
+  pronacInicial,
+  onProjetoEncontrado,
+}: {
+  pronacInicial?: string;
+  onProjetoEncontrado?: (projeto: SalicProjeto) => void;
+}) {
   const { get } = useAPI();
   const [pronac, setPronac] = useState(pronacInicial || "");
   const [projeto, setProjeto] = useState<SalicProjeto | null>(null);
@@ -34,6 +40,9 @@ export function SalicConsulta({ pronacInicial }: { pronacInicial?: string }) {
     try {
       const data = await get<SalicProjeto>(`/api/v1/salic/projetos/${p.trim()}`);
       setProjeto(data);
+      if (onProjetoEncontrado) {
+        onProjetoEncontrado(data);
+      }
     } catch (e) {
       setProjeto(null);
       setErro(e instanceof Error ? e.message : "Erro ao consultar SALIC.");

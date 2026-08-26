@@ -13,7 +13,7 @@ def main():
         with conn.cursor() as cur:
             cur.execute(
                 """
-                select t.fornecedor, t.cnpj_fornecedor, t.data_pagamento, t.valor_liquido,
+                select t.fornecedor, t.documento, t.data_pagamento, t.valor_liquido,
                        t.status, t.salic_ref, t.razao_social,
                        m.data as mov_data, m.historico, m.documento, m.tipo, m.valor as mov_valor,
                        ce.metodo, ce.score

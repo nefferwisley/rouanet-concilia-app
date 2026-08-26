@@ -46,9 +46,10 @@ vi.mock('../hooks/useImportacoes', () => ({
   }),
 }));
 
-vi.mock('lucide-react', () => ({
-  Trash2: () => null,
-  AlertCircle: () => null,
-  CheckCircle: () => null,
-  XCircle: () => null,
-}));
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+vi.stubGlobal('ResizeObserver', ResizeObserverMock);

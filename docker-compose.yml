@@ -1,20 +1,20 @@
-services:
+﻿services:
   # PostgreSQL database
   postgres:
     image: postgres:16-alpine
     container_name: rouanet_db
     environment:
       POSTGRES_USER: rouanet
-      POSTGRES_PASSWORD: rouanet_dev_password
+      POSTGRES_PASSWORD: "${ROUANET_DB_PASSWORD:?ROUANET_DB_PASSWORD is required}"
       POSTGRES_DB: rouanet_concilia
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # Migrations serão rodadas manualmente pra evitar erros de inicialização
+      # Migrations serÃ£o rodadas manualmente pra evitar erros de inicializaÃ§Ã£o
       # - ./db/migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U rouanet"]
+      test: ["CMD-SHELL", "pg_isready -U rouanet -d rouanet_concilia"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,8 +28,8 @@ services:
       dockerfile: backend/Dockerfile
     container_name: rouanet_backend
     environment:
-      DATABASE_URL: postgresql://rouanet:rouanet_dev_password@postgres:5432/rouanet_concilia
-      SUPABASE_JWT_SECRET: "dev-secret-key-min-32-chars-long-!!!"
+      DATABASE_URL: "postgresql://rouanet:${ROUANET_DB_PASSWORD}@postgres:5432/rouanet_concilia"
+      SUPABASE_JWT_SECRET: "${SUPABASE_JWT_SECRET:?SUPABASE_JWT_SECRET is required}"
       APP_ENV: dev
       GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
       CORS_ORIGINS: "http://localhost:5173,http://localhost:3000"
@@ -54,7 +54,7 @@ services:
     networks:
       - rouanet_network
     # Permite o container enxergar o Ollama rodando no host (Orquestrador
-    # Phidata usa ele como fallback grátis quando não há GOOGLE_API_KEY).
+    # Phidata usa ele como fallback grÃ¡tis quando nÃ£o hÃ¡ GOOGLE_API_KEY).
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
@@ -90,3 +90,4 @@ volumes:
 networks:
   rouanet_network:
     driver: bridge
+

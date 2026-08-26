@@ -22,7 +22,7 @@ export function useProjects(): UseProjectsResult {
     setCarregando(true);
     setErro(null);
     try {
-      const response = await get<{ projetos: Projeto[]; total: number }>('/api/v1/projetos');
+      const response = await get<{ projetos: Projeto[]; total: number }>('/api/v1/projetos?limit=100');
       setProjetos(response.projetos || []);
       setTotal(response.total || 0);
     } catch (err: any) {

@@ -3,6 +3,8 @@ Testes para backend/services/conciliacao_service.py — estado das execuções,
 resolução de artefatos, extração segura de ZIP, localização de pastas e o
 mapeamento do resultado do cruzamento em linhas/resumo.
 """
+import asyncio
+import hashlib
 import io
 import zipfile
 
@@ -257,3 +259,533 @@ def test_linha_para_tabela_posicoes():
 def test_linha_para_tabela_campos_ausentes():
     cel = _linha_para_tabela({})
     assert all(c is None for c in cel)
+
+
+# ============================================================
+# importar pasta — integridade dos dados persistidos
+# ============================================================
+
+class _TransacaoFake:
+    def __init__(self, conn):
+        self.conn = conn
+        self.iniciada_manualmente = False
+
+    async def start(self):
+        self.iniciada_manualmente = True
+
+    async def commit(self):
+        if self.iniciada_manualmente:
+            self.conn.commits += 1
+            self.conn.eventos_transacao.append("commit")
+
+    async def rollback(self):
+        if self.iniciada_manualmente:
+            self.conn.rollbacks += 1
+            self.conn.eventos_transacao.append("rollback")
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        return False
+
+
+class _ConnImportacaoFake:
+    def __init__(self, projeto_ja_populado=False):
+        self.projeto_ja_populado = projeto_ja_populado
+        self.fetchrows = []
+        self.execucoes = []
+        self.commits = 0
+        self.rollbacks = 0
+        self.eventos_transacao = []
+
+    async def fetchval(self, sql, *args):
+        if "pg_try_advisory" in sql:
+            return True
+        return self.projeto_ja_populado
+
+    def transaction(self):
+        return _TransacaoFake(self)
+
+    async def fetchrow(self, sql, *args):
+        self.fetchrows.append((" ".join(sql.split()).lower(), args))
+        sql_normalizado = " ".join(sql.split()).lower()
+        if sql_normalizado.startswith("select id from contas_captadoras"):
+            return {"id": "conta-1"}
+        if "insert into transacoes" in sql_normalizado:
+            return {"id": "transacao-1"}
+        if "insert into extrato_movimentos" in sql_normalizado:
+            return {"id": "movimento-1"}
+        return None
+
+    async def execute(self, sql, *args):
+        self.execucoes.append((" ".join(sql.split()).lower(), args))
+
+
+class _PoolImportacaoFake:
+    def __init__(self):
+        self.liberadas = []
+
+    async def release(self, conn):
+        self.liberadas.append(conn)
+
+
+def _resultado_vazio():
+    return {"linhas": [], "resumo": {}}
+
+
+def test_importacao_bloqueia_projeto_populado_antes_de_escrever(monkeypatch):
+    conn = _ConnImportacaoFake(projeto_ja_populado=True)
+    pool = _PoolImportacaoFake()
+
+    async def adquirir_conn():
+        return pool, conn
+
+    monkeypatch.setattr("backend.database.adquirir_conn", adquirir_conn)
+    monkeypatch.setattr(cs.tempfile, "mkdtemp", lambda **kwargs: pytest.fail("não deve criar pasta temporária"))
+    monkeypatch.setattr(cs, "_parse_comprovantes", lambda pasta: pytest.fail("não deve processar arquivos"))
+
+    cid = cs.criar_execucao("usuario-1")
+    asyncio.run(
+        cs.executar_importacao_pasta_bg(
+            "projeto-1", cid, "usuario-1", None, None, [("doc.pdf", b"pdf")]
+        )
+    )
+
+    status = cs.obter_status(cid, "usuario-1")
+    assert status["status"] == "erro"
+    assert "substituição automática foi bloqueada" in status["erro_fatal"]
+    assert conn.fetchrows == []
+    assert not any("pg_advisory_unlock" in sql for sql, args in conn.execucoes)
+
+
+def test_importacao_persiste_ref_estavel_sem_inventar_metadata_ou_data(monkeypatch):
+    conn = _ConnImportacaoFake()
+    pool = _PoolImportacaoFake()
+    uploads = []
+
+    async def adquirir_conn():
+        return pool, conn
+
+    def parse_comprovantes(pasta):
+        arquivo = pasta / "doc.pdf"
+        return ([{
+            "fonte": "doc.pdf",
+            "caminho": str(arquivo),
+            "data": "data-invalida",
+            "valor": "10.00",
+            "favorecido": "Pessoa",
+        }], [])
+
+    def criar_arquivo_se_ausente(chave, conteudo):
+        uploads.append((chave, conteudo))
+        return chave, True
+
+    monkeypatch.setattr("backend.database.adquirir_conn", adquirir_conn)
+    monkeypatch.setattr(
+        "backend.services.storage_service.criar_arquivo_se_ausente",
+        criar_arquivo_se_ausente,
+    )
+    monkeypatch.setattr(cs, "_parse_comprovantes", parse_comprovantes)
+    monkeypatch.setattr(cs, "_parse_extratos", lambda pasta: [])
+    monkeypatch.setattr(cs, "conciliar", lambda comprovantes, movimentos: _resultado_vazio())
+    registrar_original = cs._registrar
+
+    def registrar_com_evento(conciliacao_id, **campos):
+        if campos.get("status") == "sucesso":
+            conn.eventos_transacao.append("status_sucesso")
+        registrar_original(conciliacao_id, **campos)
+
+    monkeypatch.setattr(cs, "_registrar", registrar_com_evento)
+
+    cid = cs.criar_execucao("usuario-1")
+    asyncio.run(
+        cs.executar_importacao_pasta_bg(
+            "projeto-1", cid, "usuario-1", None, None, [("doc.pdf", b"pdf-controlado")]
+        )
+    )
+
+    assert cs.obter_status(cid, "usuario-1")["status"] == "sucesso"
+    hash_esperado = hashlib.sha256(b"pdf-controlado").hexdigest()
+    ref_esperada = f"projeto-1/comprovantes/{hash_esperado}.pdf"
+    assert uploads == [(ref_esperada, b"pdf-controlado")]
+    insert_transacao = next(args for sql, args in conn.fetchrows if "insert into transacoes" in sql)
+    assert insert_transacao[4] is None
+    assert insert_transacao[7] is False
+    assert insert_transacao[8] is False
+    insert_documento = next(args for sql, args in conn.execucoes if "insert into documentos_transacao" in sql)
+    assert insert_documento[2] == ref_esperada
+    assert "importacao_pasta_" not in insert_documento[2]
+    assert insert_documento[3] is None
+    assert conn.commits == 1
+    assert conn.rollbacks == 0
+    assert conn.eventos_transacao == ["commit", "status_sucesso"]
+    assert any(
+        "update storage_orfaos" in sql and args[0] == ref_esperada
+        for sql, args in conn.execucoes
+    )
+
+
+def test_falha_de_status_apos_commit_nao_compensa_objeto_persistido(monkeypatch):
+    conn = _ConnImportacaoFake()
+    pool = _PoolImportacaoFake()
+    removidos = []
+
+    async def adquirir_conn():
+        return pool, conn
+
+    def parse_comprovantes(pasta):
+        return ([{
+            "fonte": "doc.pdf",
+            "caminho": str(pasta / "doc.pdf"),
+            "data": "2024-01-01",
+            "valor": "10.00",
+        }], [])
+
+    monkeypatch.setattr("backend.database.adquirir_conn", adquirir_conn)
+    monkeypatch.setattr(
+        "backend.services.storage_service.criar_arquivo_se_ausente",
+        lambda chave, conteudo: (chave, True),
+    )
+    monkeypatch.setattr(
+        "backend.services.storage_service.remover_arquivo",
+        lambda chave: removidos.append(chave) is None,
+    )
+    monkeypatch.setattr(cs, "_parse_comprovantes", parse_comprovantes)
+    monkeypatch.setattr(cs, "_parse_extratos", lambda pasta: [])
+    monkeypatch.setattr(cs, "conciliar", lambda comprovantes, movimentos: _resultado_vazio())
+    registrar_original = cs._registrar
+
+    def registrar_que_falha_no_sucesso(conciliacao_id, **campos):
+        if campos.get("status") == "sucesso":
+            raise RuntimeError("falha controlada no status")
+        registrar_original(conciliacao_id, **campos)
+
+    monkeypatch.setattr(cs, "_registrar", registrar_que_falha_no_sucesso)
+
+    cid = cs.criar_execucao("usuario-1")
+    asyncio.run(
+        cs.executar_importacao_pasta_bg(
+            "projeto-1", cid, "usuario-1", None, None, [("doc.pdf", b"pdf-controlado")]
+        )
+    )
+
+    assert cs.obter_status(cid, "usuario-1")["status"] == "erro"
+    assert conn.commits == 1
+    assert conn.rollbacks == 0
+    assert removidos == []
+
+
+class _TransacaoCommitAckPerdido(_TransacaoFake):
+    def __init__(self, conn, estado, aplicar_commit):
+        super().__init__(conn)
+        self.estado = estado
+        self.aplicar_commit = aplicar_commit
+
+    async def commit(self):
+        if self.iniciada_manualmente:
+            self.conn.commits += 1
+            if self.aplicar_commit:
+                self.estado["referenciada"] = True
+            raise RuntimeError("commit aplicado; ACK perdido")
+
+
+class _ConnCommitAckPerdido(_ConnImportacaoFake):
+    def __init__(self, estado, *, aplicar_commit=True):
+        super().__init__()
+        self.estado = estado
+        self.aplicar_commit = aplicar_commit
+        self._n_transacoes = 0
+
+    def transaction(self):
+        self._n_transacoes += 1
+        if self._n_transacoes == 1:
+            return _TransacaoCommitAckPerdido(
+                self, self.estado, self.aplicar_commit
+            )
+        return _TransacaoFake(self)
+
+
+class _ConnReconciliacaoFake(_ConnImportacaoFake):
+    def __init__(self, estado, *, falhar_fila=False):
+        super().__init__()
+        self.estado = estado
+        self.falhar_fila = falhar_fila
+        self.consultas = []
+
+    async def fetchval(self, sql, *args):
+        sql_normalizado = " ".join(sql.split()).lower()
+        self.consultas.append((sql_normalizado, args))
+        if "pg_advisory_xact_lock" in sql_normalizado or "pg_try_advisory" in sql_normalizado:
+            return True
+        if "documentos_transacao" in sql_normalizado and "select exists" in sql_normalizado:
+            return self.estado.get("referenciada", False)
+        return False
+
+    async def execute(self, sql, *args):
+        sql_normalizado = " ".join(sql.split()).lower()
+        self.execucoes.append((sql_normalizado, args))
+        if self.falhar_fila and "insert into storage_orfaos" in sql_normalizado:
+            raise RuntimeError("fila indisponível")
+
+
+def test_commit_aplicado_com_ack_perdido_reconsulta_e_nao_remove_referencia(monkeypatch):
+    estado = {"referenciada": False}
+    conn_original = _ConnCommitAckPerdido(estado)
+    conn_reconciliacao = _ConnReconciliacaoFake(estado)
+    pool_original = _PoolImportacaoFake()
+    pool_reconciliacao = _PoolImportacaoFake()
+    conexoes = [(pool_original, conn_original), (pool_reconciliacao, conn_reconciliacao)]
+    removidos = []
+
+    async def adquirir_conn():
+        return conexoes.pop(0)
+
+    def parse_comprovantes(pasta):
+        return ([{
+            "fonte": "doc.pdf",
+            "caminho": str(pasta / "doc.pdf"),
+            "data": "2024-01-01",
+            "valor": "10.00",
+        }], [])
+
+    monkeypatch.setattr("backend.database.adquirir_conn", adquirir_conn)
+    monkeypatch.setattr(
+        "backend.services.storage_service.criar_arquivo_se_ausente",
+        lambda chave, conteudo: (chave, True),
+    )
+    monkeypatch.setattr(
+        "backend.services.storage_service.remover_arquivo",
+        lambda chave: removidos.append(chave) is None,
+    )
+    monkeypatch.setattr(cs, "_parse_comprovantes", parse_comprovantes)
+    monkeypatch.setattr(cs, "_parse_extratos", lambda pasta: [])
+    monkeypatch.setattr(cs, "conciliar", lambda comprovantes, movimentos: _resultado_vazio())
+
+    cid = cs.criar_execucao("usuario-1")
+    asyncio.run(
+        cs.executar_importacao_pasta_bg(
+            "projeto-1", cid, "usuario-1", None, None, [("doc.pdf", b"pdf-controlado")]
+        )
+    )
+
+    assert conn_original.commits == 1
+    assert estado["referenciada"] is True
+    assert removidos == []
+    assert any("select exists" in sql for sql, args in conn_reconciliacao.consultas)
+    assert any("update storage_orfaos" in sql for sql, args in conn_reconciliacao.execucoes)
+    assert pool_original.liberadas == [conn_original]
+    assert pool_reconciliacao.liberadas == [conn_reconciliacao]
+
+
+def test_commit_ambiguo_sem_referencia_remove_sob_novo_lock_e_enfileira_falha(monkeypatch):
+    estado = {"referenciada": False}
+    conn_original = _ConnCommitAckPerdido(estado, aplicar_commit=False)
+    conn_reconciliacao = _ConnReconciliacaoFake(estado)
+    pool_original = _PoolImportacaoFake()
+    pool_reconciliacao = _PoolImportacaoFake()
+    conexoes = [(pool_original, conn_original), (pool_reconciliacao, conn_reconciliacao)]
+    removidos = []
+
+    async def adquirir_conn():
+        return conexoes.pop(0)
+
+    def parse_comprovantes(pasta):
+        return ([{
+            "fonte": "doc.pdf",
+            "caminho": str(pasta / "doc.pdf"),
+            "data": "2024-01-01",
+            "valor": "10.00",
+        }], [])
+
+    def remover_arquivo(chave):
+        assert pool_original.liberadas == [conn_original]
+        removidos.append(chave)
+        return False
+
+    monkeypatch.setattr("backend.database.adquirir_conn", adquirir_conn)
+    monkeypatch.setattr(
+        "backend.services.storage_service.criar_arquivo_se_ausente",
+        lambda chave, conteudo: (chave, True),
+    )
+    monkeypatch.setattr("backend.services.storage_service.remover_arquivo", remover_arquivo)
+    monkeypatch.setattr(cs, "_parse_comprovantes", parse_comprovantes)
+    monkeypatch.setattr(cs, "_parse_extratos", lambda pasta: [])
+    monkeypatch.setattr(cs, "conciliar", lambda comprovantes, movimentos: _resultado_vazio())
+
+    cid = cs.criar_execucao("usuario-1")
+    asyncio.run(
+        cs.executar_importacao_pasta_bg(
+            "projeto-1", cid, "usuario-1", None, None, [("doc.pdf", b"pdf-controlado")]
+        )
+    )
+
+    assert estado["referenciada"] is False
+    assert len(removidos) == 1
+    assert any("select exists" in sql for sql, args in conn_reconciliacao.consultas)
+    assert any("insert into storage_orfaos" in sql for sql, args in conn_reconciliacao.execucoes)
+    assert pool_reconciliacao.liberadas == [conn_reconciliacao]
+
+
+def test_falha_ao_enfileirar_orfao_em_conexao_nova_aparece_no_status(monkeypatch):
+    conn_original = _ConnFalhaAposUpload()
+    conn_fila = _ConnReconciliacaoFake({"referenciada": False}, falhar_fila=True)
+    pool_original = _PoolImportacaoFake()
+    pool_fila = _PoolImportacaoFake()
+    conexoes = [(pool_original, conn_original), (pool_fila, conn_fila)]
+
+    async def adquirir_conn():
+        return conexoes.pop(0)
+
+    def parse_comprovantes(pasta):
+        return ([{
+            "fonte": "doc.pdf",
+            "caminho": str(pasta / "doc.pdf"),
+            "data": "2024-01-01",
+            "valor": "10.00",
+        }], [])
+
+    monkeypatch.setattr("backend.database.adquirir_conn", adquirir_conn)
+    monkeypatch.setattr(
+        "backend.services.storage_service.criar_arquivo_se_ausente",
+        lambda chave, conteudo: (chave, True),
+    )
+    monkeypatch.setattr("backend.services.storage_service.remover_arquivo", lambda chave: False)
+    monkeypatch.setattr(cs, "_parse_comprovantes", parse_comprovantes)
+    monkeypatch.setattr(cs, "_parse_extratos", lambda pasta: [])
+    monkeypatch.setattr(cs, "conciliar", lambda comprovantes, movimentos: _resultado_vazio())
+
+    cid = cs.criar_execucao("usuario-1")
+    asyncio.run(
+        cs.executar_importacao_pasta_bg(
+            "projeto-1", cid, "usuario-1", None, None, [("doc.pdf", b"pdf-controlado")]
+        )
+    )
+
+    status = cs.obter_status(cid, "usuario-1")
+    assert status["status"] == "erro"
+    assert "fila durável" in status["erro_fatal"]
+    assert pool_original.liberadas == [conn_original]
+    assert pool_fila.liberadas == [conn_fila]
+
+
+def test_importacao_rejeita_data_invalida_de_extrato_antes_de_persistir(monkeypatch):
+    conn = _ConnImportacaoFake()
+    pool = _PoolImportacaoFake()
+
+    async def adquirir_conn():
+        return pool, conn
+
+    monkeypatch.setattr("backend.database.adquirir_conn", adquirir_conn)
+    monkeypatch.setattr(cs, "_parse_comprovantes", lambda pasta: ([], []))
+    monkeypatch.setattr(cs, "_parse_extratos", lambda pasta: [{"data": "31/02/2024"}])
+    monkeypatch.setattr(cs, "conciliar", lambda comprovantes, movimentos: _resultado_vazio())
+
+    cid = cs.criar_execucao("usuario-1")
+    asyncio.run(
+        cs.executar_importacao_pasta_bg(
+            "projeto-1", cid, "usuario-1", None, None, []
+        )
+    )
+
+    status = cs.obter_status(cid, "usuario-1")
+    assert status["status"] == "erro"
+    assert "data inválida" in status["erro_fatal"]
+    assert "1970" not in status["erro_fatal"]
+    assert conn.fetchrows == []
+    assert not any("pg_advisory_unlock" in sql for sql, args in conn.execucoes)
+
+
+class _ConnFalhaAposUpload(_ConnImportacaoFake):
+    async def execute(self, sql, *args):
+        sql_normalizado = " ".join(sql.split()).lower()
+        self.execucoes.append((sql_normalizado, args))
+        if "insert into documentos_transacao" in sql_normalizado:
+            raise RuntimeError("falha controlada após upload")
+
+
+def _configurar_falha_apos_upload(monkeypatch, conn, *, criado, remover_resultado, removidos):
+    pool = _PoolImportacaoFake()
+
+    async def adquirir_conn():
+        return pool, conn
+
+    def parse_comprovantes(pasta):
+        return ([{
+            "fonte": "doc.pdf",
+            "caminho": str(pasta / "doc.pdf"),
+            "data": "2024-01-01",
+            "valor": "10.00",
+        }], [])
+
+    def criar_arquivo_se_ausente(chave, conteudo):
+        return chave, criado
+
+    def remover_arquivo(chave):
+        removidos.append(chave)
+        return remover_resultado
+
+    monkeypatch.setattr("backend.database.adquirir_conn", adquirir_conn)
+    monkeypatch.setattr(
+        "backend.services.storage_service.criar_arquivo_se_ausente",
+        criar_arquivo_se_ausente,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        "backend.services.storage_service.upload_arquivo",
+        lambda chave, conteudo: chave,
+    )
+    monkeypatch.setattr("backend.services.storage_service.remover_arquivo", remover_arquivo)
+    monkeypatch.setattr(cs, "_parse_comprovantes", parse_comprovantes)
+    monkeypatch.setattr(cs, "_parse_extratos", lambda pasta: [])
+    monkeypatch.setattr(cs, "conciliar", lambda comprovantes, movimentos: _resultado_vazio())
+
+
+def test_importacao_nao_remove_objeto_preexistente_quando_banco_falha(monkeypatch):
+    conn = _ConnFalhaAposUpload()
+    removidos = []
+    _configurar_falha_apos_upload(
+        monkeypatch,
+        conn,
+        criado=False,
+        remover_resultado=True,
+        removidos=removidos,
+    )
+
+    cid = cs.criar_execucao("usuario-1")
+    asyncio.run(
+        cs.executar_importacao_pasta_bg(
+            "projeto-1", cid, "usuario-1", None, None, [("doc.pdf", b"pdf-controlado")]
+        )
+    )
+
+    assert cs.obter_status(cid, "usuario-1")["status"] == "erro"
+    assert removidos == []
+    assert not any("storage_orfaos" in sql for sql, args in conn.execucoes)
+
+
+def test_importacao_registra_orfao_quando_remocao_do_objeto_criado_falha(monkeypatch):
+    conn = _ConnFalhaAposUpload()
+    removidos = []
+    _configurar_falha_apos_upload(
+        monkeypatch,
+        conn,
+        criado=True,
+        remover_resultado=False,
+        removidos=removidos,
+    )
+
+    cid = cs.criar_execucao("usuario-1")
+    asyncio.run(
+        cs.executar_importacao_pasta_bg(
+            "projeto-1", cid, "usuario-1", None, None, [("doc.pdf", b"pdf-controlado")]
+        )
+    )
+
+    assert len(removidos) == 1
+    registro = next(
+        args for sql, args in conn.execucoes if "insert into storage_orfaos" in sql
+    )
+    assert registro[0] == "projeto-1"
+    assert registro[1] == cid
+    assert registro[2] == removidos[0]

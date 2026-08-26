@@ -18,11 +18,20 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/projetos", tags=["auditoria"])
 
 WHERE_STATUS = {
-    # 'CONCILIADA'/'OK' não existem no enum status_conciliacao (valores reais
-    # em db/migrations/0001_schema.sql) -- esse filtro quebrava com erro de
-    # enum inválido assim que alguém clicava em "OK / Conciliadas".
-    "pendente": "t.status = 'PENDENTE'",
-    "ok": "t.status = 'CONCILIADO_OK'",
+    # Filtros baseados na realidade dos dados, não no campo `status` do banco
+    # (que raramente é atualizado após a importação inicial).
+    #
+    # ok = conciliação completa: tem documento fiscal registrado E tem movimento
+    #      de extrato bancário conciliado. É a condição que o MinC exige.
+    "ok": (
+        "exists (select 1 from documentos_transacao _d where _d.transacao_id = t.id)"
+        " and exists (select 1 from conciliacao_extrato _ce where _ce.transacao_id = t.id)"
+    ),
+    # pendente = falta pelo menos um dos dois (doc fiscal OU extrato matched)
+    "pendente": (
+        "not exists (select 1 from documentos_transacao _d where _d.transacao_id = t.id)"
+        " or not exists (select 1 from conciliacao_extrato _ce where _ce.transacao_id = t.id)"
+    ),
     "revisao_pendente": "t.status = 'REVISAO_PENDENTE'",
     "com_docs": "t.tem_nf and t.tem_comprovante",
     "sem_docs": "not (t.tem_nf and t.tem_comprovante)",
@@ -89,6 +98,25 @@ async def auditoria_projeto(
         "select status, count(*)::int as total from transacoes where projeto_id = $1 group by status",
         projeto_id,
     )
+    # Contagens reais para os badges das abas (usa a mesma lógica dos filtros)
+    total_ok = await conn.fetchval(
+        """
+        select count(*) from transacoes t where t.projeto_id = $1
+          and exists (select 1 from documentos_transacao _d where _d.transacao_id = t.id)
+          and exists (select 1 from conciliacao_extrato _ce where _ce.transacao_id = t.id)
+        """,
+        projeto_id,
+    )
+    total_pendente = await conn.fetchval(
+        """
+        select count(*) from transacoes t where t.projeto_id = $1
+          and (
+            not exists (select 1 from documentos_transacao _d where _d.transacao_id = t.id)
+            or not exists (select 1 from conciliacao_extrato _ce where _ce.transacao_id = t.id)
+          )
+        """,
+        projeto_id,
+    )
 
     # ---- transações (com filtro se pedido) paginadas ----
     total_filtrado = await conn.fetchval(f"select count(*) from transacoes t {where}", *params)
@@ -100,17 +128,35 @@ async def auditoria_projeto(
             -- soma corrida SEMPRE sobre todas as transações do projeto (não
             -- sobre o filtro atual) -- "saldo restante" só faz sentido como
             -- sequência única do orçamento, não recalculado por filtro
+            --
+            -- ORDER BY determinístico: o desempate por id garante a MESMA
+            -- ordem dentro de mesma data+created_at, senão a soma corrida e a
+            -- página podem divergir entre execuções.
             select id, sum(valor_bruto) over (
-                order by data_pagamento nulls last, created_at
+                order by data_pagamento nulls last, created_at, id
                 rows between unbounded preceding and current row
             ) as debitado_acumulado
             from transacoes
             where projeto_id = $1
         )
-        select t.id, t.fornecedor, t.razao_social, t.cnpj_fornecedor, t.data_pagamento, t.valor_bruto,
+        select t.id, t.fornecedor, t.razao_social, t.prestador, t.documento, t.data_pagamento, t.valor_bruto,
                t.tem_nf, t.tem_comprovante, t.status, t.score_conciliacao,
-               r.codigo as rubrica_codigo, r.descricao as rubrica_descricao,
-               d.descricao as item_descricao,
+               -- rubrica/despesa da PRIMEIRA despesa (order determinístico por
+               -- created_at,id), colhida em subselect: substitui o antigo
+               -- `left join despesas d`, que multiplicava linhas quando uma
+               -- transação tinha mais de uma despesa (quebrava paginação e
+               -- duplicava a transação na tela).
+               (select r.codigo from despesas d
+                 join rubricas r on r.id = d.rubrica_id
+                where d.transacao_id = t.id
+                order by d.created_at, d.id limit 1) as rubrica_codigo,
+               (select r.descricao from despesas d
+                 join rubricas r on r.id = d.rubrica_id
+                where d.transacao_id = t.id
+                order by d.created_at, d.id limit 1) as rubrica_descricao,
+               (select d.descricao from despesas d
+                where d.transacao_id = t.id
+                order by d.created_at, d.id limit 1) as item_descricao,
                sa.debitado_acumulado,
                coalesce(
                    (
@@ -139,11 +185,9 @@ async def auditoria_projeto(
                    limit 1
                ) as movimento_extrato
         from transacoes t
-        left join despesas d on d.transacao_id = t.id
-        left join rubricas r on r.id = d.rubrica_id
         left join saldo_acumulado sa on sa.id = t.id
         {where}
-        order by t.data_pagamento nulls last, t.created_at
+        order by t.data_pagamento nulls last, t.created_at, t.id
         limit ${limit_idx} offset ${offset_idx}
         """,
         *params, limit, (page - 1) * limit,
@@ -161,6 +205,9 @@ async def auditoria_projeto(
         "por_status": [{"status": r["status"], "total": r["total"]} for r in por_status],
         "filtro_status": status,
         "total_filtrado": total_filtrado,
+        # Contagens reais para badges das abas
+        "total_ok": total_ok,
+        "total_pendente": total_pendente,
     }
     transacoes = []
     for r in rows:
@@ -171,7 +218,8 @@ async def auditoria_projeto(
                 "id": str(r["id"]),
                 "fornecedor": r["fornecedor"],
                 "razao_social": r["razao_social"],
-                "cnpj_fornecedor": r["cnpj_fornecedor"],
+                "prestador": r["prestador"],
+                "documento": r["documento"],
                 "data_pagamento": r["data_pagamento"].isoformat() if r["data_pagamento"] else None,
                 "valor_bruto": r["valor_bruto"],
                 "tem_nf": r["tem_nf"],
@@ -193,6 +241,14 @@ async def auditoria_projeto(
                 ),
                 "documento": primeiro_doc.get("arquivo_ref") or "",
                 "confianca_ocr": primeiro_doc.get("confianca_ocr"),
+                # Campos calculados para o frontend exibir status real
+                # independente do campo `status` bruto do banco.
+                "tem_doc": len(documentos) > 0,
+                "tem_extrato": r["movimento_extrato"] is not None,
+                "conciliado_ok": len(documentos) > 0 and r["movimento_extrato"] is not None,
+                # O que está faltando (para a aba de Pendências)
+                "falta_doc": len(documentos) == 0,
+                "falta_extrato": r["movimento_extrato"] is None,
             }
         )
 

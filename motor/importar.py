@@ -382,7 +382,7 @@ class MotorImportacao:
             cur.execute(
                 """
                 insert into transacoes (
-                    projeto_id, fornecedor, cnpj_fornecedor, data_pagamento,
+                    projeto_id, fornecedor, documento, data_pagamento,
                     valor_bruto, valor_liquido, tem_nf, tem_comprovante, status
                 ) values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 returning id
