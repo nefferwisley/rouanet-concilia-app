@@ -32,6 +32,8 @@ import uuid
 import zipfile
 from pathlib import Path
 from typing import Optional
+from datetime import date
+from decimal import Decimal
 
 logger = logging.getLogger("rouanet-api.conciliacao")
 
@@ -191,6 +193,7 @@ def executar_conciliacao_bg(
 
         _registrar(conciliacao_id, etapa="conciliando lançamentos (003)", progresso=60)
         resultado = conciliar(comprovantes, movimentos)
+        _aplicar_rubricas_da_pasta(resultado, raiz)
 
         artefatos = base / "artefatos"
         artefatos.mkdir(parents=True, exist_ok=True)
@@ -472,7 +475,7 @@ def conciliar(comprovantes: list[dict], movimentos: list[dict]) -> dict:
 # ============================================================
 _CABECALHO = [
     "Data", "Valor", "Favorecido", "CNPJ/CPF", "Nº arquivo",
-    "Comprovante", "Histórico extrato", "Doc extrato", "Status",
+    "Comprovante", "Histórico extrato", "Doc extrato", "Status", "Rubrica",
 ]
 
 
@@ -487,7 +490,44 @@ def _linha_para_tabela(l: dict) -> list:
         l.get("historico_extrato"),
         l.get("doc_extrato"),
         l.get("status"),
+        l.get("rubrica"),
     ]
+
+
+def _aplicar_rubricas_da_pasta(resultado: dict, raiz: Path) -> int:
+    """Aplica códigos explícitos da planilha-base às linhas conciliadas."""
+    from backend.services.sincronizacao_documentos_service import (
+        extrair_vinculos_rubrica_planilha_base,
+        tipo_planilha,
+    )
+
+    planilha = None
+    for caminho in sorted(raiz.rglob("*")):
+        if caminho.is_file() and caminho.suffix.lower() in {".csv", ".xlsx", ".xlsm", ".xltx", ".xltm"}:
+            conteudo = caminho.read_bytes()
+            if tipo_planilha(conteudo) == "planilha_base":
+                planilha = conteudo
+                break
+    if planilha is None:
+        return 0
+
+    filas = {}
+    for data_vinculo, valor_vinculo, codigo in extrair_vinculos_rubrica_planilha_base(planilha):
+        filas.setdefault((data_vinculo, valor_vinculo), []).append(codigo)
+
+    aplicadas = 0
+    for linha in resultado["linhas"]:
+        try:
+            data_linha = date.fromisoformat(str(linha.get("data")))
+            valor_linha = abs(Decimal(str(linha.get("valor")))).quantize(Decimal("0.01"))
+        except (TypeError, ValueError, ArithmeticError):
+            continue
+        fila = filas.get((data_linha, valor_linha), [])
+        if fila:
+            linha["rubrica"] = fila.pop(0)
+            aplicadas += 1
+    resultado["resumo"]["rubricas_aplicadas"] = aplicadas
+    return aplicadas
 
 
 def _gerar_planilha(artefatos: Path, resultado: dict) -> Path:

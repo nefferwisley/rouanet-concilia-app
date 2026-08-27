@@ -2,13 +2,18 @@ import pytest
 import uuid
 import zipfile
 import io
+import openpyxl
 from decimal import Decimal
 from datetime import date
 from backend.services.sincronizacao_documentos_service import (
     ArquivoRecebido,
     extrair_zip_seguro,
     ingerir_arquivo,
-    extrair_sinais_locais
+    extrair_sinais_locais,
+    detectar_mime,
+    tipo_planilha,
+    extrair_rubricas_planilha_base,
+    extrair_vinculos_rubrica_planilha_base,
 )
 
 def test_extrair_zip_seguro():
@@ -45,6 +50,39 @@ def test_ingerir_arquivo():
         
     with pytest.raises(ValueError, match="XML entities"):
         ingerir_arquivo(pid, 'doc.xml', 'application/xml', b'<!ENTITY x "y">')
+
+
+def test_detecta_planilha_base_pelo_conteudo_mesmo_com_extensao_csv():
+    memoria = io.BytesIO()
+    livro = openpyxl.Workbook()
+    livro.active.title = 'conciliação'
+    rubricas = livro.create_sheet('rubricas')
+    rubricas.append([None, None, '1.5.1', 'Produtora Executiva', None, None, None, None, 11000])
+    livro.save(memoria)
+    conteudo = memoria.getvalue()
+
+    assert detectar_mime('3. 1961.csv', conteudo) == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    assert tipo_planilha(conteudo) == 'planilha_base'
+    assert extrair_rubricas_planilha_base(conteudo) == [('1.5.1', 'Produtora Executiva', Decimal('11000'))]
+
+    ingerido = ingerir_arquivo(uuid.uuid4(), '3. 1961.csv', 'text/csv', conteudo)
+    assert ingerido.mime == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    assert ingerido.caminho_logico.endswith('.xlsx')
+
+
+def test_extrai_vinculo_explicito_da_aba_conciliacao_da_planilha_base():
+    memoria = io.BytesIO()
+    livro = openpyxl.Workbook()
+    conciliacao = livro.active
+    conciliacao.title = 'conciliação'
+    conciliacao.append(['CONTROLE', 'FORNECEDOR PESSOA FISICA', 'DATA', 'VALOR', 'RUBRICA', 'RUBRICA'])
+    conciliacao.append([1, 'Mônica Guimarães', date(2022, 11, 4), 11000, 'Produtora Executiva', '1.5.1'])
+    livro.create_sheet('rubricas')
+    livro.save(memoria)
+
+    assert extrair_vinculos_rubrica_planilha_base(memoria.getvalue()) == [
+        (date(2022, 11, 4), Decimal('11000.00'), '1.5.1')
+    ]
 
 def test_extrair_sinais_locais():
     # PDF extraction tested with fitz

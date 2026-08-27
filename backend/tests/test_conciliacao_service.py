@@ -253,7 +253,7 @@ def test_linha_para_tabela_posicoes():
     assert cel[0] == "2023-01-01"
     assert cel[1] == 10.0
     assert cel[8] == "conferido"
-    assert len(cel) == 9
+    assert len(cel) == 10
 
 
 def test_linha_para_tabela_campos_ausentes():
