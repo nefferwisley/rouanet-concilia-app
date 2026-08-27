@@ -1,7 +1,8 @@
 ﻿import uuid
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, UploadFile, File
 from backend.services.sincronizacao_documentos_service import (
-    iniciar_sincronizacao, processar_sincronizacao, ArquivoRecebido
+    iniciar_sincronizacao, processar_sincronizacao, registrar_arquivos_sincronizacao,
+    ArquivoRecebido,
 )
 from backend.database import get_conn
 
@@ -25,6 +26,7 @@ async def criar_sincronizacao(
         lidos.append(ArquivoRecebido(nome=a.filename, mime=a.content_type, conteudo=conteudo))
         
     sinc_id = await iniciar_sincronizacao(conn, id, uuid.UUID(user_id), lidos)
+    await registrar_arquivos_sincronizacao(conn, sinc_id, id, lidos)
     background_tasks.add_task(processar_sincronizacao, sinc_id)
     return {"sincronizacao_id": str(sinc_id)}
 

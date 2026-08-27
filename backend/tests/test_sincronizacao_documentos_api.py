@@ -51,9 +51,21 @@ def test_api_sincronizacoes_documentos_nao_encontrado():
 
 def test_api_sincronizacoes_documentos_sucesso(monkeypatch):
     import backend.routes.sincronizacao_documentos as sd
+    chamadas_registro = []
+
     async def mock_init(*args, **kwargs):
         return uuid.uuid4()
+
+    async def mock_registrar(*args, **kwargs):
+        chamadas_registro.append(args)
+        return None
+
+    async def mock_processar(*args, **kwargs):
+        return None
+
     monkeypatch.setattr(sd, "iniciar_sincronizacao", mock_init)
+    monkeypatch.setattr(sd, "registrar_arquivos_sincronizacao", mock_registrar)
+    monkeypatch.setattr(sd, "processar_sincronizacao", mock_processar)
     
     app.dependency_overrides[get_conn] = mock_get_conn
     resp = client.post(
@@ -62,6 +74,7 @@ def test_api_sincronizacoes_documentos_sucesso(monkeypatch):
     )
     assert resp.status_code == 202
     assert "sincronizacao_id" in resp.json()
+    assert len(chamadas_registro) == 1
     app.dependency_overrides.clear()
 
 def test_api_get_sincronizacao_sucesso():

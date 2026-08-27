@@ -37,7 +37,10 @@ from .divergencias import LinhaPlanilha
 # Sinônimos aceitos por coluna: planilhas de projetos diferentes escrevem o
 # mesmo conceito de formas ligeiramente diferentes.
 COLUNAS = {
-    "prestador": ("PRESTADOR DE SERVICO", "PRESTADOR", "PRESTADOR DE SERVIÇO"),
+    "prestador": (
+        "PRESTADOR DE SERVICO", "PRESTADOR", "PRESTADOR DE SERVIÇO",
+        "FORNECEDOR PESSOA FISICA", "FORNECEDOR PESSOA FÍSICA", "FORNECEDOR",
+    ),
     "razao_social": ("RAZAO SOCIAL", "RAZÃO SOCIAL"),
     "data": ("DATA", "DATA DE PAGAMENTO"),
     "valor": ("VALOR", "VALOR PAGO"),
