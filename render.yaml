@@ -34,6 +34,8 @@ services:
         sync: false   # opcional — sem ela, /sincronizar-drive responde 503
       - key: CORS_ORIGINS
         value: "https://rouanet-concilia.pages.dev,https://taupe-shortbread-e4d403.netlify.app"
+      - key: APP_ENV
+        value: "dev"
       - key: UPLOAD_DIR
         value: /app/uploads
       - key: PYTHONUNBUFFERED
