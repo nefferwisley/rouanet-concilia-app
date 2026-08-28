@@ -815,6 +815,7 @@ async def executar_importacao_pasta_bg(
             extrato_file.write_bytes(extrato_bytes)
         
         hashes_salvos = set()
+        planilha_base_bytes = None
         
         for nome_arq, c_bytes in comprovantes_dados:
             if nome_arq.lower().endswith(".zip"):
@@ -843,6 +844,14 @@ async def executar_importacao_pasta_bg(
                 caminho_dest = pag_dir / Path(nome_arq)
                 caminho_dest.parent.mkdir(parents=True, exist_ok=True)
                 caminho_dest.write_bytes(c_bytes)
+
+        from backend.services.sincronizacao_documentos_service import tipo_planilha
+        for p in pag_dir.glob("**/*"):
+            if p.is_file() and p.suffix.lower() in {".csv", ".xlsx", ".xlsm", ".xltx", ".xltm"}:
+                candidato = p.read_bytes()
+                if tipo_planilha(candidato) == "planilha_base":
+                    planilha_base_bytes = candidato
+                    break
         
         # Move arquivos identificados como extrato para a pasta de extratos
         for p in list(pag_dir.glob("**/*")):
@@ -1053,6 +1062,28 @@ async def executar_importacao_pasta_bg(
                         ''',
                         projeto_id
                     )
+                    if planilha_base_bytes:
+                        from backend.services.sincronizacao_documentos_service import (
+                            extrair_rubricas_planilha_base,
+                            extrair_vinculos_rubrica_planilha_base,
+                            vincular_despesas_planilha_base,
+                        )
+                        for codigo, descricao, valor_orcado in extrair_rubricas_planilha_base(planilha_base_bytes):
+                            await conn_bg.execute(
+                                """
+                                insert into rubricas (projeto_id, codigo, descricao, valor_orcado)
+                                values ($1, $2, $3, $4)
+                                on conflict (projeto_id, codigo) do update
+                                  set descricao = excluded.descricao,
+                                      valor_orcado = excluded.valor_orcado
+                                """,
+                                projeto_id, codigo, descricao, valor_orcado,
+                            )
+                        await vincular_despesas_planilha_base(
+                            conn_bg,
+                            projeto_id,
+                            extrair_vinculos_rubrica_planilha_base(planilha_base_bytes),
+                        )
             finally:
                 pass
 
