@@ -125,13 +125,14 @@ export function Sidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean;
         </nav>
 
         <div className="border-t border-slate-100 dark:border-navy-800 px-3 py-4 space-y-1">
-          <button
-            type="button"
+          <Link
+            to="/configuracoes"
+            onClick={onClose}
             className="flex w-full items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-navy-800 hover:text-slate-900 dark:hover:text-white transition-colors"
           >
             <Settings className="h-[18px] w-[18px] shrink-0" aria-hidden="true" />
             <span>Configurações</span>
-          </button>
+          </Link>
           <button
             type="button"
             className="flex w-full items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-400 transition-colors"

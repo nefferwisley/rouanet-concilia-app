@@ -1,0 +1,520 @@
+- generic [ref=f5e3]:
+  - region "Barra de Acessibilidade" [ref=f5e4]:
+    - generic [ref=f5e5]:
+      - generic [ref=f5e6]: Acessibilidade eMAG / WCAG
+      - generic [ref=f5e10]: "|"
+      - generic [ref=f5e11]: "Atalhos: Alt + 1..5 navegar"
+    - generic [ref=f5e12]:
+      - generic [ref=f5e13]:
+        - button "Aumentar tamanho do texto (Alt + +)" [ref=f5e14]: A+
+        - button "Tamanho normal do texto (Alt + 0)" [ref=f5e15]: A
+        - button "Diminuir tamanho do texto (Alt + -)" [ref=f5e16]: A-
+      - button "Alternar modo de alto contraste (Alt + C)" [ref=f5e17]:
+        - generic [ref=f5e24]: Alto Contraste
+      - button "Ver todos os atalhos de teclado (Alt + K)" [ref=f5e25]:
+        - generic [ref=f5e28]: Atalhos
+  - banner [ref=f5e29]:
+    - generic [ref=f5e31]:
+      - generic:
+        - generic:
+          - generic:
+            - generic: Concilia Rouanet
+            - generic [ref=f5e36]: MinC • SALIC
+          - paragraph: Prestação de Contas & Auditoria Preventiva IA
+      - generic [ref=f5e37]:
+        - generic [ref=f5e38]:
+          - generic [ref=f5e39]: "PRONAC:"
+          - combobox "Selecionar Projeto PRONAC" [ref=f5e43]:
+            - option "19-1961/FSA-BRDE - 1961 (Longa-Metragem Documental - ANCINE/FSA)" [selected]
+            - option "234891 - Festival Sons & Raízes do Brasil - Edição 2024"
+        - button "Novo" [ref=f5e44]
+        - button "Excluir projeto ativo" [ref=f5e48]:
+          - generic [ref=f5e52]: Excluir
+        - button "Importar Drive" [ref=f5e53]
+      - generic [ref=f5e58]:
+        - generic "Modo Offline (Persistência em LocalStorage Ativa)" [ref=f5e59]: LocalStorage
+        - button "LangChain & RAG" [ref=f5e64]
+        - button "Auditoria IA" [ref=f5e69]
+        - button "Exportar" [ref=f5e75]
+  - generic [ref=f5e82]:
+    - generic [ref=f5e83]:
+      - text: "Regras aplicáveis:"
+      - 'combobox "Regras aplicáveis: SALIC = sistema MinC; PRONAC = número do projeto." [ref=f5e84]':
+        - option "SALIC / PRONAC" [selected]
+        - option "FSA / ANCINE"
+      - generic [ref=f5e85]: SALIC = sistema MinC; PRONAC = número do projeto.
+    - generic [ref=f5e86]: "Perfil Ativo (RBAC):"
+    - combobox [ref=f5e87]:
+      - option "ADMIN" [selected]
+      - option "AUDITOR (MinC)"
+      - option "PRODUTOR (Agente Cultural)"
+  - generic [ref=f5e88]:
+    - complementary [ref=f5e89]:
+      - generic [ref=f5e90]:
+        - generic [ref=f5e91]:
+          - generic [ref=f5e92]: Módulos do Sistema
+          - button "Painel Executivo" [ref=f5e94]
+          - button "Esteira de Revisão (6 Etapas) Procedimento" [ref=f5e102]:
+            - generic [ref=f5e103]: Esteira de Revisão (6 Etapas)
+            - generic [ref=f5e108]: Procedimento
+          - button "Conciliação Tripartite Manual MinC" [ref=f5e109]:
+            - generic [ref=f5e110]: Conciliação Tripartite
+            - generic [ref=f5e117]: Manual MinC
+          - button "Motor & Skills (TigerBeetle / Splink) NEW" [ref=f5e118]:
+            - generic [ref=f5e119]: Motor & Skills (TigerBeetle / Splink)
+            - generic [ref=f5e124]: NEW
+          - button "Plano de Trabalho & Rubricas" [ref=f5e125]
+          - button "Extrato & Conciliação Bancária BB" [ref=f5e133]:
+            - generic [ref=f5e134]: Extrato & Conciliação Bancária
+            - generic [ref=f5e139]: BB
+          - button "Documentos Fiscais & OCR" [ref=f5e140]
+          - button "Auditoria IA & Regras MinC 2" [ref=f5e146]:
+            - generic [ref=f5e147]: Auditoria IA & Regras MinC
+            - generic [ref=f5e152]: "2"
+          - button "Relatório & Dossiê SALIC Export" [ref=f5e153]:
+            - generic [ref=f5e154]: Relatório & Dossiê SALIC
+            - generic [ref=f5e159]: Export
+          - button "Consultor Virtual Rouanet IA IA" [ref=f5e160]:
+            - generic [ref=f5e161]: Consultor Virtual Rouanet IA
+            - generic [ref=f5e166]: IA
+          - button "Simulador de Patrocínio Art. 18" [ref=f5e167]:
+            - generic [ref=f5e168]: Simulador de Patrocínio
+            - generic [ref=f5e172]: Art. 18
+          - button "Módulo de Captação & Recibos NOVO" [ref=f5e173]:
+            - generic [ref=f5e174]: Módulo de Captação & Recibos
+            - generic [ref=f5e181]: NOVO
+          - button "Painel de Risco Contínuo ALERTA" [ref=f5e182]:
+            - generic [ref=f5e183]: Painel de Risco Contínuo
+            - generic [ref=f5e188]: ALERTA
+        - generic [ref=f5e189]:
+          - generic [ref=f5e190]:
+            - generic [ref=f5e191]: PRONAC 19-1961/FSA-BRDE
+            - generic [ref=f5e196]: Fundo
+          - paragraph [ref=f5e197]: 1961 (Longa-Metragem Documental - ANCINE/FSA)
+          - generic [ref=f5e198]:
+            - generic [ref=f5e199]:
+              - generic [ref=f5e200]: "Aprovado:"
+              - generic [ref=f5e201]: R$ 835.000,00
+            - generic [ref=f5e202]:
+              - generic [ref=f5e203]: "Captado:"
+              - generic [ref=f5e204]: R$ 835.000,00
+            - generic [ref=f5e205]:
+              - generic [ref=f5e206]: "Executado:"
+              - generic [ref=f5e207]: R$ 897.759,15
+            - generic [ref=f5e208]:
+              - generic [ref=f5e209]: "Pendente:"
+              - generic [ref=f5e210]: R$ 242.417,79
+          - generic [ref=f5e211]:
+            - generic [ref=f5e212]: "Fim Prestação:"
+            - generic [ref=f5e215]: 28/02/2026
+    - main [ref=f5e216]:
+      - generic [ref=f5e218]:
+        - generic [ref=f5e220]:
+          - generic [ref=f5e221]:
+            - generic [ref=f5e222]:
+              - generic [ref=f5e223]: PRONAC 19-1961/FSA-BRDE
+              - generic [ref=f5e224]: Audiovisual (Cinema / FSA)
+              - generic [ref=f5e225]: Fundo Setorial do Audiovisual - FSA / BRDE
+              - generic [ref=f5e226]: Em Execução / Conciliação
+            - heading "1961 (Longa-Metragem Documental - ANCINE/FSA)" [level=1] [ref=f5e230]
+            - paragraph [ref=f5e231]:
+              - generic [ref=f5e232]:
+                - strong [ref=f5e233]: "Proponente:"
+                - text: Circunstância Produções / Amir Labaki (05.518.874/0001-41)
+              - generic [ref=f5e234]: •
+              - generic [ref=f5e235]: "Vigência: 01/10/2022 até 31/12/2025"
+          - generic [ref=f5e238]:
+            - button "Auditar com IA" [ref=f5e239]
+            - button "Extrato BB" [ref=f5e243]
+            - button "Gerar SALIC" [ref=f5e247]
+        - generic [ref=f5e251]:
+          - generic [ref=f5e252]:
+            - heading "Guia Passo a Passo da Prestação de Contas SALIC" [level=2] [ref=f5e258]
+            - generic [ref=f5e259]:
+              - generic [ref=f5e260]: "Prontidão para Envio MinC:"
+              - generic [ref=f5e261]: 33%
+          - generic [ref=f5e262]:
+            - button "1. Rubricas Orçamentárias 109 rubricas parametrizadas" [ref=f5e263]:
+              - generic [ref=f5e264]: 1. Rubricas Orçamentárias
+              - paragraph [ref=f5e269]: 109 rubricas parametrizadas
+            - button "2. Extrato Bancário Nenhum extrato importado" [ref=f5e270]:
+              - generic [ref=f5e271]: 2. Extrato Bancário
+              - paragraph [ref=f5e274]: Nenhum extrato importado
+            - button "3. Documentos Fiscais 178 notas/comprovantes anexados" [ref=f5e275]:
+              - generic [ref=f5e276]: 3. Documentos Fiscais
+              - paragraph [ref=f5e281]: 178 notas/comprovantes anexados
+            - button "4. Conciliação Tripartite 96/178 débitos vinculados" [ref=f5e282]:
+              - generic [ref=f5e283]: 4. Conciliação Tripartite
+              - paragraph [ref=f5e286]: 96/178 débitos vinculados
+            - button "5. Auditoria de Conformidade 2 alerta(s) a revisar" [ref=f5e287]:
+              - generic [ref=f5e288]: 5. Auditoria de Conformidade
+              - paragraph [ref=f5e291]: 2 alerta(s) a revisar
+            - button "6. Dossiê SALIC Pronto para exportação oficial" [ref=f5e292]:
+              - generic [ref=f5e293]: 6. Dossiê SALIC
+              - paragraph [ref=f5e296]: Pronto para exportação oficial
+        - generic [ref=f5e297]:
+          - generic [ref=f5e298]: Resumo validado
+          - generic [ref=f5e302]: Recalculado a partir dos lançamentos importados
+        - generic [ref=f5e303]:
+          - generic [ref=f5e304]:
+            - generic [ref=f5e305]:
+              - generic [ref=f5e306]: Orçamento Aprovado
+              - generic [ref=f5e312]: SALIC MinC
+            - generic [ref=f5e313]: R$ 835.000,00
+            - generic [ref=f5e314]:
+              - generic [ref=f5e315]: Teto máximo aprovado
+              - generic [ref=f5e316]: 100%
+          - generic [ref=f5e319]:
+            - generic [ref=f5e320]:
+              - generic [ref=f5e321]: Conciliado (par completo)
+              - generic [ref=f5e325]: 96 de 178
+            - generic [ref=f5e326]: R$ 655.341,36
+            - generic [ref=f5e327]:
+              - generic [ref=f5e328]: "Par completo: Comp. BB + NF OK"
+              - generic [ref=f5e329]: 54%
+          - button "Ver 82 lançamentos pendentes" [ref=f5e332]:
+            - generic [ref=f5e333]:
+              - generic [ref=f5e334]: Pendente de comprovação
+              - generic [ref=f5e337]: 82 itens
+            - generic [ref=f5e338]: R$ 242.417,79
+            - generic [ref=f5e339]:
+              - generic [ref=f5e340]: "Executado total: R$ 897.759,15"
+              - generic [ref=f5e341]: 46%
+          - generic [ref=f5e344]:
+            - generic [ref=f5e345]:
+              - generic [ref=f5e346]: Saldo em Conta
+              - generic [ref=f5e350]: Conta não informada
+            - generic [ref=f5e351]: Saldo não informado
+            - generic [ref=f5e352]:
+              - generic [ref=f5e353]: Importe o extrato bancário
+              - generic [ref=f5e354]: Aguardando dados
+        - generic [ref=f5e357]:
+          - generic [ref=f5e358]:
+            - generic [ref=f5e359]: Conciliação do Extrato
+            - generic [ref=f5e360]: 96 de 178 Débitos
+          - paragraph [ref=f5e361]: 82 débito(s) pendente(s) de Nota Fiscal
+          - generic [ref=f5e364]:
+            - generic [ref=f5e365]: 0 Alerta de Glosa
+            - generic [ref=f5e366]: 96 Conciliados
+        - generic [ref=f5e368]:
+          - generic [ref=f5e375]:
+            - generic [ref=f5e376]:
+              - heading "Motores Contábeis & Auditoria em Tempo Real Ativos" [level=3] [ref=f5e377]
+              - generic [ref=f5e378]: TigerBeetle + Splink + Pandera
+            - paragraph [ref=f5e379]: Contabilidade por partidas dobradas, bloqueio de idempotência com chaves determinísticas, linkagem bayesiana e asserções fiscais do MinC/FSA.
+          - button "Abrir Centro de Skills" [ref=f5e381]
+        - generic [ref=f5e385]:
+          - generic [ref=f5e386]:
+            - generic [ref=f5e387]:
+              - generic [ref=f5e388]:
+                - heading "Execução Financeira por Etapa do Plano de Trabalho" [level=2] [ref=f5e389]
+                - paragraph [ref=f5e390]: Orçamento aprovado no SALIC versus valores realizados
+              - button "Ver Rubricas" [ref=f5e391]
+            - generic [ref=f5e395]:
+              - generic [ref=f5e396]:
+                - generic [ref=f5e397]:
+                  - generic [ref=f5e398]: Pré-Produção / Preparação
+                  - generic [ref=f5e399]:
+                    - text: R$ 0,00
+                    - generic [ref=f5e400]: / R$ 0,00
+                - generic [ref=f5e402]:
+                  - generic [ref=f5e403]:
+                    - text: "Saldo Restante:"
+                    - strong [ref=f5e404]: R$ 0,00
+                  - generic [ref=f5e405]: 0% executado
+              - generic [ref=f5e406]:
+                - generic [ref=f5e407]:
+                  - generic [ref=f5e408]: Produção / Execução
+                  - generic [ref=f5e409]:
+                    - text: R$ 0,00
+                    - generic [ref=f5e410]: / R$ 0,00
+                - generic [ref=f5e412]:
+                  - generic [ref=f5e413]:
+                    - text: "Saldo Restante:"
+                    - strong [ref=f5e414]: R$ 0,00
+                  - generic [ref=f5e415]: 0% executado
+              - generic [ref=f5e416]:
+                - generic [ref=f5e417]:
+                  - generic [ref=f5e418]: Divulgação / Comercialização
+                  - generic [ref=f5e419]:
+                    - text: R$ 0,00
+                    - generic [ref=f5e420]: / R$ 0,00
+                - generic [ref=f5e422]:
+                  - generic [ref=f5e423]:
+                    - text: "Saldo Restante:"
+                    - strong [ref=f5e424]: R$ 0,00
+                  - generic [ref=f5e425]: 0% executado
+              - generic [ref=f5e426]:
+                - generic [ref=f5e427]:
+                  - generic [ref=f5e428]: Custos Administrativos
+                  - generic [ref=f5e429]:
+                    - text: R$ 0,00
+                    - generic [ref=f5e430]: / R$ 0,00
+                - generic [ref=f5e432]:
+                  - generic [ref=f5e433]:
+                    - text: "Saldo Restante:"
+                    - strong [ref=f5e434]: R$ 0,00
+                  - generic [ref=f5e435]: 0% executado
+              - generic [ref=f5e436]:
+                - generic [ref=f5e437]:
+                  - generic [ref=f5e438]: Impostos e Recolhimentos
+                  - generic [ref=f5e439]:
+                    - text: R$ 0,00
+                    - generic [ref=f5e440]: / R$ 0,00
+                - generic [ref=f5e442]:
+                  - generic [ref=f5e443]:
+                    - text: "Saldo Restante:"
+                    - strong [ref=f5e444]: R$ 0,00
+                  - generic [ref=f5e445]: 0% executado
+          - generic [ref=f5e446]:
+            - generic [ref=f5e447]:
+              - generic [ref=f5e448]:
+                - generic [ref=f5e454]:
+                  - heading "Auditoria Preventiva MinC" [level=2] [ref=f5e455]
+                  - paragraph [ref=f5e456]: Instrução Normativa MinC nº 01/2023
+                - button "Ver Todas" [ref=f5e457]
+              - generic [ref=f5e461]:
+                - generic [ref=f5e462]:
+                  - generic [ref=f5e463]:
+                    - generic [ref=f5e464]: Passagens Aéreas sem Cartão de Embarque Anexado (8 Lançamentos)
+                    - generic [ref=f5e468]: MEDIA
+                  - paragraph [ref=f5e469]: Identificados 8 lançamentos de compra de bilhetes aéreos (André Manfrin, Luis Cipullo, Thiago Cunha, Frico Guimarães) somando R$ 12.000,00 que exigem a vinculação do comprovante de emissão do bilhete (BP-e/E-Ticket) e respectivo canhoto/cartão de embarque da equipe.
+                  - generic [ref=f5e470]:
+                    - generic [ref=f5e471]: Comprovação Física de Viagem
+                    - button "Resolver / Justificar →" [ref=f5e472]
+                - generic [ref=f5e473]:
+                  - generic [ref=f5e474]:
+                    - generic [ref=f5e475]: Transferências de Verba de Alimentação sem Recibo de Diária Assinado (10 Lançamentos)
+                    - generic [ref=f5e479]: MEDIA
+                  - paragraph [ref=f5e480]: Identificados 10 lançamentos de transferência de verba de alimentação somando R$ 10.800,00 para equipe em trânsito (Ida Leal, Anne Santos, Motorista, André, Frico, Luis, Thiago) pendentes da via assinada do Recibo de Diária/Alimentação.
+                  - generic [ref=f5e481]:
+                    - generic [ref=f5e482]: Comprovação de Diárias / Alimentação
+                    - button "Resolver / Justificar →" [ref=f5e483]
+            - generic [ref=f5e484]:
+              - generic [ref=f5e485]: "Prazo de Envio no SALIC:"
+              - generic [ref=f5e486]: 28/02/2026
+        - generic [ref=f5e487]:
+          - generic [ref=f5e488]:
+            - generic [ref=f5e494]:
+              - generic [ref=f5e495]:
+                - heading "Extrato e Lançamentos Bancários do Projeto" [level=3] [ref=f5e496]
+                - generic [ref=f5e497]: 194 Lançamentos • Conta BB 8768-8
+              - paragraph [ref=f5e498]: Visualize os débitos, créditos e status de conciliação com notas fiscais e rubricas
+            - generic [ref=f5e499]:
+              - button "Conciliação Tripartite" [ref=f5e500]
+              - button "Abrir Tela Completa de Extratos (194)" [ref=f5e506]
+          - generic [ref=f5e510]:
+            - generic [ref=f5e511]:
+              - button "Todos (194)" [ref=f5e512]
+              - button "Conciliados (96)" [ref=f5e513]
+              - button "Débitos (178)" [ref=f5e517]
+              - button "Pendentes (82)" [ref=f5e518]
+            - generic [ref=f5e521]:
+              - combobox "Categoria da despesa" [ref=f5e523]:
+                - option "Categoria da despesa" [selected]
+                - option "Alimentação e diárias (25)"
+                - option "Roteiro e direção (21)"
+                - option "Hospedagem (10)"
+                - option "Passagens aéreas (8)"
+                - option "Produção e equipe (8)"
+                - option "Transporte terrestre (3)"
+                - option "Prestação de contas (3)"
+                - option "Material de consumo (2)"
+                - option "Edição e finalização (2)"
+              - textbox "Buscar por descrição, valor..." [ref=f5e528]
+          - table [ref=f5e530]:
+            - rowgroup [ref=f5e531]:
+              - row [ref=f5e532]:
+                - columnheader "# Nº" [ref=f5e533]
+                - columnheader "Data" [ref=f5e534]
+                - columnheader "Descrição no Extrato BB" [ref=f5e535]
+                - columnheader "Favorecido / Fornecedor (Pessoa + Empresa)" [ref=f5e536]
+                - columnheader "Valor" [ref=f5e537]
+                - columnheader "Rubrica SALIC" [ref=f5e538]
+                - columnheader "Status MinC" [ref=f5e539]
+                - columnheader "Ação" [ref=f5e540]
+            - rowgroup [ref=f5e541]:
+              - row [ref=f5e542]:
+                - cell "#001" [ref=f5e543]
+                - cell "31/10/2022" [ref=f5e544]
+                - 'cell "Doc: TED-BRDE" [ref=f5e545]'
+                - cell "🏛️ Banco do Brasil • FSA / BRDE Conta Captação / Rendimentos" [ref=f5e550]:
+                  - generic [ref=f5e551]:
+                    - generic [ref=f5e552]: 🏛️ Banco do Brasil • FSA / BRDE
+                    - generic [ref=f5e553]: Conta Captação / Rendimentos
+                - cell "+ R$ 835.000,00" [ref=f5e554]
+                - cell "Não vinculada" [ref=f5e555]
+                - cell "Conciliado" [ref=f5e556]
+                - cell [ref=f5e560]:
+                  - button "Conciliar" [ref=f5e561]
+              - row [ref=f5e564]:
+                - cell "#002" [ref=f5e565]
+                - cell "04/11/2022" [ref=f5e566]
+                - 'cell "Doc: DOC-1" [ref=f5e567]'
+                - cell "Mônica Guimarães Circunstância Produções Ltda" [ref=f5e572]:
+                  - generic [ref=f5e573]:
+                    - generic "Mônica Guimarães" [ref=f5e574]
+                    - generic "Circunstância Produções Ltda" [ref=f5e575]
+                - cell "- R$ 11.000,00" [ref=f5e580]
+                - cell "rub-1961-1-5-1 - 1.5.1 - Produtor Executivo Desenvolvimento Outros" [ref=f5e581]:
+                  - generic [ref=f5e582]:
+                    - generic "1.5.1 - Produtor Executivo" [ref=f5e583]: rub-1961-1-5-1 - 1.5.1 - Produtor Executivo
+                    - text: Desenvolvimento
+                  - generic [ref=f5e584]: Outros
+                - cell "CONCILIADO" [ref=f5e586]
+                - cell [ref=f5e591]:
+                  - button "Conciliar" [ref=f5e592]
+              - row [ref=f5e595]:
+                - cell "#003" [ref=f5e596]
+                - cell "04/11/2022" [ref=f5e597]
+                - 'cell "Doc: DOC-2" [ref=f5e598]'
+                - cell "Amir Labaki Circunstância Produções Ltda" [ref=f5e603]:
+                  - generic [ref=f5e604]:
+                    - generic "Amir Labaki" [ref=f5e605]
+                    - generic "Circunstância Produções Ltda" [ref=f5e606]
+                - cell "- R$ 30.000,00" [ref=f5e611]
+                - cell "rub-1961-1-1-1 - 1.1.1 - Roteirista Desenvolvimento Outros" [ref=f5e612]:
+                  - generic [ref=f5e613]:
+                    - generic "1.1.1 - Roteirista" [ref=f5e614]: rub-1961-1-1-1 - 1.1.1 - Roteirista
+                    - text: Desenvolvimento
+                  - generic [ref=f5e615]: Outros
+                - cell "CONCILIADO" [ref=f5e617]
+                - cell [ref=f5e622]:
+                  - button "Conciliar" [ref=f5e623]
+              - row [ref=f5e626]:
+                - cell "#004" [ref=f5e627]
+                - cell "04/11/2022" [ref=f5e628]
+                - 'cell "Doc: DOC-3" [ref=f5e629]'
+                - cell "Amir Labaki Circunstância Produções Ltda" [ref=f5e634]:
+                  - generic [ref=f5e635]:
+                    - generic "Amir Labaki" [ref=f5e636]
+                    - generic "Circunstância Produções Ltda" [ref=f5e637]
+                - cell "- R$ 20.000,00" [ref=f5e642]
+                - cell "rub-1961-1-4 - 1.4 - Diretor Desenvolvimento Roteiro e direção" [ref=f5e643]:
+                  - generic [ref=f5e644]:
+                    - generic "1.4 - Diretor" [ref=f5e645]: rub-1961-1-4 - 1.4 - Diretor
+                    - text: Desenvolvimento
+                  - generic [ref=f5e646]: Roteiro e direção
+                - cell "CONCILIADO" [ref=f5e648]
+                - cell [ref=f5e653]:
+                  - button "Conciliar" [ref=f5e654]
+              - row [ref=f5e657]:
+                - cell "#005" [ref=f5e658]
+                - cell "04/11/2022" [ref=f5e659]
+                - 'cell "Doc: DOC-4" [ref=f5e660]'
+                - cell "Amir Labaki Circunstância Produções Ltda" [ref=f5e665]:
+                  - generic [ref=f5e666]:
+                    - generic "Amir Labaki" [ref=f5e667]
+                    - generic "Circunstância Produções Ltda" [ref=f5e668]
+                - cell "- R$ 5.000,00" [ref=f5e673]
+                - cell "rub-1961-1-2-1 - 1.2.1 - obras pré existentes (obra literária) Desenvolvimento Outros" [ref=f5e674]:
+                  - generic [ref=f5e675]:
+                    - generic "1.2.1 - obras pré existentes (obra literária)" [ref=f5e676]: rub-1961-1-2-1 - 1.2.1 - obras pré existentes (obra literária)
+                    - text: Desenvolvimento
+                  - generic [ref=f5e677]: Outros
+                - cell "CONCILIADO" [ref=f5e679]
+                - cell [ref=f5e684]:
+                  - button "Conciliar" [ref=f5e685]
+              - row [ref=f5e688]:
+                - cell "#006" [ref=f5e689]
+                - cell "10/11/2022" [ref=f5e690]
+                - 'cell "Doc: DOC-5" [ref=f5e691]'
+                - cell "Felipe Frico Guimarães Circunstância Produções / Produção Local" [ref=f5e696]:
+                  - generic [ref=f5e697]:
+                    - generic "Felipe Frico Guimarães" [ref=f5e698]
+                    - generic "Circunstância Produções / Produção Local" [ref=f5e699]
+                - cell "- R$ 1.200,00" [ref=f5e704]
+                - cell "rub-1961-3-5 - 3.5 - Diretor de fotografia Produção e Filmagem Roteiro e direção" [ref=f5e705]:
+                  - generic [ref=f5e706]:
+                    - generic "3.5 - Diretor de fotografia" [ref=f5e707]: rub-1961-3-5 - 3.5 - Diretor de fotografia
+                    - text: Produção e Filmagem
+                  - generic [ref=f5e708]: Roteiro e direção
+                - cell "CONCILIADO" [ref=f5e710]
+                - cell [ref=f5e715]:
+                  - button "Conciliar" [ref=f5e716]
+              - row [ref=f5e719]:
+                - cell "#007" [ref=f5e720]
+                - cell "10/11/2022" [ref=f5e721]
+                - 'cell "Doc: DOC-6" [ref=f5e722]'
+                - cell "Luis Felipe Labaki Labaki Cinema & Pesquisa" [ref=f5e727]:
+                  - generic [ref=f5e728]:
+                    - generic "Luis Felipe Labaki" [ref=f5e729]
+                    - generic "Labaki Cinema & Pesquisa" [ref=f5e730]
+                - cell "- R$ 1.200,00" [ref=f5e735]
+                - cell "rub-1961-2-4-1 - 2.4.1 - Som direto (tech scout) Pré- produção Outros" [ref=f5e736]:
+                  - generic [ref=f5e737]:
+                    - generic "2.4.1 - Som direto (tech scout)" [ref=f5e738]: rub-1961-2-4-1 - 2.4.1 - Som direto (tech scout)
+                    - text: Pré- produção
+                  - generic [ref=f5e739]: Outros
+                - cell "CONCILIADO" [ref=f5e741]
+                - cell [ref=f5e746]:
+                  - button "Conciliar" [ref=f5e747]
+              - row [ref=f5e750]:
+                - cell "#008" [ref=f5e751]
+                - cell "21/11/2022" [ref=f5e752]
+                - 'cell "Doc: DOC-7" [ref=f5e753]'
+                - cell "Luis Felipe Cipullo Cipullo Filmes & Produções" [ref=f5e758]:
+                  - generic [ref=f5e759]:
+                    - generic "Luis Felipe Cipullo" [ref=f5e760]
+                    - generic "Cipullo Filmes & Produções" [ref=f5e761]
+                - cell "- R$ 800,00" [ref=f5e766]
+                - cell "rub-1961-3-6-2 - 3.6.2 - Assistente de câmera (fotografia) Produção e Filmagem Outros" [ref=f5e767]:
+                  - generic [ref=f5e768]:
+                    - generic "3.6.2 - Assistente de câmera (fotografia)" [ref=f5e769]: rub-1961-3-6-2 - 3.6.2 - Assistente de câmera (fotografia)
+                    - text: Produção e Filmagem
+                  - generic [ref=f5e770]: Outros
+                - cell "CONCILIADO" [ref=f5e772]
+                - cell [ref=f5e777]:
+                  - button "Conciliar" [ref=f5e778]
+              - row [ref=f5e781]:
+                - cell "#009" [ref=f5e782]
+                - cell "28/11/2022" [ref=f5e783]
+                - 'cell "Doc: DOC-8" [ref=f5e784]'
+                - cell "Amir Labaki Circunstância Produções Ltda" [ref=f5e789]:
+                  - generic [ref=f5e790]:
+                    - generic "Amir Labaki" [ref=f5e791]
+                    - generic "Circunstância Produções Ltda" [ref=f5e792]
+                - cell "- R$ 20.000,00" [ref=f5e797]
+                - cell "rub-1961-1-4 - 1.4 - Diretor Desenvolvimento Roteiro e direção" [ref=f5e798]:
+                  - generic [ref=f5e799]:
+                    - generic "1.4 - Diretor" [ref=f5e800]: rub-1961-1-4 - 1.4 - Diretor
+                    - text: Desenvolvimento
+                  - generic [ref=f5e801]: Roteiro e direção
+                - cell "PENDENTE" [ref=f5e803]
+                - cell [ref=f5e807]:
+                  - button "Conciliar" [ref=f5e808]
+              - row [ref=f5e811]:
+                - cell "#010" [ref=f5e812]
+                - cell "12/12/2022" [ref=f5e813]
+                - 'cell "Doc: DOC-9" [ref=f5e814]'
+                - cell "Amir Labaki Circunstância Produções Ltda" [ref=f5e819]:
+                  - generic [ref=f5e820]:
+                    - generic "Amir Labaki" [ref=f5e821]
+                    - generic "Circunstância Produções Ltda" [ref=f5e822]
+                - cell "- R$ 30.000,00" [ref=f5e827]
+                - cell "rub-1961-1-4 - 1.4 - Diretor Desenvolvimento Roteiro e direção" [ref=f5e828]:
+                  - generic [ref=f5e829]:
+                    - generic "1.4 - Diretor" [ref=f5e830]: rub-1961-1-4 - 1.4 - Diretor
+                    - text: Desenvolvimento
+                  - generic [ref=f5e831]: Roteiro e direção
+                - cell "CONCILIADO" [ref=f5e833]
+                - cell [ref=f5e838]:
+                  - button "Conciliar" [ref=f5e839]
+          - generic [ref=f5e842]:
+            - generic [ref=f5e843]:
+              - text: Exibindo
+              - strong [ref=f5e844]: "10"
+              - text: de
+              - strong [ref=f5e845]: "194"
+              - text: "lançamentos filtrados (Total no projeto:"
+              - strong [ref=f5e846]: "194"
+              - text: )
+            - generic [ref=f5e847]:
+              - button "Mostrar todos os 194" [ref=f5e848]
+              - button "Abrir tela completa de Extrato e Conciliação Bancária →" [ref=f5e849]
+  - navigation "Navegação rápida" [ref=f5e850]:
+    - button "Painel" [ref=f5e851]
+    - button "Tripartite" [ref=f5e858]
+    - button "Extrato BB" [ref=f5e865]
+    - button "Auditoria" [ref=f5e870]
+    - button "Mais" [ref=f5e876]

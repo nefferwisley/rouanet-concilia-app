@@ -16,6 +16,7 @@ const AlertasPage = lazy(() => import("./pages/AlertasPage").then(m => ({ defaul
 const AgendaPage = lazy(() => import("./pages/AgendaPage").then(m => ({ default: m.AgendaPage })));
 const DocumentosPage = lazy(() => import("./pages/DocumentosPage").then(m => ({ default: m.DocumentosPage })));
 const UsuariosPage = lazy(() => import("./pages/UsuariosPage").then(m => ({ default: m.UsuariosPage })));
+const ConfiguracoesPage = lazy(() => import("./pages/ConfiguracoesPage").then(m => ({ default: m.ConfiguracoesPage })));
 
 const ImportacaoDetalhes = lazy(() => import("./pages/ImportacaoDetalhes").then(m => ({ default: m.ImportacaoDetalhes })));
 const LoginPage = lazy(() => import("./pages/LoginPage").then(m => ({ default: m.LoginPage })));
@@ -74,6 +75,7 @@ function MainLayout() {
               <Route path="/alertas" element={<ProtectedRoute><AlertasPage /></ProtectedRoute>} />
               <Route path="/agenda" element={<ProtectedRoute><AgendaPage /></ProtectedRoute>} />
               <Route path="/usuarios" element={<ProtectedRoute><UsuariosPage /></ProtectedRoute>} />
+              <Route path="/configuracoes" element={<ProtectedRoute><ConfiguracoesPage /></ProtectedRoute>} />
 
                             <Route path="/importacao/:id" element={<ProtectedRoute><ImportacaoDetalhes /></ProtectedRoute>} />
               <Route path="/relatorio/:id" element={<ProtectedRoute><RelatorioPage /></ProtectedRoute>} />

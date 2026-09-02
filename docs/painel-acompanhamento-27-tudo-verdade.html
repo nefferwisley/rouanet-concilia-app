@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel de acompanhamento — 27º É Tudo Verdade</title>
+  <style>
+    :root { --bg:#07111f; --card:#101d31; --line:#23354e; --text:#edf4ff; --muted:#9db0c8; --ok:#23c998; --warn:#ffba3b; --bad:#ef6b73; --info:#48b8ff; }
+    * { box-sizing:border-box; } body { margin:0; min-width:320px; font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif; color:var(--text); background:linear-gradient(130deg,#07111f,#0a1728 58%,#07111f); }
+    main { max-width:1180px; margin:auto; padding:34px 22px 60px; } h1 { font-size:clamp(1.55rem,3vw,2.25rem); margin:6px 0; } h2 { font-size:1.05rem; margin:0 0 15px; } .eyebrow { color:var(--info); font-weight:700; letter-spacing:.08em; font-size:.73rem; text-transform:uppercase; } .lead { color:var(--muted); max-width:820px; margin:0 0 25px; }
+    .banner { display:flex; gap:12px; align-items:flex-start; border:1px solid #805d1f; background:#2a2112; padding:14px 16px; border-radius:12px; margin:18px 0 25px; } .banner strong { color:#ffd26a; }
+    .grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:13px; } .card { border:1px solid var(--line); background:rgba(16,29,49,.9); border-radius:14px; padding:16px; box-shadow:0 12px 30px rgba(0,0,0,.14); } .metric { font-size:1.65rem; font-weight:800; margin:4px 0; } .muted { color:var(--muted); font-size:.82rem; } .good { color:var(--ok); } .warning { color:var(--warn); } .bad { color:var(--bad); } .info { color:var(--info); }
+    .layout { display:grid; grid-template-columns:1.1fr .9fr; gap:16px; margin-top:16px; } .barrow { display:grid; grid-template-columns:165px 1fr 72px; gap:10px; align-items:center; margin:13px 0; font-size:.84rem; } .bar { height:11px; border-radius:99px; overflow:hidden; background:#1d2d45; } .fill { height:100%; border-radius:99px; } .fill.ok { background:var(--ok); } .fill.warn { background:var(--warn); } .fill.info { background:var(--info); }
+    table { width:100%; border-collapse:collapse; font-size:.84rem; } th,td { border-bottom:1px solid var(--line); padding:11px 9px; text-align:left; vertical-align:top; } th { color:var(--muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; } .tag { display:inline-block; padding:3px 8px; border-radius:99px; font-size:.72rem; font-weight:700; white-space:nowrap; } .tag.ok { color:#052b20; background:var(--ok); } .tag.warn { color:#382400; background:var(--warn); } .tag.bad { color:#fff; background:#b63644; } .tag.info { color:#002b45; background:var(--info); }
+    .steps { margin-top:16px; } .step { display:grid; grid-template-columns:34px 1fr auto; gap:12px; align-items:center; padding:13px 0; border-bottom:1px solid var(--line); } .num { width:28px; height:28px; display:grid; place-items:center; border-radius:50%; background:#1b2d47; color:var(--info); font-weight:800; } .step p { margin:2px 0 0; color:var(--muted); font-size:.8rem; } footer { color:var(--muted); font-size:.78rem; margin-top:22px; }
+    @media (max-width:820px) { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .layout { grid-template-columns:1fr; } .barrow { grid-template-columns:125px 1fr 60px; } }
+    @media (max-width:430px) { main { padding:24px 14px; } .grid { grid-template-columns:1fr 1fr; } .metric { font-size:1.32rem; } .barrow { grid-template-columns:1fr; gap:4px; } .step { grid-template-columns:30px 1fr; } .step .tag { grid-column:2; justify-self:start; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">Concilia Rouanet · acompanhamento de validação</div>
+    <h1>27º É Tudo Verdade</h1>
+    <p class="lead">PRONAC 21.1623 · Dados exibidos apenas quando comprovados pela pasta enviada. Atualizado em 02/09/2026.</p>
+
+    <div class="banner"><span aria-hidden="true">⚠</span><div><strong>Bloqueio externo atual:</strong> o site publicado respondeu HTTP 503 durante a jornada no navegador. A validação visual em produção fica pendente até o serviço voltar; o painel separa esse bloqueio das correções de dados.</div></div>
+
+    <section class="grid" aria-label="Resumo da pasta">
+      <div class="card"><div class="muted">Arquivos comprovados</div><div class="metric good">102</div><div class="muted">1 planilha + 101 PDFs</div></div>
+      <div class="card"><div class="muted">Rubricas</div><div class="metric good">25</div><div class="muted">extraídas da planilha</div></div>
+      <div class="card"><div class="muted">Saídas na planilha</div><div class="metric good">101</div><div class="muted">R$ 671.377,08</div></div>
+      <div class="card"><div class="muted">Extrato bancário</div><div class="metric warning">Ausente</div><div class="muted">OFX/CSV não enviado</div></div>
+    </section>
+
+    <section class="layout">
+      <div class="card">
+        <h2>O que a pasta permite afirmar</h2>
+        <div class="barrow"><span>Planilha de execução</span><div class="bar"><div class="fill ok" style="width:100%"></div></div><strong class="good">100%</strong></div>
+        <div class="barrow"><span>Documentos de pagamento</span><div class="bar"><div class="fill ok" style="width:100%"></div></div><strong class="good">101 PDFs</strong></div>
+        <div class="barrow"><span>Rubricas</span><div class="bar"><div class="fill ok" style="width:100%"></div></div><strong class="good">25</strong></div>
+        <div class="barrow"><span>Movimentação da planilha</span><div class="bar"><div class="fill info" style="width:100%"></div></div><strong class="info">101 + 5</strong></div>
+        <div class="barrow"><span>Conciliação bancária definitiva</span><div class="bar"><div class="fill warn" style="width:0%"></div></div><strong class="warning">OFX pendente</strong></div>
+        <p class="muted">As barras representam disponibilidade de evidência, não “percentual de aprovação”. Sem OFX/CSV, não há base para certificar saldo ou comprovante bancário.</p>
+      </div>
+      <div class="card">
+        <h2>Semáforo da correção</h2>
+        <table aria-label="Status das frentes de correção"><thead><tr><th>Frente</th><th>Status</th></tr></thead><tbody>
+          <tr><td>Base factual da pasta</td><td><span class="tag ok">COMPROVADA</span></td></tr>
+          <tr><td>Rótulos falsos de NF/Comprovante</td><td><span class="tag info">EM CORREÇÃO</span></td></tr>
+          <tr><td>Valores financeiros fictícios</td><td><span class="tag info">EM CORREÇÃO</span></td></tr>
+          <tr><td>Importação e persistência</td><td><span class="tag warn">A VALIDAR</span></td></tr>
+          <tr><td>Jornada em produção</td><td><span class="tag bad">BLOQUEADA 503</span></td></tr>
+        </tbody></table>
+      </div>
+    </section>
+
+    <section class="card steps">
+      <h2>Roteiro de acompanhamento</h2>
+      <div class="step"><span class="num">1</span><div><strong>Corrigir a semântica dos dados</strong><p>Ausência de extrato deve mostrar “Aguardando OFX/CSV”, nunca “Falta NF” automaticamente.</p></div><span class="tag info">EM ANDAMENTO</span></div>
+      <div class="step"><span class="num">2</span><div><strong>Remover dados demonstrativos e valores de fallback</strong><p>Nenhum total ou aporte pode aparecer se não houver fonte no projeto importado.</p></div><span class="tag info">EM ANDAMENTO</span></div>
+      <div class="step"><span class="num">3</span><div><strong>Importar a pasta real em ambiente limpo</strong><p>Conferir 25 rubricas, 101 PDFs, 101 saídas, 5 entradas e saldo de planilha R$ 0,00.</p></div><span class="tag warn">PENDENTE</span></div>
+      <div class="step"><span class="num">4</span><div><strong>Recarregar e criar um novo projeto</strong><p>Validar persistência sem que o projeto suma nem que dados mock reapareçam.</p></div><span class="tag warn">PENDENTE</span></div>
+      <div class="step"><span class="num">5</span><div><strong>Jornada nas 13 abas</strong><p>Capturar evidência visual de cada aba e corrigir em loop os desvios encontrados.</p></div><span class="tag bad">AGUARDA SITE</span></div>
+    </section>
+    <footer>Fonte: leitura local da pasta do projeto e inspeção do código. A ausência comprovada é o extrato OFX/CSV; documentos fiscais não podem ser marcados ausentes apenas porque o extrato não foi anexado.</footer>
+  </main>
+</body>
+</html>

@@ -45,6 +45,9 @@ agency-agents/
 # Local Netlify folder
 .netlify
 
+# Ambiente local sem Docker (banco e logs gerados)
+.local/
+
 # Testes temporários e outputs
 .tmp_pytest_*
 .opencode/

@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
@@ -85,8 +85,8 @@ app.add_middleware(
     # atualizar CORS_ORIGINS no Render (foi o que quebrou o carregamento
     # dos lanÃ§amentos em produÃ§Ã£o).
     allow_origin_regex=r"https://([a-z0-9-]+\.)?rouanet-concilia\.pages\.dev",
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Requested-With"],
 )
 
 
@@ -106,8 +106,8 @@ app.include_router(salic.router)
 app.include_router(organizacao.router)
 app.include_router(regularizacao.router)
 app.include_router(orquestrador.router)
-# Login de demonstraÃ§Ã£o SEM autenticaÃ§Ã£o (rota /api/v1/dev/demo-login).
-app.include_router(dev_demo.router)
+# Rotas de demonstração sem autenticação são registradas apenas em desenvolvimento/teste.
+dev_demo.registrar_rota_demo(app)
 
 
 @app.exception_handler(HTTPException)
@@ -147,6 +147,6 @@ async def health_db():
         log.exception("health/db: banco inacessÃ­vel")
         return JSONResponse(
             status_code=503,
-            content={"status": "erro", "db": "inacessÃ­vel", "detalhe": str(e)},
+            content={"status": "erro", "db": "inacessÃ­vel"},
         )
     return {"status": "ok", "db": "reachable"}

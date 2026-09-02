@@ -237,7 +237,13 @@ async def iniciar_importacao_autonoma(
             p = Path(root) / f
             if f.startswith(".") or f.startswith("__MACOSX"):
                 continue
-            if p.suffix.lower() in [".pdf", ".png", ".jpg", ".jpeg"]:
+            # A pasta do projeto é a fonte completa da importação. Além dos
+            # comprovantes, inclui a planilha-base e arquivos estruturados para
+            # que rubricas, extratos e notas fiscais não sejam ignorados.
+            if p.suffix.lower() in [
+                ".pdf", ".png", ".jpg", ".jpeg",
+                ".csv", ".xlsx", ".xls", ".xml", ".ofx",
+            ]:
                 b = p.read_bytes()
                 rel_path = os.path.relpath(str(p), str(pasta_local))
                 comprovantes_dados.append((rel_path, b))

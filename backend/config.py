@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     # Backend de leitura automática de documentos (P4): "" (auto: Gemini se
     # houver chave, Ollama local caso contrário), "gemini" ou "ollama".
     ocr_backend: str = ""
-    cors_origins: str = "*"
+    cors_origins: str = "http://localhost:5173"
     max_upload_mb: int = 10
 
     class Config:

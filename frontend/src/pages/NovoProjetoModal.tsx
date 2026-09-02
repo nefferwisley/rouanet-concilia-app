@@ -2,11 +2,13 @@ import { useRef, useState } from "react";
 
 import { useAPI } from "../hooks/useAPI";
 import { SalicConsulta } from "../components/SalicConsulta";
+import { obterRegrasPlataforma } from "../lib/regrasPlataforma";
 
 type FonteDados = "pasta" | "drive";
 
 export function NovoProjetoModal({ onClose, onCriado }: { onClose: () => void; onCriado: () => void }) {
   const api = useAPI();
+  const regras = obterRegrasPlataforma();
   const [form, setForm] = useState({
     pronac: "", nome: "", proponente: "", banco_nome: "", agencia: "", conta: "",
   });
@@ -21,8 +23,12 @@ export function NovoProjetoModal({ onClose, onCriado }: { onClose: () => void; o
     setForm((f) => ({ ...f, [campo]: e.target.value }));
 
   async function salvar() {
-    if (!form.pronac || !form.nome) {
-      setErro("PRONAC e Nome são obrigatórios.");
+    if ((!form.pronac && regras.identificadorObrigatorio) || !form.nome) {
+      setErro(`${regras.rotuloIdentificador} e Nome são obrigatórios.`);
+      return;
+    }
+    if (form.pronac && !new RegExp(regras.formatoIdentificador).test(form.pronac)) {
+      setErro(`${regras.rotuloIdentificador} não segue o formato configurado.`);
       return;
     }
     if (fonte === "pasta" && arquivos.length === 0) {
@@ -64,9 +70,9 @@ export function NovoProjetoModal({ onClose, onCriado }: { onClose: () => void; o
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="card w-full max-w-md space-y-3 max-h-[90vh] overflow-y-auto">
         <h2 className="text-lg font-bold">Novo Projeto</h2>
-        <input className="input" placeholder="PRONAC *" value={form.pronac} onChange={set("pronac")} />
+        <input className="input" placeholder={`${regras.rotuloIdentificador}${regras.identificadorObrigatorio ? " *" : ""}`} value={form.pronac} onChange={set("pronac")} />
 
-        <SalicConsulta
+        {regras.consultaSalicAtiva && <SalicConsulta
           pronacInicial={form.pronac}
           onProjetoEncontrado={(p) =>
             setForm((f) => ({
@@ -76,7 +82,7 @@ export function NovoProjetoModal({ onClose, onCriado }: { onClose: () => void; o
               proponente: p.proponente || f.proponente,
             }))
           }
-        />
+        />}
 
         <input className="input" placeholder="Nome do Projeto *" value={form.nome} onChange={set("nome")} />
         <input className="input" placeholder="Proponente" value={form.proponente} onChange={set("proponente")} />
