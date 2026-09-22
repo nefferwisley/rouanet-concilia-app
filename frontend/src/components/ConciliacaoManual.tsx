@@ -77,6 +77,7 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
   const [filtroStatus, setFiltroStatus] = useState("TODOS");
   const [busca, setBusca] = useState("");
   const [importando, setImportando] = useState(false);
+  const [arquivoExtrato, setArquivoExtrato] = useState<File | null>(null);
   const [mensagemImportacao, setMensagemImportacao] = useState<string | null>(null);
 
   // States para upload e processamento de documentos
@@ -166,14 +167,18 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
   };
 
   const importarExtrato = async () => {
+    if (!arquivoExtrato) return;
     setImportando(true);
     setMensagemImportacao(null);
     try {
-      const resp = await postForm<{ importados: number }>(
+      const form = new FormData();
+      form.append("arquivo", arquivoExtrato);
+      const resp = await postForm<{ importados: number; ja_existentes: number }>(
         `/api/v1/projetos/${projetoId}/extrato/importar`,
-        new FormData()
+        form
       );
-      setMensagemImportacao(`${resp.importados} movimento(s) importado(s) do extrato.`);
+      setMensagemImportacao(`${resp.importados} movimento(s) importado(s); ${resp.ja_existentes} já existente(s).`);
+      setArquivoExtrato(null);
       await carregar();
     } catch (e) {
       setMensagemImportacao(e instanceof Error ? `Falha: ${e.message}` : "Falha ao importar extrato.");
@@ -233,7 +238,17 @@ export function ConciliacaoManual({ projetoId }: { projetoId: string }) {
             <button className="btn-secondary text-xs" onClick={carregar}>
               🔄 Atualizar
             </button>
-            <button className="btn-primary text-xs" disabled={importando} onClick={importarExtrato}>
+            <label className="text-xs text-slate-300">
+              Extrato PDF
+              <input
+                type="file"
+                accept=".pdf,application/pdf"
+                className="input text-xs ml-2 max-w-52"
+                onChange={(e) => setArquivoExtrato(e.target.files?.[0] ?? null)}
+                disabled={importando}
+              />
+            </label>
+            <button className="btn-primary text-xs" disabled={importando || !arquivoExtrato} onClick={importarExtrato}>
               {importando ? "Importando…" : "📥 Importar extrato"}
             </button>
           </div>

@@ -4,15 +4,12 @@
  * (POST /api/v1/conciliar), faz polling do status e serve os downloads
  * de planilha, pasta zipada e relatório.
  *
- * Fonte dos documentos (ao menos uma):
- *   - ZIP com a estrutura da pasta (1. Pagamentos/, 3. Extratos/...)
- *   - caminho de pasta local no servidor (form 'pasta')
- *   - link de pasta do Google Drive (form 'drive_link')
- * Se nada for informado, o backend usa a pasta padrão local (dev).
+ * Fonte dos documentos: ZIP enviado pelo usuário com a estrutura
+ * da pasta (1. Pagamentos/, 3. Extratos/...).
  */
 
 import { useEffect, useRef, useState } from "react";
-import { Archive, CheckCircle2, Download, FileSpreadsheet, FileText, FolderInput, Link, LoaderCircle, Play, UploadCloud } from "lucide-react";
+import { Archive, CheckCircle2, Download, FileSpreadsheet, FileText, FolderInput, LoaderCircle, Play, UploadCloud } from "lucide-react";
 
 import { useAPI } from "../hooks/useAPI";
 
@@ -51,8 +48,6 @@ const ARTEFATOS = [
 export function ConciliacaoPage() {
   const api = useAPI();
   const [zip, setZip] = useState<File | null>(null);
-  const [pasta, setPasta] = useState("");
-  const [driveLink, setDriveLink] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [status, setStatus] = useState<ConciliacaoStatus | null>(null);
@@ -82,14 +77,13 @@ export function ConciliacaoPage() {
   }, [pollId]);
 
   async function iniciar() {
+    if (!zip) { setErro("Selecione um arquivo ZIP para conciliar."); return; }
     setErro(null);
     setStatus(null);
     setEnviando(true);
     try {
       const form = new FormData();
-      if (zip) form.append("zip_1961", zip);
-      if (pasta.trim()) form.append("pasta", pasta.trim());
-      if (driveLink.trim()) form.append("drive_link", driveLink.trim());
+      form.append("zip_1961", zip);
 
       const resp = await api.postForm<IniciarResponse>("/api/v1/conciliar", form);
       setPollId(resp.conciliacao_id);
@@ -132,13 +126,13 @@ export function ConciliacaoPage() {
       <section aria-label="Iniciar conciliação" className="dashboard-panel space-y-5">
         <div>
           <h3 className="text-base font-bold text-slate-900 dark:text-white">Fonte dos documentos</h3>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Informe uma fonte ou deixe todos os campos vazios para usar a pasta padrão local.</p>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Envie um arquivo ZIP com os comprovantes e extratos.</p>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4">
           <div className="rounded-xl border border-dashed border-slate-200 p-4 dark:border-navy-600">
           <label htmlFor="zip-conciliacao" className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
             <UploadCloud className="h-4 w-4 text-teal-600" aria-hidden="true" />
-            ZIP com a pasta dos documentos (1. Pagamentos / 3. Extratos) — opcional
+            ZIP com a pasta dos documentos (1. Pagamentos / 3. Extratos) *
           </label>
           <input
             id="zip-conciliacao"
@@ -149,35 +143,8 @@ export function ConciliacaoPage() {
           />
           </div>
 
-          <div className="rounded-xl border border-slate-200 p-4 dark:border-navy-700">
-          <label htmlFor="pasta-conciliacao" className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-            <FolderInput className="h-4 w-4 text-blue-600" aria-hidden="true" />
-            Pasta local no servidor (ex: "3. 1961") — opcional
-          </label>
-          <input
-            id="pasta-conciliacao"
-            className="input"
-            placeholder="Caminho relativo à raiz do projeto ou absoluto"
-            value={pasta}
-            onChange={(e) => setPasta(e.target.value)}
-          />
-          </div>
-
-          <div className="rounded-xl border border-slate-200 p-4 dark:border-navy-700">
-          <label htmlFor="drive-conciliacao" className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200"><Link className="h-4 w-4 text-violet-600" aria-hidden="true" />Link do Google Drive — opcional</label>
-          <input
-            id="drive-conciliacao"
-            className="input"
-            placeholder="https://drive.google.com/drive/folders/..."
-            value={driveLink}
-            onChange={(e) => setDriveLink(e.target.value)}
-          />
-          </div>
         </div>
 
-        <p className="text-xs text-slate-400">
-          Sem nenhuma das três fontes, o backend usa a pasta padrão local (PASTA_1961).
-        </p>
 
         {erro && <p className="text-sm text-red-600">{erro}</p>}
 
@@ -185,7 +152,7 @@ export function ConciliacaoPage() {
           <button
             className="btn-primary interactive-focus inline-flex items-center gap-2"
             onClick={iniciar}
-            disabled={enviando || emAndamento}
+            disabled={!zip || enviando || emAndamento}
           >
             {enviando || emAndamento ? <><LoaderCircle className="h-4 w-4 animate-spin" />Conciliando...</> : <><Play className="h-4 w-4" />Conciliar Pasta 1961</>}
           </button>

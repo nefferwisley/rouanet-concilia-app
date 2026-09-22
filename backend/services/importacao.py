@@ -38,7 +38,7 @@ def _atualizar(importacao_id: str, **campos):
             sets.append(f"{k} = %s")
             valores.append(v)
     valores.append(importacao_id)
-    logger.info("bg update importacoes %s: %s | db=%s", importacao_id, list(campos), settings.database_url)
+    logger.info("bg update importacoes %s: %s", importacao_id, list(campos))
     # A linha `importacoes` é inserida dentro da transação do request (get_conn),
     # que só encerra DEPOIS que a background task começa. Pra não perder o
     # primeiro UPDATE por linha ainda não visível, retenta até enxergar a

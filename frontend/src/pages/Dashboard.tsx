@@ -215,7 +215,7 @@ export function Dashboard() {
     for (const transacao of dados?.transacoes ?? []) {
       if (!transacao.data_pagamento) continue;
       const indice = new Date(`${transacao.data_pagamento}T00:00:00`).getMonth();
-      if (indice < 0 || indice > 11) continue;
+      if (!Number.isInteger(indice) || indice < 0 || indice > 11) continue;
       base[indice].despesas += Number(transacao.valor_bruto ?? 0) || 0;
       if (transacao.conciliado_ok) base[indice].conciliadas += 1;
       else base[indice].pendentes += 1;

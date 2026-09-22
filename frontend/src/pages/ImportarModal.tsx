@@ -10,7 +10,7 @@ export function ImportarModal({
   const api = useAPI();
   const navigate = useNavigate();
   const [projetoId, setProjetoId] = useState(() => projetos[0]?.id || "");
-  const [tipoImportacao, setTipoImportacao] = useState<"documentos" | "planilha">("documentos");
+  const [tipoImportacao, setTipoImportacao] = useState<"documentos" | "extrato" | "planilha">("documentos");
 
   // Fontes de comprovantes
   const [fonteComprovantes, setFonteComprovantes] = useState<"pasta" | "arquivos" | "zip">("pasta");
@@ -114,6 +114,28 @@ export function ImportarModal({
         setProgresso(null);
         setErro(e instanceof Error ? e.message : "Erro ao iniciar importação de documentos.");
       }
+    } else if (tipoImportacao === "extrato") {
+      if (!extratoArquivo) {
+        setErro("Selecione o PDF do extrato bancário.");
+        return;
+      }
+      setEnviando(true);
+      setErro(null);
+      try {
+        const form = new FormData();
+        form.append("arquivo", extratoArquivo);
+        await api.postForm(`/api/v1/projetos/${projetoId}/extrato/importar`, form);
+        if (onImported) {
+          onImported();
+        } else {
+          onClose();
+          navigate(0);
+        }
+      } catch (e) {
+        setErro(e instanceof Error ? e.message : "Erro ao importar extrato.");
+      } finally {
+        setEnviando(false);
+      }
     } else {
       if (!arquivo || !configYaml) {
         setErro("Arquivo JSON e config.yaml são obrigatórios.");
@@ -165,6 +187,18 @@ export function ImportarModal({
             disabled={enviando}
           >
             📂 Por Documentos (Recomendado)
+          </button>
+          <button
+            type="button"
+            className={`flex-1 pb-2 text-sm font-semibold border-b-2 transition-all ${
+              tipoImportacao === "extrato"
+                ? "border-blue-500 text-blue-400 font-bold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+            onClick={() => !enviando && setTipoImportacao("extrato")}
+            disabled={enviando}
+          >
+            🏦 Só Extrato
           </button>
           <button
             type="button"
@@ -298,6 +332,21 @@ export function ImportarModal({
               )}
             </div>
           </div>
+        ) : tipoImportacao === "extrato" ? (
+          <div className="space-y-3">
+            <p className="text-xs text-slate-300">Envie um extrato PDF do Banco do Brasil para este projeto. Movimentos já cadastrados e conciliações existentes são preservados.</p>
+            <div>
+              <label htmlFor="arquivo-extrato-projeto" className="text-xs text-slate-400 block mb-1">Extrato bancário em PDF *</label>
+              <input
+                id="arquivo-extrato-projeto"
+                type="file"
+                accept=".pdf,application/pdf"
+                className="text-sm text-slate-300 w-full bg-slate-950 border border-slate-800 rounded-lg p-2"
+                onChange={(e) => setExtratoArquivo(e.target.files?.[0] ?? null)}
+                disabled={enviando}
+              />
+            </div>
+          </div>
         ) : (
           <div className="space-y-3">
             <div>
@@ -344,7 +393,7 @@ export function ImportarModal({
         )}
 
         {/* Chave Gemini */}
-        <div>
+        {tipoImportacao !== "extrato" && <div>
           <label className="text-xs text-slate-400 block mb-1">API Key Gemini (opcional, ativa OCR inteligente)</label>
           <input
             type="password"
@@ -354,7 +403,7 @@ export function ImportarModal({
             onChange={(e) => setApiKeyGemini(e.target.value)}
             disabled={enviando}
           />
-        </div>
+        </div>}
 
         {/* Barra de Progresso Real-time */}
         {enviando && progresso !== null && (

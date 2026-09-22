@@ -91,11 +91,13 @@ describe('ConciliacaoManual', () => {
     });
   });
 
-  it('botão Importar extrato chama /extrato/importar via postForm', async () => {
-    mockPostForm.mockResolvedValue({ importados: 265, conta_id: 'conta-1' });
+  it('importa o PDF enviado para o projeto via postForm', async () => {
+    mockPostForm.mockResolvedValue({ importados: 265, ja_existentes: 2 });
     render(<ConciliacaoManual projetoId="projeto-123" />);
 
-    await waitFor(() => screen.getByText(/Importar extrato/i));
+    const arquivo = new File(['%PDF-1.4'], 'extrato.pdf', { type: 'application/pdf' });
+    await waitFor(() => screen.getByLabelText(/Extrato PDF/i));
+    fireEvent.change(screen.getByLabelText(/Extrato PDF/i), { target: { files: [arquivo] } });
     fireEvent.click(screen.getByText(/Importar extrato/i));
 
     await waitFor(() => {
@@ -103,6 +105,8 @@ describe('ConciliacaoManual', () => {
         '/api/v1/projetos/projeto-123/extrato/importar',
         expect.any(FormData)
       );
+      const form = mockPostForm.mock.calls[0][1] as FormData;
+      expect(form.get('arquivo')).toBe(arquivo);
       expect(screen.getByText(/265 movimento\(s\) importado\(s\)/i)).toBeInTheDocument();
     });
   });

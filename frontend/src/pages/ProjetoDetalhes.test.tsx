@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 
 import { ProjetoDetalhes } from "./ProjetoDetalhes";
@@ -11,6 +11,7 @@ const api = vi.hoisted(() => ({
 
 vi.mock("../hooks/useAPI", () => ({ useAPI: () => api }));
 vi.mock("./ImportarModal", () => ({ ImportarModal: () => null }));
+vi.mock("./Dashboard", () => ({ Dashboard: () => null }));
 vi.mock("../components/AuditoriaProjeto", () => ({ AuditoriaProjeto: () => null }));
 vi.mock("../components/ConfrontoSalic", () => ({ ConfrontoSalic: () => null }));
 vi.mock("../components/DemonstrativoSaldos", () => ({ DemonstrativoSaldos: () => null }));
@@ -73,6 +74,7 @@ describe("ProjetoDetalhes - importação autônoma", () => {
   });
 
   afterEach(() => {
+    cleanup();
     vi.restoreAllMocks();
   });
 

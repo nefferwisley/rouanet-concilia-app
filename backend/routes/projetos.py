@@ -58,7 +58,7 @@ async def listar_projetos(page: int = 1, limit: int = 20, pronac: str | None = N
         total = await conn.fetchval("select count(*) from projetos where pronac ilike $1", filtro)
         rows = await conn.fetch(
             """
-            select p.id, p.pronac, p.nome, p.created_at,
+            select p.id, p.pronac, p.nome, p.proponente, p.created_at,
                    (select count(*) from transacoes t where t.projeto_id = p.id) as transacoes_count
             from projetos p where p.pronac ilike $1
             order by p.created_at desc limit $2 offset $3
@@ -69,7 +69,7 @@ async def listar_projetos(page: int = 1, limit: int = 20, pronac: str | None = N
         total = await conn.fetchval("select count(*) from projetos")
         rows = await conn.fetch(
             """
-            select p.id, p.pronac, p.nome, p.created_at,
+            select p.id, p.pronac, p.nome, p.proponente, p.created_at,
                    (select count(*) from transacoes t where t.projeto_id = p.id) as transacoes_count
             from projetos p order by p.created_at desc limit $1 offset $2
             """,
@@ -82,6 +82,7 @@ async def listar_projetos(page: int = 1, limit: int = 20, pronac: str | None = N
         "projetos": [
             {
                 "id": str(r["id"]), "pronac": r["pronac"], "nome": r["nome"],
+                "proponente": r["proponente"],
                 "transacoes_count": r["transacoes_count"],
                 "criado_em": r["created_at"].isoformat(),
             }

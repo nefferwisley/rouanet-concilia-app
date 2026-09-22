@@ -256,17 +256,21 @@ def _resolver_entrada(
 def _extrair_zip(zip_bytes: bytes, destino: Path) -> None:
     """Extrai com proteção contra zip-slip (caminhos tipo ../ fora do destino)."""
     destino.mkdir(parents=True, exist_ok=True)
-    raiz = destino.resolve()
     with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
         for membro in zf.infolist():
-            alvo = (destino / membro.filename).resolve()
-            if not str(alvo).startswith(str(raiz)):
-                raise RuntimeError(f"ZIP contém caminho inseguro: {membro.filename}")
+            alvo = _destino_seguro(destino, membro.filename)
             if membro.is_dir():
                 alvo.mkdir(parents=True, exist_ok=True)
             else:
                 alvo.parent.mkdir(parents=True, exist_ok=True)
                 alvo.write_bytes(zf.read(membro))
+
+
+def _destino_seguro(raiz: Path, nome: str) -> Path:
+    destino = (raiz / nome).resolve()
+    if destino == raiz.resolve() or not destino.is_relative_to(raiz.resolve()):
+        raise RuntimeError(f"Arquivo contém caminho inseguro: {nome}")
+    return destino
 
 
 def _achar_raiz_do_zip(raiz: Path) -> Path:
@@ -298,7 +302,7 @@ def _sincronizar_drive(drive_link: str, base: Path) -> Path:
         total = 0
         for arq in arquivos:
             if arq.get("mimeType") == "application/vnd.google-apps.folder":
-                sub = pasta_local / arq["name"]
+                sub = _destino_seguro(pasta_local, arq["name"])
                 sub.mkdir(parents=True, exist_ok=True)
                 total += baixar_para(
                     f"https://drive.google.com/drive/folders/{arq['id']}", sub
@@ -308,7 +312,7 @@ def _sincronizar_drive(drive_link: str, base: Path) -> Path:
             if conteudo is None:
                 logger.warning("Falha ao baixar '%s' do Drive — pulando.", arq.get("name"))
                 continue
-            (pasta_local / arq["name"]).write_bytes(conteudo)
+            _destino_seguro(pasta_local, arq["name"]).write_bytes(conteudo)
             total += 1
         return total
 
@@ -832,7 +836,7 @@ async def executar_importacao_pasta_bg(
                             continue
                         hashes_salvos.add(m_hash)
                         
-                        caminho_dest = pag_dir / Path(member)
+                        caminho_dest = _destino_seguro(pag_dir, member)
                         caminho_dest.parent.mkdir(parents=True, exist_ok=True)
                         caminho_dest.write_bytes(member_bytes)
             else:
@@ -841,7 +845,7 @@ async def executar_importacao_pasta_bg(
                     continue
                 hashes_salvos.add(f_hash)
                 
-                caminho_dest = pag_dir / Path(nome_arq)
+                caminho_dest = _destino_seguro(pag_dir, nome_arq)
                 caminho_dest.parent.mkdir(parents=True, exist_ok=True)
                 caminho_dest.write_bytes(c_bytes)
 

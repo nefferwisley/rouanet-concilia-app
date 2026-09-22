@@ -143,6 +143,25 @@ def test_extrair_zip_rejeita_path_traversal(tmp_path):
     assert not (tmp_path / "fora.txt").exists()
 
 
+def test_extrair_zip_rejeita_pasta_irma_com_mesmo_prefixo(tmp_path):
+    destino = tmp_path / "dest"
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        zf.writestr("../dest_outra/fora.txt", "escapou")
+    with pytest.raises(RuntimeError):
+        cs._extrair_zip(buf.getvalue(), destino)
+    assert not (tmp_path / "dest_outra" / "fora.txt").exists()
+
+
+def test_destino_seguro_rejeita_nome_fora_da_pasta(tmp_path):
+    raiz = tmp_path / "pagamentos"
+    assert cs._destino_seguro(raiz, "sub/doc.pdf") == (raiz / "sub/doc.pdf").resolve()
+    with pytest.raises(RuntimeError):
+        cs._destino_seguro(raiz, "../fora.pdf")
+    with pytest.raises(RuntimeError):
+        cs._destino_seguro(raiz, str(tmp_path / "fora.pdf"))
+
+
 def test_extrair_zip_cria_subdiretorios(tmp_path):
     destino = tmp_path / "dest"
     buf = io.BytesIO()

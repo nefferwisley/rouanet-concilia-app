@@ -5,24 +5,24 @@ Roda as etapas 001→006 (parse de comprovantes e extratos, conciliação,
 planilha, relatório e pasta zipada) em BackgroundTasks — mesmo padrão de
 importacoes.py — e expõe o status por polling + downloads dos artefatos.
 
-Entrada da execução (pode combinar): ZIP (.zip) com a pasta dos documentos,
-ou caminho de pasta local (form 'pasta'), ou link de pasta do Google Drive
-(form 'drive_link'). Sem nenhum deles, usa a pasta padrão do servidor
-(PASTA_1961 ou '3. 1961/' na raiz do repo) — ver services/conciliacao_service.py.
+Entrada da execução: ZIP (.zip) com a pasta dos documentos enviado pelo
+usuário. Pastas locais do servidor e links do Drive não são aceitos pela rota
+pública — ver services/conciliacao_service.py.
 """
+import hashlib
 import json
 import logging
 from datetime import date
-from decimal import Decimal
 from pathlib import Path
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
+from starlette.concurrency import run_in_threadpool
 
 from backend.config import settings
 from backend.database import get_conn
-from backend.services import conciliacao_service
-from motor.extrato_importer import calcular_status_movimentos, tipo_por_sinal
+from backend.services import conciliacao_service, extrato_projeto_service
+from backend.services.storage_service import criar_arquivo_se_ausente
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["conciliacao"])
@@ -116,9 +116,6 @@ def _motivo_pendencia(movimento: dict, candidatos: list[dict]) -> str:
     return "Pagamento no extrato sem lançamento correspondente na planilha."
 
 _MEDIA = conciliacao_service._MEDIA_POR_SUFIXO
-_PARSED_DIR = conciliacao_service._REPO_RAIZ / "motor" / "_parsed"
-
-
 @router.post("/api/v1/conciliar", status_code=202)
 async def iniciar_conciliacao(
     background_tasks: BackgroundTasks,
@@ -129,10 +126,15 @@ async def iniciar_conciliacao(
 ):
     """Inicia a conciliação da pasta do Projeto 1961. Retorna 202 + conciliacao_id.
 
-    O usuário manda pelo menos uma das fontes (ZIP / pasta local / drive_link);
-    se mandar nenhuma, o backend usa a pasta padrão local (ideal em dev).
+    A API pública aceita apenas um ZIP enviado pelo usuário. Caminhos locais e
+    links do Drive exigem uma autorização de projeto que esta rota não possui.
     """
     conn, user_id = dep
+
+    if pasta is not None or drive_link is not None:
+        raise HTTPException(400, "Envie um ZIP. Pastas do servidor e links do Drive não são aceitos nesta rota.")
+    if zip_1961 is None or not zip_1961.filename:
+        raise HTTPException(400, "Envie um arquivo ZIP para conciliar.")
 
     zip_bytes: bytes | None = None
     if zip_1961 is not None and zip_1961.filename:
@@ -150,8 +152,8 @@ async def iniciar_conciliacao(
         conciliacao_id,
         user_id,
         zip_bytes=zip_bytes,
-        pasta=pasta,
-        drive_link=drive_link,
+        pasta=None,
+        drive_link=None,
     )
 
     base = "/api/v1/conciliacao"
@@ -309,65 +311,101 @@ async def baixar_artefato(
 # Conciliação manual — extrato real × lançamento (P3)
 # ============================================================
 #
-# Ponte entre o pipeline de arquivo (001→006, acima) e o schema do banco:
-# importar_extrato lê motor/_parsed/movimentos.json + cruzamento.json (já
-# gerados por uma execução do fluxo acima) e grava em extrato_movimentos,
-# com o status resolvido pelo cruzamento — CONCILIADO fica só marcado,
-# PENDENTE é o que a tela de conciliação manual existe pra resolver.
-# Ligar um movimento a uma transação real é sempre decisão humana aqui:
-# comprovante_pdf (cruzamento) e docLink (transações importadas) usam
-# nomenclaturas diferentes, não dá pra casar com segurança automaticamente.
+# O arquivo é recebido nesta rota, vinculado ao projeto e registrado em
+# documentos_projeto/importacoes. Nenhum artefato global é lido.
 
 
 @router.post("/api/v1/projetos/{projeto_id}/extrato/importar", status_code=201)
-async def importar_extrato(projeto_id: str, dep=Depends(get_conn)):
-    conn, _ = dep
+async def importar_extrato(
+    projeto_id: str,
+    arquivo: UploadFile = File(...),
+    dep=Depends(get_conn),
+):
+    conn, user_id = dep
     projeto = await conn.fetchrow("select id from projetos where id = $1", projeto_id)
     if not projeto:
         raise HTTPException(404, "Projeto não encontrado (ou sem permissão via RLS).")
 
-    caminho_mov = _PARSED_DIR / "movimentos.json"
-    caminho_cruz = _PARSED_DIR / "cruzamento.json"
-    if not caminho_mov.exists() or not caminho_cruz.exists():
-        raise HTTPException(
-            409, "Extrato ainda não foi parseado — rode 'Conciliar Pasta 1961' primeiro."
-        )
+    nome = (arquivo.filename or "").replace("\\", "/").rsplit("/", 1)[-1]
+    if not nome.lower().endswith(".pdf"):
+        raise HTTPException(400, "Envie um extrato bancário em PDF.")
+    limite = settings.max_upload_mb * 1024 * 1024
+    conteudo = await arquivo.read(limite + 1)
+    if len(conteudo) > limite:
+        raise HTTPException(413, f"O extrato excede o limite de {settings.max_upload_mb} MB.")
+    if b"%PDF-" not in conteudo[:1024]:
+        raise HTTPException(422, "O arquivo enviado não é um PDF válido.")
 
-    movimentos = json.loads(caminho_mov.read_text(encoding="utf-8"))
-    cruzamento = json.loads(caminho_cruz.read_text(encoding="utf-8"))
-    status_por_chave = calcular_status_movimentos(cruzamento)
+    try:
+        movimentos = await run_in_threadpool(extrato_projeto_service.preparar_movimentos_pdf, conteudo)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+    sha256 = hashlib.sha256(conteudo).hexdigest()
+    arquivo_ref, _ = await run_in_threadpool(
+        criar_arquivo_se_ausente,
+        f"{projeto_id}/extratos/{sha256}.pdf",
+        conteudo,
+    )
 
     conta = await conn.fetchrow("select id from contas_captadoras where projeto_id = $1", projeto_id)
     if not conta:
         conta = await conn.fetchrow(
-            "insert into contas_captadoras (projeto_id) values ($1) returning id", projeto_id
+            "insert into contas_captadoras (projeto_id) values ($1) "
+            "on conflict (projeto_id) do nothing returning id",
+            projeto_id,
         )
+        if not conta:
+            conta = await conn.fetchrow("select id from contas_captadoras where projeto_id = $1", projeto_id)
     conta_id = conta["id"]
 
     importados = 0
-    for m in movimentos:
-        chave = (m["fonte"], m["doc"])
-        status = status_por_chave.get(chave, "PENDENTE")
-        valor = Decimal(str(m["valor"]))
-        if m["sinal"] == "D":
-            valor = -valor
-        try:
-            data_mov = date.fromisoformat(str(m["data"]))
-        except (TypeError, ValueError):
-            data_mov = date(1970, 1, 1)
-        await conn.execute(
+    for data_mov, historico, documento, tipo, valor in movimentos:
+        movimento_id = await conn.fetchval(
             """
-            insert into extrato_movimentos (conta_id, data, historico, documento, tipo, valor, status_conciliacao)
-            values ($1, $2, $3, $4, $5, $6, $7)
-            on conflict (conta_id, data, documento, valor) do update set
-                historico = excluded.historico, status_conciliacao = excluded.status_conciliacao
+            insert into extrato_movimentos
+                (conta_id, data, historico, documento, tipo, valor)
+            values ($1, $2, $3, $4, $5, $6)
+            on conflict (conta_id, data, documento, valor) do nothing
+            returning id
             """,
-            conta_id, data_mov, m.get("historico") or m.get("favorecido"),
-            m["doc"], tipo_por_sinal(m["sinal"]), valor, status,
+            conta_id, data_mov, historico, documento, tipo, valor,
         )
-        importados += 1
+        if movimento_id:
+            importados += 1
 
-    return {"importados": importados, "conta_id": str(conta_id)}
+    documento = await conn.fetchrow(
+        """
+        insert into documentos_projeto
+            (projeto_id, origem, nome_arquivo, arquivo_ref, tamanho_bytes, status, criado_por)
+        values ($1, 'upload', $2, $3, $4, 'processado', $5)
+        returning id
+        """,
+        projeto_id, nome, arquivo_ref, len(conteudo), user_id,
+    )
+    importacao = await conn.fetchrow(
+        """
+        insert into importacoes
+            (projeto_id, criado_por, status, modo, linhas_total, linhas_processadas,
+             linhas_ok, arquivo_json, relatorio, tempo_fim)
+        values ($1, $2, 'sucesso', 'commit', $3, $3, $4, $5::jsonb, $6::jsonb, now())
+        returning id
+        """,
+        projeto_id, user_id, len(movimentos), importados,
+        json.dumps({
+            "tipo": "extrato_pdf",
+            "nome_arquivo": nome,
+            "sha256": sha256,
+            "documento_projeto_id": str(documento["id"]),
+        }),
+        json.dumps({"importados": importados, "ja_existentes": len(movimentos) - importados}),
+    )
+    return {
+        "importacao_id": str(importacao["id"]),
+        "documento_projeto_id": str(documento["id"]),
+        "importados": importados,
+        "ja_existentes": len(movimentos) - importados,
+    }
 
 
 @router.get("/api/v1/projetos/{projeto_id}/extrato/pendentes")
@@ -549,63 +587,6 @@ async def criar_lancamento_a_partir_do_movimento(
         "valor_bruto": float(transacao["valor_bruto"]),
         "status": transacao["status"],
         "movimento_id": movimento_id,
-    }
-
-
-@router.post("/api/v1/projetos/{projeto_id}/extrato/{movimento_id}/criar-lancamento")
-async def criar_lancamento_a_partir_do_movimento(
-    projeto_id: str,
-    movimento_id: str,
-    dep=Depends(get_conn),
-):
-    """Cria um lançamento na planilha (tabela transacoes) a partir de um
-    movimento do extrato, e vincula ambos (conciliação manual)."""
-    conn, user_id = dep
-
-    movimento = await conn.fetchrow(
-        """
-        select m.id, m.data, m.historico, m.valor from extrato_movimentos m
-        join contas_captadoras c on c.id = m.conta_id
-        where m.id = $1 and c.projeto_id = $2
-        """,
-        movimento_id, projeto_id,
-    )
-    if not movimento:
-        raise HTTPException(404, "Movimento não encontrado (ou sem permissão via RLS).")
-
-    # Inserir transação
-    valor = abs(movimento["valor"])
-    transacao_id = await conn.fetchval(
-        """
-        insert into transacoes (projeto_id, fornecedor, data_pagamento, valor_bruto, valor_liquido, status)
-        values ($1, $2, $3, $4, $4, 'CONCILIADO_OK')
-        returning id
-        """,
-        projeto_id, movimento["historico"], movimento["data"], valor,
-    )
-
-    # Reconciliar
-    await conn.execute(
-        """
-        insert into conciliacao_extrato (movimento_id, transacao_id, metodo, conciliado_por)
-        values ($1, $2, 'MANUAL', $3)
-        on conflict (movimento_id) do update set
-            transacao_id = excluded.transacao_id, metodo = 'MANUAL',
-            conciliado_por = excluded.conciliado_por, conciliado_em = now()
-        """,
-        movimento_id, transacao_id, user_id,
-    )
-
-    # Marcar movimento como conciliado
-    await conn.execute(
-        "update extrato_movimentos set status_conciliacao = 'CONCILIADO' where id = $1", movimento_id
-    )
-
-    return {
-        "movimento_id": movimento_id,
-        "transacao_id": str(transacao_id),
-        "status_conciliacao": "CONCILIADO",
-        "status": "CONCILIADO_OK"
     }
 
 

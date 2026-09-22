@@ -33,7 +33,7 @@ const menuItems: NavItem[] = [
   { name: "Captações", path: "/captacoes", icon: CircleDollarSign },
   { name: "Lançamentos", path: "/lancamentos", icon: Receipt },
   { name: "Relatórios", path: "/relatorios", icon: BarChart2 },
-  { name: "Alertas", path: "/alertas", icon: Bell, badge: 12 },
+  { name: "Alertas", path: "/alertas", icon: Bell },
   { name: "Agenda", path: "/agenda", icon: CalendarDays },
   { name: "Documentos", path: "/documentos", icon: FileText },
   { name: "Usuários", path: "/usuarios", icon: Users },
@@ -89,14 +89,20 @@ export function Sidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean;
 
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Navegação principal">
           {menuItems.map((item) => {
-            const destino = item.path === "/" && projetoSelecionadoId
-              ? `/projetos/${projetoSelecionadoId}/visao-geral`
-              : item.path;
-            const isActive = item.path === "/"
-              ? pathname === "/" || /^\/projetos\/[^/]+\/visao-geral$/.test(pathname)
-              : item.path === "/projetos"
-                ? pathname.startsWith("/projetos") && !/^\/projetos\/[^/]+\/visao-geral$/.test(pathname)
-                : pathname.startsWith(item.path);
+            const moduloDoProjeto = ["/captacoes", "/lancamentos", "/documentos"].includes(item.path);
+            let destino = item.path;
+            if (moduloDoProjeto) {
+              destino = projetoSelecionadoId ? `/projetos/${projetoSelecionadoId}${item.path}` : "/projetos";
+            } else if (item.path === "/" && projetoSelecionadoId) {
+              destino = `/projetos/${projetoSelecionadoId}/visao-geral`;
+            }
+            const isActive = moduloDoProjeto
+              ? Boolean(projetoSelecionadoId) && pathname === destino
+              : item.path === "/"
+                ? pathname === "/" || /^\/projetos\/[^/]+\/visao-geral$/.test(pathname)
+                : item.path === "/projetos"
+                  ? pathname === "/projetos"
+                  : pathname.startsWith(item.path);
 
             return (
               <Link

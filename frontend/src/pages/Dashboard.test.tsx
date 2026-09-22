@@ -30,7 +30,7 @@ function auditoria(total: number, totalOk: number, debitado: number) {
     transacoes: Array.from({ length: total }, (_, indice) => ({
       id: `t-${indice}`,
       fornecedor: `Fornecedor ${indice}`,
-      data_pagamento: `2026-0${indice + 1}-01`,
+      data_pagamento: `2026-${String(indice + 1).padStart(2, "0")}-01`,
       valor_bruto: debitado / Math.max(total, 1),
       tem_nf: indice < totalOk,
       tem_comprovante: indice < totalOk,
@@ -86,6 +86,22 @@ describe("Dashboard por projeto", () => {
     await waitFor(() => expect(screen.getByTestId("status-conciliadas")).toHaveTextContent("4"));
     expect(screen.getByTestId("status-em-analise")).toHaveTextContent("3");
     expect(screen.getByTestId("status-pendencias")).toHaveTextContent("3");
+  });
+
+  it("mantém o painel quando a API retorna uma data inválida", async () => {
+    api.get.mockImplementation((url: string) => {
+      if (url === "/api/v1/projetos/p-1") return Promise.resolve({ ...p1, proponente: "Instituto Um" });
+      if (url.includes("/api/v1/projetos/p-1/auditoria")) {
+        const resposta = auditoria(1, 0, 100);
+        resposta.transacoes[0].data_pagamento = "data-invalida";
+        return Promise.resolve(resposta);
+      }
+      return Promise.reject(new Error(`URL inesperada: ${url}`));
+    });
+
+    render(<MemoryRouter><Dashboard /></MemoryRouter>);
+    await screen.findByText("Instituto Um");
+    expect(screen.getByTestId("metric-pagamentos")).toHaveTextContent("1");
   });
 
   it("expõe regiões e tabelas navegáveis do dashboard", async () => {

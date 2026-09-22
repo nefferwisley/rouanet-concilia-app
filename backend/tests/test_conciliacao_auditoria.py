@@ -11,6 +11,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from backend.main import app
+from backend.database import get_conn
 from backend.routes import auditoria, conciliacao
 
 
@@ -25,6 +26,26 @@ def test_iniciar_conciliacao_requires_auth():
     """POST /conciliar - sem auth deve retornar 401 (antes do Form/Upload)"""
     response = client.post("/api/v1/conciliar")
     assert response.status_code == 401
+
+
+def test_iniciar_conciliacao_recusa_pasta_local_autenticada():
+    app.dependency_overrides[get_conn] = lambda: (None, "usuario-teste")
+    try:
+        response = client.post("/api/v1/conciliar", data={"pasta": "C:/dados/privados"})
+        assert response.status_code == 400
+        assert "Pastas do servidor" in response.json()["detail"]
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_iniciar_conciliacao_exige_zip_autenticado():
+    app.dependency_overrides[get_conn] = lambda: (None, "usuario-teste")
+    try:
+        response = client.post("/api/v1/conciliar")
+        assert response.status_code == 400
+        assert "ZIP" in response.json()["detail"]
+    finally:
+        app.dependency_overrides.clear()
 
 
 # ============================================================
@@ -59,6 +80,15 @@ def test_criar_lancamento_a_partir_do_movimento_requires_auth():
         "/api/v1/projetos/fake-uuid/extrato/fake-uuid/criar-lancamento"
     )
     assert response.status_code == 401
+
+
+def test_criar_lancamento_tem_uma_unica_rota():
+    rotas = [
+        rota for rota in conciliacao.router.routes
+        if getattr(rota, "path", "") == "/api/v1/projetos/{projeto_id}/extrato/{movimento_id}/criar-lancamento"
+        and "POST" in getattr(rota, "methods", set())
+    ]
+    assert len(rotas) == 1
 
 
 # ============================================================
@@ -139,6 +169,93 @@ def test_media_types_dos_artefatos():
 def test_importar_extrato_requires_auth():
     response = client.post("/api/v1/projetos/fake-uuid/extrato/importar")
     assert response.status_code == 401
+
+
+def test_importar_extrato_nao_grava_arquivos_globais():
+    class ConnFake:
+        async def fetchrow(self, _query, *_args):
+            return {"id": "projeto-teste"}
+
+        async def execute(self, *_args):
+            raise AssertionError("Não deve gravar movimentos globais")
+
+    app.dependency_overrides[get_conn] = lambda: (ConnFake(), "usuario-teste")
+    try:
+        response = client.post("/api/v1/projetos/projeto-teste/extrato/importar")
+        assert response.status_code == 422
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_importar_extrato_exige_acesso_ao_projeto(monkeypatch):
+    class ConnFake:
+        async def fetchrow(self, _query, *_args):
+            return None
+
+    monkeypatch.setattr(
+        conciliacao.extrato_projeto_service, "preparar_movimentos_pdf",
+        lambda _conteudo: pytest.fail("Não deve ler arquivo de outro projeto"),
+    )
+    app.dependency_overrides[get_conn] = lambda: (ConnFake(), "usuario-teste")
+    try:
+        response = client.post(
+            "/api/v1/projetos/projeto-alheio/extrato/importar",
+            files={"arquivo": ("extrato.pdf", b"%PDF-1.4 exemplo", "application/pdf")},
+        )
+        assert response.status_code == 404
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_importar_extrato_preserva_movimentos_existentes(monkeypatch):
+    from datetime import date
+    from decimal import Decimal
+
+    consultas = []
+
+    class ConnFake:
+        async def fetchrow(self, query, *args):
+            consultas.append((query, args))
+            if "select id from projetos" in query:
+                return {"id": "projeto-teste"}
+            if "select id from contas_captadoras" in query:
+                return {"id": "conta-teste"}
+            if "insert into documentos_projeto" in query:
+                return {"id": "documento-teste"}
+            if "insert into importacoes" in query:
+                return {"id": "importacao-teste"}
+            raise AssertionError(query)
+
+        async def fetchval(self, query, *args):
+            consultas.append((query, args))
+            return "movimento-novo" if args[3] == "doc-novo" else None
+
+    monkeypatch.setattr(
+        conciliacao.extrato_projeto_service,
+        "preparar_movimentos_pdf",
+        lambda _conteudo: [
+            (date(2026, 1, 1), "Novo", "doc-novo", "DEBITO_PAGAMENTO", Decimal("-10.00")),
+            (date(2026, 1, 2), "Existente", "doc-existente", "DEBITO_PAGAMENTO", Decimal("-20.00")),
+        ],
+    )
+    monkeypatch.setattr(conciliacao, "criar_arquivo_se_ausente", lambda _chave, _dados: ("projeto-teste/extratos/hash.pdf", True))
+    app.dependency_overrides[get_conn] = lambda: (ConnFake(), "usuario-teste")
+    try:
+        response = client.post(
+            "/api/v1/projetos/projeto-teste/extrato/importar",
+            files={"arquivo": ("extrato.pdf", b"%PDF-1.4 exemplo", "application/pdf")},
+        )
+        assert response.status_code == 201
+        assert response.json()["importados"] == 1
+        assert response.json()["ja_existentes"] == 1
+        assert response.json()["documento_projeto_id"] == "documento-teste"
+        sql = " ".join(query.lower() for query, _ in consultas)
+        assert "on conflict (conta_id, data, documento, valor) do nothing" in sql
+        assert "update extrato_movimentos" not in sql
+        assert "delete from" not in sql
+        assert "insert into importacoes" in sql
+    finally:
+        app.dependency_overrides.clear()
 
 
 def test_listar_extrato_pendentes_requires_auth():

@@ -43,7 +43,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const rotaProjeto = pathname.match(/^\/projetos\/([^/]+)\/visao-geral$/)?.[1]
+    const rotaProjeto = pathname.match(/^\/projetos\/([^/]+)\/(?:visao-geral|auditoria|captacoes|lancamentos|documentos|entrega)$/)?.[1]
       ?? pathname.match(/^\/projeto\/([^/]+)$/)?.[1];
     if (rotaProjeto && projetos.some((projeto) => projeto.id === rotaProjeto)) {
       selecionarProjeto(rotaProjeto);

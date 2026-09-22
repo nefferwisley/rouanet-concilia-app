@@ -5,13 +5,12 @@ import { RelatorioCumulativo } from "../components/RelatorioCumulativo";
 import { useAPI } from "../hooks/useAPI";
 import { Relatorio } from "../types";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
-
 export function RelatorioPage() {
   const { id } = useParams<{ id: string }>();
   const api = useAPI();
   const [relatorio, setRelatorio] = useState<Relatorio | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [erroDownload, setErroDownload] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -20,6 +19,16 @@ export function RelatorioPage() {
       .then(setRelatorio)
       .catch((e) => setErro(e instanceof Error ? e.message : "Erro ao carregar relatório."));
   }, [api, id]);
+
+  async function baixar(formato: "csv" | "markdown") {
+    if (!id) return;
+    setErroDownload(null);
+    try {
+      await api.download(`/api/v1/relatorios/${id}?format=${formato}`, `relatorio_${id}.${formato === "csv" ? "csv" : "md"}`);
+    } catch (falha) {
+      setErroDownload(falha instanceof Error ? falha.message : "Falha ao baixar relatório.");
+    }
+  }
 
   if (erro) return <div className="max-w-3xl mx-auto p-6 text-red-600">{erro}</div>;
   if (!relatorio) return <div className="max-w-3xl mx-auto p-6">Carregando...</div>;
@@ -62,9 +71,10 @@ export function RelatorioPage() {
         </div>
       )}
 
+      {erroDownload && <p role="alert" className="text-sm text-red-600">{erroDownload}</p>}
       <div className="flex gap-2">
-        <a className="btn-secondary" href={`${API_URL}/api/v1/relatorios/${id}?format=csv`}>↓ CSV</a>
-        <a className="btn-secondary" href={`${API_URL}/api/v1/relatorios/${id}?format=markdown`}>↓ Markdown</a>
+        <button type="button" className="btn-secondary" onClick={() => void baixar("csv")}>↓ CSV</button>
+        <button type="button" className="btn-secondary" onClick={() => void baixar("markdown")}>↓ Markdown</button>
       </div>
     </div>
   );

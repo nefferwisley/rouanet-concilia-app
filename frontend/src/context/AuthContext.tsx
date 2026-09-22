@@ -6,7 +6,7 @@ interface AuthContextValue {
   user: AuthUser | null;
   setToken: (t: string | null) => void;
   login: (e: string, p: string) => Promise<void>;
-  signup: (e: string, p: string) => Promise<void>;
+  signup: (e: string, p: string) => Promise<boolean>;
   logout: () => void;
   renovar: () => Promise<boolean>;
 }
@@ -106,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(sessao.user);
       localStorage.setItem("rc_user", JSON.stringify(sessao.user));
     }
+    return Boolean(sessao.access_token);
   }
 
   function logout() {
